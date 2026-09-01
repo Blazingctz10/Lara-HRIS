@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Filament\Resources\Reimbursements;
+
+use App\Filament\Resources\Reimbursements\Pages\CreateReimbursement;
+use App\Filament\Resources\Reimbursements\Pages\EditReimbursement;
+use App\Filament\Resources\Reimbursements\Pages\ListReimbursements;
+use App\Filament\Resources\Reimbursements\Schemas\ReimbursementForm;
+use App\Filament\Resources\Reimbursements\Tables\ReimbursementsTable;
+use App\Models\Reimbursement;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
+
+class ReimbursementResource extends Resource
+{
+    protected static ?string $model = Reimbursement::class;
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Payroll & Finansial';
+
+    protected static ?string $navigationLabel = 'Klaim Reimbursement & AO';
+
+    protected static ?string $modelLabel = 'Klaim Reimbursement';
+
+    protected static ?string $pluralModelLabel = 'Daftar Klaim Reimbursement Pegawai';
+
+    protected static ?int $navigationSort = 2;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->accessibleBy();
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return ReimbursementForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return ReimbursementsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListReimbursements::route('/'),
+            'create' => CreateReimbursement::route('/create'),
+            'edit' => EditReimbursement::route('/{record}/edit'),
+        ];
+    }
+}
