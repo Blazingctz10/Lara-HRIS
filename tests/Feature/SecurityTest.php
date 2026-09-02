@@ -114,5 +114,8 @@ class SecurityTest extends TestCase
         // Regular employee role should not have access to admin panel
         $this->assertFalse($employee->canAccessPanel(\Filament\Facades\Filament::getPanel('admin')));
         $this->assertTrue($employee->canAccessPanel(\Filament\Facades\Filament::getPanel('portal')));
+
+        $response = $this->get('/portal');
+        $response->assertStatus(200);
     }
 }

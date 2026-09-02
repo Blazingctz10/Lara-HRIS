@@ -21,6 +21,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (User::where('email', 'admin@bprbandaraya.com')->exists()) {
+            return;
+        }
+
         // 1. Seed Branches (Sesuai Data Resmi BPR Banda Raya Batam)
         $ho = Branch::create([
             'code' => 'HO-001',
