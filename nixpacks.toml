@@ -1,6 +1,9 @@
+[variables]
+NIXPACKS_PHP_EXTENSIONS = "intl,pdo,pdo_sqlite,sqlite3,gd,zip,mbstring,xml,bcmath,curl,fileinfo,openssl,tokenizer,ctype,filter,session,iconv,opcache"
+
 [phases.setup]
 nixPkgs = [
-  '(php83.withExtensions (pe: with pe; [ pdo pdo_sqlite sqlite3 intl gd zip mbstring xml bcmath curl fileinfo openssl tokenizer ctype filter session iconv opcache ]))',
+  'php83',
   'php83Packages.composer',
   'nodejs_20'
 ]
