@@ -338,7 +338,7 @@
           </div>
         @endif
 
-        <form method="POST" action="{{ url('/login') }}">
+        <form method="POST" action="/login">
           @csrf
 
           {{-- Anti-Bot Honeypot Trap --}}

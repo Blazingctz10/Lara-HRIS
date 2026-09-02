@@ -40,6 +40,10 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
+        if (config('app.env') === 'production' || env('APP_ENV') === 'production' || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         Employee::observe(EmployeeObserver::class);
         LeaveRequest::observe(LeaveRequestObserver::class);
     }
