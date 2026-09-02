@@ -35,8 +35,16 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('database.default') === 'sqlite') {
             $dbPath = config('database.connections.sqlite.database');
-            if ($dbPath && !file_exists($dbPath) && $dbPath !== ':memory:') {
-                @touch($dbPath);
+            if ($dbPath && $dbPath !== ':memory:') {
+                $dir = dirname($dbPath);
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                if (!file_exists($dbPath)) {
+                    @touch($dbPath);
+                }
+                @chmod($dir, 0777);
+                @chmod($dbPath, 0666);
             }
         }
 

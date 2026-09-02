@@ -21,7 +21,7 @@ class ReimbursementResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Payroll & Finansial';
+    protected static string|UnitEnum|null $navigationGroup = 'Penggajian & Klaim';
 
     protected static ?string $navigationLabel = 'Klaim Reimbursement & AO';
 

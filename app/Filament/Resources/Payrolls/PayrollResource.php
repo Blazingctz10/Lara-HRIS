@@ -21,7 +21,7 @@ class PayrollResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Penggajian (Payroll)';
+    protected static string|UnitEnum|null $navigationGroup = 'Penggajian & Klaim';
 
     protected static ?string $navigationLabel = 'Arsip Slip Gaji';
 

@@ -21,7 +21,7 @@ class OvertimeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-fire';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Manajemen Presensi';
+    protected static string|UnitEnum|null $navigationGroup = 'Presensi & Kehadiran';
 
     protected static ?string $navigationLabel = 'Lembur / SPK Lembur';
 
