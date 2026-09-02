@@ -33,6 +33,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('database.default') === 'sqlite') {
+            $dbPath = config('database.connections.sqlite.database');
+            if ($dbPath && !file_exists($dbPath) && $dbPath !== ':memory:') {
+                @touch($dbPath);
+            }
+        }
+
         Employee::observe(EmployeeObserver::class);
         LeaveRequest::observe(LeaveRequestObserver::class);
     }
