@@ -21,27 +21,17 @@ class SecurityHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        // Remove X-Powered-By from Symfony response headers
-        $response->headers->remove('X-Powered-By');
+        if ($response instanceof Response) {
+            $response->headers->remove('X-Powered-By');
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('X-XSS-Protection', '1; mode=block');
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+            $response->headers->set('Permissions-Policy', 'camera=*, geolocation=*, microphone=()');
 
-        // Prevent Clickjacking attacks
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-
-        // Prevent MIME type sniffing
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-
-        // Enable browser XSS filtering
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
-
-        // Control referrer information sent in headers
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-        // Restrict potentially sensitive browser features while allowing camera & geolocation
-        $response->headers->set('Permissions-Policy', 'camera=*, geolocation=*, microphone=()');
-
-        // HSTS (HTTP Strict Transport Security) - active when requested over HTTPS
-        if ($request->isSecure()) {
-            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+            if ($request->isSecure()) {
+                $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+            }
         }
 
         return $response;
