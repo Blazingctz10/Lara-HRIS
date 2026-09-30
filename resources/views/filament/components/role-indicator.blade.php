@@ -42,7 +42,16 @@
     $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'branch_manager']);
 @endphp
 
-<div class="m3-role-bar" style="display: flex; align-items: center; gap: 0.6rem; margin-right: 0.75rem;">
+<style>
+    @media (max-width: 1320px) {
+        .m3-role-branch-label,
+        .m3-role-branch-dot {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="m3-role-bar" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-right: 0.5rem;">
     <!-- Active Role Badge -->
     <div style="
         display: inline-flex;
@@ -57,11 +66,12 @@
         font-weight: 800;
         letter-spacing: 0.3px;
         white-space: nowrap;
+        flex-shrink: 0;
     ">
         <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $roleConfig['color'] }};"></span>
         <span>{{ $roleConfig['label'] }}</span>
-        <span style="opacity: 0.5;">&bull;</span>
-        <span style="font-weight: 600; opacity: 0.9;">{{ $branchName }}</span>
+        <span class="m3-role-branch-dot" style="opacity: 0.5;">&bull;</span>
+        <span class="m3-role-branch-label" style="font-weight: 600; opacity: 0.9;">{{ $branchName }}</span>
     </div>
 
     <!-- Quick Switcher to Admin / Portal for Privileged Roles -->
@@ -81,6 +91,7 @@
                 text-decoration: none;
                 transition: all 0.2s ease;
                 white-space: nowrap;
+                flex-shrink: 0;
             " onmouseover="this.style.background='#ea580c'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(234, 88, 12, 0.12)'; this.style.color='#ea580c';">
                 <span>Panel HRD</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 12px; height: 12px;">
@@ -102,6 +113,7 @@
                 text-decoration: none;
                 transition: all 0.2s ease;
                 white-space: nowrap;
+                flex-shrink: 0;
             " onmouseover="this.style.background='#0E6838'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(14, 104, 56, 0.12)'; this.style.color='#0E6838';">
                 <span>Portal Karyawan</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 12px; height: 12px;">

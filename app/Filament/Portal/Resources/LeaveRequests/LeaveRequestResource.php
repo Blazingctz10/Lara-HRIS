@@ -18,7 +18,7 @@ class LeaveRequestResource extends Resource
 {
     protected static ?string $model = LeaveRequest::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-plus';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-check';
 
     protected static ?string $navigationLabel = 'Pengajuan Cuti Saya';
 

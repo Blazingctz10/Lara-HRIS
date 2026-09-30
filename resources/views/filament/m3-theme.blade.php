@@ -164,14 +164,55 @@ body.fi-body {
 /* =============================================================================
    2. FILAMENT TOPBAR & TOP NAVIGATION
    ============================================================================= */
+.fi-topbar-ctn {
+    overflow-x: visible !important;
+}
+
 .fi-topbar {
     background-color: var(--m3-surface-container-lowest) !important;
     border-bottom: 1px solid var(--m3-outline-variant) !important;
     box-shadow: var(--m3-elevation-1) !important;
+    overflow: visible !important;
+    padding-right: 1.5rem !important;
+    box-sizing: border-box !important;
 }
 
 .fi-topbar nav {
     background-color: transparent !important;
+    overflow: visible !important;
+    padding-right: 0.5rem !important;
+}
+
+.fi-topbar-nav-groups {
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+}
+
+.fi-topbar-nav-groups::-webkit-scrollbar {
+    display: none !important;
+}
+
+.fi-topbar-end {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding-right: 0.5rem !important;
+}
+
+.fi-user-menu {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.fi-user-menu-trigger {
+    flex-shrink: 0 !important;
+    min-width: 2.25rem !important;
+    min-height: 2.25rem !important;
 }
 
 .fi-topbar-item-btn {
@@ -457,8 +498,9 @@ body.fi-body {
    10. DROPDOWNS & USER MENU (M3 Surface Container & Full Name Display)
    ============================================================================= */
 .fi-dropdown-panel {
-    min-width: 18rem !important;
-    max-width: 24rem !important;
+    min-width: 20rem !important;
+    max-width: 28rem !important;
+    width: max-content !important;
     border-radius: 20px !important;
     border: 1px solid var(--m3-outline-variant) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
@@ -478,12 +520,16 @@ body.fi-body {
     margin-bottom: 0.35rem !important;
 }
 
+.fi-dropdown-header span,
+.fi-dropdown-header > span,
 .fi-dropdown-header .fi-dropdown-header-label,
 .fi-dropdown-list-item-label,
-.fi-user-menu-item-label {
+.fi-user-menu-item-label,
+.fi-user-menu-trigger-text {
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: unset !important;
+    word-break: break-word !important;
     font-weight: 700 !important;
     font-size: 0.9rem !important;
     color: var(--m3-on-surface) !important;
