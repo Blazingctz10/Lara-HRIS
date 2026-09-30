@@ -517,6 +517,173 @@ body.fi-body {
     transition: all 0.2s ease !important;
 }
 
+/* =============================================================================
+   11. MATERIAL 3 EXPRESSIVE MODALS & DIALOG POPUPS
+   Tactile 28px Containers, Frosted Scrim, M3 Action Pills & Elevated Toasts
+   ============================================================================= */
+
+/* Modal Scrim / Backdrop */
+.fi-modal-close-overlay {
+    background-color: rgba(13, 20, 16, 0.68) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+/* Modal Window Container */
+.fi-modal-window {
+    border-radius: 28px !important;
+    background-color: var(--m3-surface) !important;
+    border: 1px solid var(--m3-outline-variant) !important;
+    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(14, 104, 56, 0.08) !important;
+    overflow: hidden !important;
+    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+:is(.dark) .fi-modal-window {
+    background-color: var(--m3-surface-container-high) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 28px 72px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Slide-over Modals (Panel Slide from Edge) */
+.fi-modal-window.fi-modal-slide-over {
+    border-top-left-radius: 28px !important;
+    border-bottom-left-radius: 28px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* Modal Header */
+.fi-modal-header {
+    padding: 1.5rem 1.75rem 1.15rem !important;
+    border-bottom: 1px solid var(--m3-outline-variant) !important;
+    background-color: var(--m3-surface) !important;
+}
+
+:is(.dark) .fi-modal-header {
+    background-color: var(--m3-surface-container-high) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-modal-heading {
+    font-family: var(--m3-font-display) !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.015em !important;
+    color: var(--m3-on-surface) !important;
+}
+
+.fi-modal-description {
+    font-size: 0.875rem !important;
+    color: var(--m3-on-surface-variant) !important;
+    line-height: 1.5 !important;
+    margin-top: 0.35rem !important;
+}
+
+/* Modal Close Button */
+.fi-modal-close-btn {
+    border-radius: 9999px !important;
+    padding: 0.5rem !important;
+    color: var(--m3-on-surface-variant) !important;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+.fi-modal-close-btn:hover {
+    background-color: var(--m3-surface-container-highest) !important;
+    color: var(--m3-on-surface) !important;
+    transform: rotate(90deg);
+}
+
+/* Modal Content / Body */
+.fi-modal-content {
+    padding: 1.5rem 1.75rem !important;
+    color: var(--m3-on-surface) !important;
+}
+
+/* Modal Footer & Action Buttons */
+.fi-modal-footer {
+    padding: 1.15rem 1.75rem !important;
+    border-top: 1px solid var(--m3-outline-variant) !important;
+    background-color: var(--m3-surface-container-low) !important;
+}
+
+:is(.dark) .fi-modal-footer {
+    background-color: var(--m3-surface-container) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-modal-footer .fi-btn {
+    border-radius: 9999px !important; /* M3 Action Pill */
+    font-weight: 700 !important;
+    font-size: 0.875rem !important;
+    padding: 0.55rem 1.35rem !important;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+    letter-spacing: 0.1px !important;
+}
+
+.fi-modal-footer .fi-btn:hover {
+    transform: translateY(-1px) !important;
+}
+
+/* Danger Modal Action (Confirm Delete) */
+.fi-modal-footer .fi-btn-color-danger {
+    background-color: #DC2626 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
+}
+
+.fi-modal-footer .fi-btn-color-danger:hover {
+    background-color: #B91C1C !important;
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45) !important;
+}
+
+/* Secondary/Cancel Modal Action */
+.fi-modal-footer .fi-btn-color-gray {
+    background-color: transparent !important;
+    border: 1px solid var(--m3-outline) !important;
+    color: var(--m3-on-surface) !important;
+}
+
+.fi-modal-footer .fi-btn-color-gray:hover {
+    background-color: var(--m3-surface-container-high) !important;
+}
+
+/* Confirmation Dialog Icon Badge */
+.fi-modal-icon-bg {
+    border-radius: 18px !important;
+    padding: 0.75rem !important;
+}
+
+/* Notifications & Toast Popups */
+.fi-no-notification {
+    border-radius: 20px !important;
+    background-color: var(--m3-surface) !important;
+    border: 1px solid var(--m3-outline-variant) !important;
+    box-shadow: var(--m3-elevation-3) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+:is(.dark) .fi-no-notification {
+    background-color: var(--m3-surface-container-high) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5) !important;
+}
+
+.fi-no-notification-title {
+    font-family: var(--m3-font-sans) !important;
+    font-weight: 800 !important;
+    font-size: 0.925rem !important;
+    color: var(--m3-on-surface) !important;
+}
+
+.fi-no-notification-date,
+.fi-no-notification-body {
+    font-size: 0.825rem !important;
+    color: var(--m3-on-surface-variant) !important;
+    line-height: 1.45 !important;
+}
+
 /* Custom Scrollbar for Smooth Ergonomics */
 ::-webkit-scrollbar {
     width: 8px;

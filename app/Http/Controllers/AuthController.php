@@ -36,7 +36,7 @@ class AuthController extends Controller
             ]);
 
             throw ValidationException::withMessages([
-                'email' => __('Permintaan tidak valid terdeteksi.'),
+                'email' => __('[SEC001] Permintaan tidak valid terdeteksi.'),
             ]);
         }
 
@@ -53,7 +53,7 @@ class AuthController extends Controller
             ]);
 
             throw ValidationException::withMessages([
-                'email' => __('Terlalu banyak percobaan masuk yang gagal. Silakan coba lagi dalam :seconds detik demi keamanan akun Anda.', [
+                'email' => __('[AUTH004] Terlalu banyak percobaan masuk yang gagal. Silakan coba lagi dalam :seconds detik demi keamanan akun Anda.', [
                     'seconds' => $seconds,
                 ]),
             ]);
@@ -91,7 +91,7 @@ class AuthController extends Controller
         ]);
 
         throw ValidationException::withMessages([
-            'email' => __('Email atau kata sandi yang Anda masukkan salah.'),
+            'email' => __('[AUTH001] Email atau kata sandi yang Anda masukkan salah.'),
         ]);
     }
 
