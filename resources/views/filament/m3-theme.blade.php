@@ -453,6 +453,70 @@ body.fi-body {
     font-weight: 700 !important;
 }
 
+/* =============================================================================
+   10. DROPDOWNS & USER MENU (M3 Surface Container & Full Name Display)
+   ============================================================================= */
+.fi-dropdown-panel {
+    min-width: 18rem !important;
+    max-width: 24rem !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--m3-outline-variant) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+    background-color: var(--m3-surface) !important;
+    padding: 0.5rem !important;
+}
+
+:is(.dark) .fi-dropdown-panel {
+    background-color: var(--m3-surface-container-low) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5) !important;
+}
+
+.fi-dropdown-header {
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid var(--m3-outline-variant) !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.fi-dropdown-header .fi-dropdown-header-label,
+.fi-dropdown-list-item-label,
+.fi-user-menu-item-label {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    color: var(--m3-on-surface) !important;
+    line-height: 1.35 !important;
+}
+
+.fi-dropdown-list-item-btn,
+.fi-dropdown-list-item-link {
+    border-radius: 14px !important;
+    padding: 0.65rem 1rem !important;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+    color: var(--m3-on-surface) !important;
+}
+
+.fi-dropdown-list-item-btn:hover,
+.fi-dropdown-list-item-link:hover {
+    background-color: var(--m3-surface-container-high) !important;
+    transform: translateX(2px);
+}
+
+.fi-theme-switcher {
+    border-radius: 14px !important;
+    background-color: var(--m3-surface-container) !important;
+    padding: 0.25rem !important;
+    margin: 0.35rem 0.5rem !important;
+    border: 1px solid var(--m3-outline-variant) !important;
+}
+
+.fi-theme-switcher-btn {
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+}
+
 /* Custom Scrollbar for Smooth Ergonomics */
 ::-webkit-scrollbar {
     width: 8px;

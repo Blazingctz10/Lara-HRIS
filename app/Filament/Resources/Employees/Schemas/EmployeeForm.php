@@ -109,6 +109,7 @@ class EmployeeForm
                                     'Internship' => 'Internship (Magang)',
                                 ])
                                 ->default('Contract')
+                                ->live()
                                 ->required(),
 
                             DatePicker::make('join_date')
@@ -117,9 +118,16 @@ class EmployeeForm
                                 ->required()
                                 ->native(false),
 
-                            DatePicker::make('end_date')
-                                ->label('Tanggal Berakhir Kontrak')
-                                ->helperText('Kosongkan jika Karyawan Tetap')
+                            DatePicker::make('contract_end_date')
+                                ->label('Tanggal Berakhir Kontrak (PKWT)')
+                                ->helperText('Masa berlaku PKWT untuk monitoring evaluasi')
+                                ->visible(fn ($get) => in_array($get('employment_status'), ['Contract', 'Internship']))
+                                ->native(false),
+
+                            DatePicker::make('probation_end_date')
+                                ->label('Tanggal Berakhir Masa Percobaan')
+                                ->helperText('Batas akhir evaluasi probation')
+                                ->visible(fn ($get) => $get('employment_status') === 'Probation')
                                 ->native(false),
 
                             Select::make('status')

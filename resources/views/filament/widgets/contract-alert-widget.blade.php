@@ -152,6 +152,36 @@
             background: #4ade80;
             color: #003a19;
         }
+        .m3-contract-emp-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #131A15;
+        }
+
+        :is(.dark) .m3-contract-emp-title {
+            color: #FFFFFF !important;
+        }
+
+        .m3-contract-emp-meta {
+            font-size: 0.8rem;
+            color: #526156;
+            margin-top: 0.25rem;
+        }
+
+        :is(.dark) .m3-contract-emp-meta {
+            color: #9EABA3 !important;
+        }
+
+        .m3-contract-days-label {
+            font-size: 0.825rem;
+            font-weight: 800;
+            color: #131A15;
+            margin-top: 0.1rem;
+        }
+
+        :is(.dark) .m3-contract-days-label {
+            color: #FFFFFF !important;
+        }
     </style>
 
     <div class="m3-contract-card">
@@ -187,13 +217,18 @@
             <div>
                 @foreach($expiringEmployees as $emp)
                     @php
-                        $daysLeft = now()->diffInDays($emp->contract_end_date ?? $emp->probation_end_date, false);
+                        $isProbation = $emp->employment_status === 'Probation';
+                        $targetDate = $isProbation 
+                            ? ($emp->probation_end_date ?? $emp->end_date)
+                            : ($emp->contract_end_date ?? $emp->end_date);
+                        
+                        $daysLeft = $targetDate ? (int) ceil(now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($targetDate)->startOfDay(), false)) : 0;
                         $isUrgent = $daysLeft <= 15;
                     @endphp
                     <div class="m3-contract-item" style="{{ $isUrgent ? 'border-left: 4px solid #ef4444;' : 'border-left: 4px solid #ea580c;' }}">
                         <div>
                             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                                <span style="font-size: 0.925rem; font-weight: 800; color: #131a15;" class="dark:text-white">
+                                <span class="m3-contract-emp-title">
                                     {{ $emp->full_name }}
                                 </span>
                                 <span style="font-size: 0.725rem; background: rgba(14, 104, 56, 0.12); color: #0E6838; padding: 0.15rem 0.6rem; border-radius: 9999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;" class="dark:bg-emerald-950 dark:text-emerald-300">
@@ -203,7 +238,7 @@
                                     <span>{{ $emp->branch?->name }}</span>
                                 </span>
                             </div>
-                            <div style="font-size: 0.8rem; color: #526156; margin-top: 0.25rem;" class="dark:text-slate-400">
+                            <div class="m3-contract-emp-meta">
                                 {{ $emp->position?->name }} &bull; {{ $emp->department?->name }} &bull; NIP: {{ $emp->nip }}
                             </div>
                         </div>
@@ -211,9 +246,9 @@
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <div style="text-align: right;">
                                 <div style="font-size: 0.725rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; color: {{ $isUrgent ? '#ef4444' : '#ea580c' }};">
-                                    {{ $emp->contract_end_date ? 'Habis Kontrak: ' . $emp->contract_end_date->format('d M Y') : 'Habis Probation: ' . $emp->probation_end_date->format('d M Y') }}
+                                    {{ $isProbation ? 'Habis Probation: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') : 'Habis Kontrak: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') }}
                                 </div>
-                                <div style="font-size: 0.825rem; font-weight: 800; color: #131a15; margin-top: 0.1rem;" class="dark:text-white">
+                                <div class="m3-contract-days-label">
                                     {{ $daysLeft >= 0 ? "Sisa {$daysLeft} Hari Lagi" : "Telah Lewat " . abs($daysLeft) . " Hari" }}
                                 </div>
                             </div>

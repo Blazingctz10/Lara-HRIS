@@ -21,10 +21,29 @@ class ContractAlertWidget extends Widget
             ->with(['branch', 'position', 'department'])
             ->where('status', 'Active')
             ->where(function ($query) use ($today, $targetDate) {
-                $query->whereBetween('contract_end_date', [$today, $targetDate])
-                    ->orWhereBetween('probation_end_date', [$today, $targetDate]);
+                // PKWT Contract expiring within 60 days
+                $query->where(function ($q) use ($today, $targetDate) {
+                    $q->whereIn('employment_status', ['Contract', 'Internship'])
+                      ->where(function ($dateQ) use ($today, $targetDate) {
+                          $dateQ->whereBetween('contract_end_date', [$today, $targetDate])
+                                ->orWhere(function ($sub) use ($today, $targetDate) {
+                                    $sub->whereNull('contract_end_date')
+                                        ->whereBetween('end_date', [$today, $targetDate]);
+                                });
+                      });
+                })
+                // OR Probation expiring within 60 days (ONLY if currently on Probation)
+                ->orWhere(function ($q) use ($today, $targetDate) {
+                    $q->where('employment_status', 'Probation')
+                      ->where(function ($dateQ) use ($today, $targetDate) {
+                          $dateQ->whereBetween('probation_end_date', [$today, $targetDate])
+                                ->orWhere(function ($sub) use ($today, $targetDate) {
+                                    $sub->whereNull('probation_end_date')
+                                        ->whereBetween('end_date', [$today, $targetDate]);
+                                });
+                      });
+                });
             })
-            ->orderBy('contract_end_date')
             ->get();
     }
 }

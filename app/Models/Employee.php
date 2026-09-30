@@ -44,8 +44,32 @@ class Employee extends Model
             'join_date' => 'date',
             'contract_end_date' => 'date',
             'probation_end_date' => 'date',
-            'end_date' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Employee $employee) {
+            if ($employee->employment_status === 'Permanent') {
+                $employee->contract_end_date = null;
+                $employee->probation_end_date = null;
+                $employee->end_date = null;
+            } elseif ($employee->employment_status === 'Contract' || $employee->employment_status === 'Internship') {
+                if ($employee->contract_end_date) {
+                    $employee->end_date = $employee->contract_end_date;
+                } elseif ($employee->end_date) {
+                    $employee->contract_end_date = $employee->end_date;
+                }
+                $employee->probation_end_date = null;
+            } elseif ($employee->employment_status === 'Probation') {
+                $employee->contract_end_date = null;
+                if ($employee->probation_end_date) {
+                    $employee->end_date = $employee->probation_end_date;
+                } elseif ($employee->end_date) {
+                    $employee->probation_end_date = $employee->end_date;
+                }
+            }
+        });
     }
 
     public function user(): BelongsTo
