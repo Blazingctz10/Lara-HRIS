@@ -187,4 +187,23 @@ class HrisTest extends TestCase
         ]);
         $this->assertDatabaseHas('warning_letters', ['letter_number' => 'SP.TEST/001']);
     }
+
+    public function test_employee_can_view_and_update_profile_and_password(): void
+    {
+        $user = User::where('email', 'teller.botania@bprbandaraya.com')->first();
+        $this->actingAs($user);
+
+        $response = $this->get('/portal/my-profile');
+        $response->assertStatus(200);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Filament\Portal\Pages\MyProfile::class)
+            ->set('data.phone', '081299998888')
+            ->set('data.address', 'Perumahan Botania Garden No. 100')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('081299998888', $user->fresh()->employee->phone);
+        $this->assertEquals('Perumahan Botania Garden No. 100', $user->fresh()->employee->address);
+    }
 }

@@ -31,11 +31,11 @@ class ReimbursementForm
                             Select::make('category')
                                 ->label('Kategori Klaim')
                                 ->options([
-                                    'Bensin & Transport AO' => '⛽ Bensin & Transport AO',
-                                    'Survei Calon Debitur' => '📍 Survei Lapangan Calon Debitur',
-                                    'Kesehatan / Kacamata' => '👓 Tunjangan Medis / Kacamata',
-                                    'Konsumsi Lembur' => '🍱 Konsumsi Lembur Closing',
-                                    'Operasional Kas Cabang' => '🏢 Operasional Kas Cabang',
+                                    'Bensin & Transport AO' => 'Bensin & Transport AO',
+                                    'Survei Calon Debitur' => 'Survei Lapangan Calon Debitur',
+                                    'Kesehatan / Kacamata' => 'Tunjangan Medis / Kacamata',
+                                    'Konsumsi Lembur' => 'Konsumsi Lembur Closing',
+                                    'Operasional Kas Cabang' => 'Operasional Kas Cabang',
                                 ])
                                 ->default('Bensin & Transport AO')
                                 ->required(),
@@ -59,10 +59,10 @@ class ReimbursementForm
                             Select::make('status')
                                 ->label('Status Approval & Pembayaran')
                                 ->options([
-                                    'Pending' => '🟡 Menunggu Approval Pincab',
-                                    'Approved_Pincab' => '🔵 Disetujui Pincab (Verifikasi Kasir)',
-                                    'Paid' => '🟢 Sudah Dibayarkan / Ditransfer',
-                                    'Rejected' => '🔴 Ditolak',
+                                    'Pending' => 'Menunggu Approval Pincab',
+                                    'Approved_Pincab' => 'Disetujui Pincab (Verifikasi Kasir)',
+                                    'Paid' => 'Sudah Dibayarkan / Ditransfer',
+                                    'Rejected' => 'Ditolak',
                                 ])
                                 ->default('Pending')
                                 ->required(),

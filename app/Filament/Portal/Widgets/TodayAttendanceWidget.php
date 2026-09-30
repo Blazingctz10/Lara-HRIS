@@ -9,7 +9,7 @@ class TodayAttendanceWidget extends Widget
 {
     protected string $view = 'filament.portal.widgets.today-attendance-widget';
 
-    protected static ?int $sort = 0;
+    protected static ?int $sort = 1;
 
     protected int|string|array $columnSpan = 'full';
 

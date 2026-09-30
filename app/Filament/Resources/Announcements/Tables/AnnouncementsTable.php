@@ -46,9 +46,9 @@ class AnnouncementsTable
                     ->label('Prioritas')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'urgent' => '🔴 Mendesak',
-                        'important' => '🟡 Penting',
-                        'normal' => '🟢 Normal',
+                        'urgent' => 'Mendesak',
+                        'important' => 'Penting',
+                        'normal' => 'Normal',
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {

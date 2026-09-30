@@ -28,15 +28,24 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('BPR Banda Raya')
-            ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('3.5rem')
-            ->favicon(asset('images/logo.png'))
+            ->brandLogo(asset('images/logo-horizontal-clean.png'))
+            ->darkModeBrandLogo(asset('images/logo-horizontal-dark.png'))
+            ->brandLogoHeight('2.75rem')
+            ->favicon(asset('images/logo-tight.png'))
             ->colors([
                 'primary' => Color::hex('#0E6838'), // BPR Banda Raya Forest Green
                 'warning' => Color::hex('#F37A20'), // BPR Banda Raya Warm Orange
                 'amber' => Color::hex('#FDB813'),   // BPR Banda Raya Golden Ribbon
                 'gray' => Color::Slate,
             ])
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => view('filament.m3-theme')->render()
+            )
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => view('filament.components.role-indicator')->render()
+            )
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

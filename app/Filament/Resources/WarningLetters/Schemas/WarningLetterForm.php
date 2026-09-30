@@ -34,10 +34,10 @@ class WarningLetterForm
                             Select::make('level')
                                 ->label('Tingkat Sanksi / SP')
                                 ->options([
-                                    'Teguran Lisan' => '🗣️ Teguran Lisan / Konseling',
-                                    'Surat Peringatan 1 (SP 1)' => '⚠️ Surat Peringatan 1 (SP 1)',
-                                    'Surat Peringatan 2 (SP 2)' => '🚨 Surat Peringatan 2 (SP 2)',
-                                    'Surat Peringatan 3 (SP 3)' => '🛑 Surat Peringatan 3 (SP 3)',
+                                    'Teguran Lisan' => 'Teguran Lisan / Konseling',
+                                    'Surat Peringatan 1 (SP 1)' => 'Surat Peringatan 1 (SP 1)',
+                                    'Surat Peringatan 2 (SP 2)' => 'Surat Peringatan 2 (SP 2)',
+                                    'Surat Peringatan 3 (SP 3)' => 'Surat Peringatan 3 (SP 3)',
                                 ])
                                 ->default('Surat Peringatan 1 (SP 1)')
                                 ->required(),
@@ -68,9 +68,9 @@ class WarningLetterForm
                             Select::make('status')
                                 ->label('Status SP')
                                 ->options([
-                                    'Aktif' => '🔴 Aktif (Dalam Masa Berlaku)',
-                                    'Kedaluwarsa' => '⚪ Kedaluwarsa (Lewat 6 Bulan)',
-                                    'Dicabut / Pembinaan Berhasil' => '🟢 Dicabut / Pembinaan Berhasil',
+                                    'Aktif' => 'Aktif (Dalam Masa Berlaku)',
+                                    'Kedaluwarsa' => 'Kedaluwarsa (Lewat 6 Bulan)',
+                                    'Dicabut / Pembinaan Berhasil' => 'Dicabut / Pembinaan Berhasil',
                                 ])
                                 ->default('Aktif')
                                 ->required(),

@@ -9,7 +9,7 @@ class AnnouncementsWidget extends Widget
 {
     protected string $view = 'filament.portal.widgets.announcements-widget';
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
 

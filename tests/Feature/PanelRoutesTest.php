@@ -50,12 +50,12 @@ class PanelRoutesTest extends TestCase
 
         $routes = [
             '/portal',
-            '/portal/quick-attendance',
             '/portal/attendances',
             '/portal/leave-requests',
             '/portal/payrolls',
             '/portal/reimbursements',
             '/portal/overtimes',
+            '/portal/my-profile',
         ];
 
         foreach ($routes as $route) {

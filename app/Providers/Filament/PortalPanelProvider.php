@@ -27,15 +27,24 @@ class PortalPanelProvider extends PanelProvider
             ->id('portal')
             ->path('portal')
             ->brandName('BPR Banda Raya')
-            ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('3.5rem')
-            ->favicon(asset('images/logo.png'))
+            ->brandLogo(asset('images/logo-horizontal-clean.png'))
+            ->darkModeBrandLogo(asset('images/logo-horizontal-dark.png'))
+            ->brandLogoHeight('2.75rem')
+            ->favicon(asset('images/logo-tight.png'))
             ->colors([
                 'primary' => Color::hex('#0E6838'), // BPR Banda Raya Forest Green
                 'warning' => Color::hex('#F37A20'), // BPR Banda Raya Warm Orange
                 'amber' => Color::hex('#FDB813'),   // BPR Banda Raya Golden Ribbon
                 'gray' => Color::Slate,
             ])
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => view('filament.m3-theme')->render()
+            )
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => view('filament.components.role-indicator')->render()
+            )
             ->topNavigation()
             ->discoverResources(in: app_path('Filament/Portal/Resources'), for: 'App\\Filament\\Portal\\Resources')
             ->discoverPages(in: app_path('Filament/Portal/Pages'), for: 'App\\Filament\\Portal\\Pages')
@@ -43,9 +52,7 @@ class PortalPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Portal/Widgets'), for: 'App\\Filament\\Portal\\Widgets')
-            ->widgets([
-                AccountWidget::class,
-            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

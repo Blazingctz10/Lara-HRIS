@@ -35,10 +35,10 @@ class AnnouncementForm
                             Select::make('category')
                                 ->label('Kategori')
                                 ->options([
-                                    'direksi_memo' => '📜 Memo / Surat Edaran Direksi',
-                                    'ojk_compliance' => '⚖️ Kepatuhan Regulasi OJK',
-                                    'internal_news' => '📰 Berita Internal Bank',
-                                    'holiday' => '🗓️ Libur & Kalender Kerja',
+                                    'direksi_memo' => 'Memo / Surat Edaran Direksi',
+                                    'ojk_compliance' => 'Kepatuhan Regulasi OJK',
+                                    'internal_news' => 'Berita Internal Bank',
+                                    'holiday' => 'Libur & Kalender Kerja',
                                 ])
                                 ->default('direksi_memo')
                                 ->required(),
@@ -46,9 +46,9 @@ class AnnouncementForm
                             Select::make('priority')
                                 ->label('Tingkat Prioritas')
                                 ->options([
-                                    'normal' => '🟢 Normal',
-                                    'important' => '🟡 Penting',
-                                    'urgent' => '🔴 Sangat Mendesak (Urgent)',
+                                    'normal' => 'Normal',
+                                    'important' => 'Penting',
+                                    'urgent' => 'Sangat Mendesak (Urgent)',
                                 ])
                                 ->default('normal')
                                 ->required(),

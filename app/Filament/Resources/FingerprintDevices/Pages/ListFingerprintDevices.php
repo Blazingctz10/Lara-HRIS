@@ -17,7 +17,7 @@ class ListFingerprintDevices extends ListRecords
     {
         return [
             Action::make('sync_all_machines')
-                ->label('⚡ Tarik Semua Log Mesin Fingerprint')
+                ->label('Tarik Semua Log Mesin Fingerprint')
                 ->icon('heroicon-o-arrow-path')
                 ->color('warning')
                 ->requiresConfirmation()

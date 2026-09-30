@@ -31,11 +31,11 @@ class CareerMovementForm
                             Select::make('type')
                                 ->label('Jenis Perubahan Karir')
                                 ->options([
-                                    'Mutasi Cabang' => '🏢 Mutasi Antar Kantor Cabang',
-                                    'Promosi Jabatan' => '⭐ Promosi Kenaikan Jabatan',
-                                    'Rotasi Divisi' => '🔄 Rotasi Antar Divisi / Bagian',
-                                    'Pengangkatan Tetap' => '📜 Pengangkatan Pegawai Tetap (PKWTT)',
-                                    'Demosi' => '🔻 Demosi / Penyesuaian',
+                                    'Mutasi Cabang' => 'Mutasi Antar Kantor Cabang',
+                                    'Promosi Jabatan' => 'Promosi Kenaikan Jabatan',
+                                    'Rotasi Divisi' => 'Rotasi Antar Divisi / Bagian',
+                                    'Pengangkatan Tetap' => 'Pengangkatan Pegawai Tetap (PKWTT)',
+                                    'Demosi' => 'Demosi / Penyesuaian',
                                 ])
                                 ->default('Mutasi Cabang')
                                 ->required(),

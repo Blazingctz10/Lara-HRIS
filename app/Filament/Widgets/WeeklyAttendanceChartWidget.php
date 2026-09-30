@@ -10,7 +10,7 @@ class WeeklyAttendanceChartWidget extends ChartWidget
 {
     protected static ?int $sort = 2;
 
-    protected ?string $heading = '📈 Tren Presensi Kerja Mingguan (Hadir & Tepat Waktu)';
+    protected ?string $heading = 'Tren Presensi Kerja Mingguan (Hadir & Tepat Waktu)';
 
     protected int|string|array $columnSpan = [
         'default' => 'full',

@@ -59,9 +59,9 @@ class FingerprintDeviceForm
                             Select::make('status')
                                 ->label('Status Koneksi')
                                 ->options([
-                                    'Online' => '🟢 Online (Terhubung)',
-                                    'Standby' => '🟡 Standby',
-                                    'Offline' => '🔴 Offline (Terputus)',
+                                    'Online' => 'Online (Terhubung)',
+                                    'Standby' => 'Standby',
+                                    'Offline' => 'Offline (Terputus)',
                                 ])
                                 ->default('Online')
                                 ->required(),

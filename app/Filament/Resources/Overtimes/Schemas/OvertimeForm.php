@@ -60,10 +60,10 @@ class OvertimeForm
                             Select::make('status')
                                 ->label('Status Approval')
                                 ->options([
-                                    'Pending' => '🟡 Menunggu Approval Pincab',
-                                    'Approved_Pincab' => '🔵 Disetujui Pincab',
-                                    'Approved_HR' => '🟢 Disetujui HR HO (Siap Cair)',
-                                    'Rejected' => '🔴 Ditolak',
+                                    'Pending' => 'Menunggu Approval Pincab',
+                                    'Approved_Pincab' => 'Disetujui Pincab',
+                                    'Approved_HR' => 'Disetujui HR HO (Siap Cair)',
+                                    'Rejected' => 'Ditolak',
                                 ])
                                 ->default('Pending')
                                 ->required(),
