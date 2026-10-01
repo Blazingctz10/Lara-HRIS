@@ -28,6 +28,25 @@ class ReimbursementResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $employee = auth()->user()?->employee;
+        if (! $employee) {
+            return null;
+        }
+
+        $activeCount = Reimbursement::where('employee_id', $employee->id)
+            ->whereIn('status', ['Pending', 'Approved_Pincab'])
+            ->count();
+
+        return $activeCount > 0 ? (string) $activeCount : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function canEdit(Model $record): bool
     {
         return $record->status === 'Pending';

@@ -31,6 +31,17 @@ class ReimbursementResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $unpaidCount = static::getEloquentQuery()->whereIn('status', ['Pending', 'Approved_Pincab'])->count();
+        return $unpaidCount > 0 ? (string) $unpaidCount : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->accessibleBy();

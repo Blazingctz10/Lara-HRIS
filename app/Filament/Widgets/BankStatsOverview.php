@@ -11,6 +11,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class BankStatsOverview extends BaseWidget
 {
+    protected static bool $isLazy = false;
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array
@@ -24,6 +26,10 @@ class BankStatsOverview extends BaseWidget
         $attendanceToday = Attendance::accessibleBy()->whereDate('date', now())->count();
         $pendingLeaves = LeaveRequest::accessibleBy()->where('status', 'Pending')->count();
         $totalBranches = Branch::where('is_active', true)->count();
+
+        $unpaidClaimsQuery = \App\Models\Reimbursement::accessibleBy()->whereIn('status', ['Pending', 'Approved_Pincab']);
+        $unpaidClaimsCount = $unpaidClaimsQuery->count();
+        $unpaidClaimsSum = (float) $unpaidClaimsQuery->sum('amount');
 
         return [
             Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
@@ -40,6 +46,11 @@ class BankStatsOverview extends BaseWidget
                 ->description('Menunggu persetujuan')
                 ->descriptionIcon('heroicon-m-document-text')
                 ->color($pendingLeaves > 0 ? 'warning' : 'gray'),
+
+            Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
+                ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : "Tidak ada antrean klaim")
+                ->descriptionIcon('heroicon-m-receipt-percent')
+                ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
 
             Stat::make('Jaringan Kantor', $totalBranches . ' Cabang')
                 ->description('HO, KC, KCP & KK aktif')
