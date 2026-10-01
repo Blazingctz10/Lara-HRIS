@@ -18,6 +18,9 @@ class CareerMovement extends Model
         'to_branch_id',
         'from_position_id',
         'to_position_id',
+        'grade',
+        'grade_effective_date',
+        'movement_notes',
         'effective_date',
         'sk_number',
         'sk_attachment',
@@ -28,6 +31,8 @@ class CareerMovement extends Model
     {
         return [
             'effective_date' => 'date:Y-m-d',
+            'grade_effective_date' => 'date:Y-m-d',
+            'grade' => 'integer',
         ];
     }
 

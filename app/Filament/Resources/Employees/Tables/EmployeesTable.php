@@ -49,6 +49,12 @@ class EmployeesTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('grade')
+                    ->label('Grade')
+                    ->badge()
+                    ->color('warning')
+                    ->sortable(),
+
                 TextColumn::make('employment_status')
                     ->label('Status')
                     ->badge()
@@ -59,6 +65,15 @@ class EmployeesTable
                         'Internship' => 'info',
                         default => 'gray',
                     }),
+
+                TextColumn::make('working_period')
+                    ->label('Masa Kerja'),
+
+                TextColumn::make('ptkp_status')
+                    ->label('PTKP')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('status')
                     ->label('Kondisi')

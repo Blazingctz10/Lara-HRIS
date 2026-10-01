@@ -18,23 +18,44 @@ class Employee extends Model
         'nik',
         'full_name',
         'email',
+        'personal_email',
         'phone',
         'gender',
         'birth_date',
+        'birth_place',
         'address',
         'photo_url',
         'branch_id',
         'department_id',
         'position_id',
+        'job_effective_date',
+        'grade',
+        'grade_effective_date',
         'employment_status',
         'join_date',
+        'permanent_date',
         'contract_end_date',
         'probation_end_date',
         'end_date',
+        'exit_date',
+        'exit_reason',
         'status',
+        'education_level',
+        'education_major',
+        'education_institution',
+        'ipk',
         'bank_account_number',
         'bank_account_holder',
+        'bank_bpr_account',
+        'bank_external_name',
+        'bank_external_account',
         'npwp',
+        'bpjs_tk_number',
+        'bpjs_kes_number',
+        'ptkp_status',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'emergency_contact_relation',
     ];
 
     protected function casts(): array
@@ -42,8 +63,14 @@ class Employee extends Model
         return [
             'birth_date' => 'date',
             'join_date' => 'date',
+            'job_effective_date' => 'date',
+            'grade_effective_date' => 'date',
+            'permanent_date' => 'date',
             'contract_end_date' => 'date',
             'probation_end_date' => 'date',
+            'exit_date' => 'date',
+            'grade' => 'integer',
+            'ipk' => 'decimal:2',
         ];
     }
 
@@ -130,6 +157,56 @@ class Employee extends Model
     public function warningLetters(): HasMany
     {
         return $this->hasMany(WarningLetter::class);
+    }
+
+    public function families(): HasMany
+    {
+        return $this->hasMany(EmployeeFamily::class);
+    }
+
+    public function trainings(): HasMany
+    {
+        return $this->hasMany(EmployeeTraining::class);
+    }
+
+    public function performanceAppraisals(): HasMany
+    {
+        return $this->hasMany(EmployeePerformanceAppraisal::class)->orderBy('period_year', 'asc');
+    }
+
+    /**
+     * Hitung masa kerja dalam format "X tahun Y bulan" sesuai standar BPR
+     */
+    public function getWorkingPeriodAttribute(): string
+    {
+        if (! $this->join_date) {
+            return '-';
+        }
+
+        $startDate = \Carbon\Carbon::parse($this->join_date);
+        $endDate = $this->exit_date ? \Carbon\Carbon::parse($this->exit_date) : now();
+
+        $diff = $startDate->diff($endDate);
+        $years = $diff->y;
+        $months = $diff->m;
+
+        $parts = [];
+        if ($years > 0) {
+            $parts[] = "{$years} tahun";
+        }
+        if ($months > 0 || $years === 0) {
+            $parts[] = "{$months} bulan";
+        }
+
+        return implode(' ', $parts);
+    }
+
+    /**
+     * Hitung usia karyawan otomatis dari tanggal lahir
+     */
+    public function getAgeAttribute(): ?int
+    {
+        return $this->birth_date ? \Carbon\Carbon::parse($this->birth_date)->age : null;
     }
 
     /**

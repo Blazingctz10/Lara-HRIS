@@ -675,5 +675,97 @@ class DatabaseSeeder extends Seeder
                 'notes' => 'Telah dilakukan konseling pembinaan bersama Pincab Bengkong',
             ]);
         }
+
+        // 13. Seed Comprehensive Profile, Families, Trainings, and Performance Appraisals
+        foreach (Employee::all() as $index => $employee) {
+            $employee->update([
+                'birth_place' => ['Batam', 'Tanjung Pinang', 'Padang', 'Kerinci', 'Yogyakarta', 'Medan'][$index % 6],
+                'grade' => [4, 5, 6, 7, 5, 4, 6][$index % 7],
+                'job_effective_date' => Carbon::parse($employee->join_date)->addMonths(6)->toDateString(),
+                'grade_effective_date' => Carbon::parse($employee->join_date)->addYears(2)->toDateString(),
+                'permanent_date' => Carbon::parse($employee->join_date)->addMonths(3)->toDateString(),
+                'education_level' => ['S-1', 'D-3', 'S-1', 'S-2', 'S-1'][$index % 5],
+                'education_major' => ['Manajemen Perbankan', 'Teknik Elektronika', 'Akuntansi Keuangan', 'Ilmu Hukum', 'Sistem Informasi'][$index % 5],
+                'education_institution' => ['Universitas Internasional Batam', 'Univ. Negeri Yogyakarta', 'Universitas Riau', 'Universitas Andalas'][$index % 4],
+                'ipk' => [3.45, 2.89, 3.72, 3.60, 3.85][$index % 5],
+                'personal_email' => 'personal.' . strtolower(explode(' ', $employee->full_name)[0]) . '@gmail.com',
+                'bpjs_tk_number' => '080' . rand(10000000, 99999999),
+                'bpjs_kes_number' => '0001' . rand(10000000, 99999999),
+                'bank_bpr_account' => '01.10.' . sprintf('%05d', $employee->id * 142 + 500),
+                'bank_external_name' => ['Bank Mandiri', 'BCA', 'BNI'][$index % 3],
+                'bank_external_account' => '109-00-' . rand(1000000, 9999999),
+                'ptkp_status' => ['TK/0', 'K/1', 'K/2', 'K/3', 'TK/1'][$index % 5],
+                'emergency_contact_name' => 'Keluarga ' . explode(' ', $employee->full_name)[0],
+                'emergency_contact_phone' => '0812' . rand(10000000, 99999999),
+                'emergency_contact_relation' => ['Istri', 'Suami', 'Orang Tua', 'Saudara Kandung'][$index % 4],
+            ]);
+
+            // Seed Families
+            \App\Models\EmployeeFamily::create([
+                'employee_id' => $employee->id,
+                'name' => $employee->emergency_contact_name,
+                'nik' => '2171' . rand(100000000000, 999999999999),
+                'relationship' => $employee->emergency_contact_relation,
+                'birth_place' => $employee->birth_place,
+                'birth_date' => Carbon::parse($employee->birth_date)->addYears(rand(-2, 2))->toDateString(),
+                'gender' => in_array($employee->emergency_contact_relation, ['Istri', 'Ibu']) ? 'Perempuan' : 'Laki-laki',
+                'occupation' => 'Ibu Rumah Tangga / Karyawan Swasta',
+            ]);
+
+            \App\Models\EmployeeFamily::create([
+                'employee_id' => $employee->id,
+                'name' => 'Anak ' . explode(' ', $employee->full_name)[0] . ' Pratama',
+                'nik' => '2171' . rand(100000000000, 999999999999),
+                'relationship' => 'Anak',
+                'birth_place' => 'Batam',
+                'birth_date' => Carbon::today()->subYears(rand(3, 10))->toDateString(),
+                'gender' => rand(0, 1) ? 'Laki-laki' : 'Perempuan',
+                'occupation' => 'Pelajar',
+            ]);
+
+            // Seed Trainings
+            $sampleTrainings = [
+                ['Smart Service Excellence Perbankan', '15-Mei-2023', 'BPR Banda Raya', 'Bp. Andreas Ariefianto', 'Batam'],
+                ['Penilaian Agunan Kredit & Properti BPR', '17-Jul-2023', 'Jakarta Financial Institute', 'Bp. Kardi P, SH, M.Ba', 'Jakarta'],
+                ['Pencegahan Fraud & Audit Operasional BPR', '05-Des-2024', 'DPD Perbarindo Kepri', 'Bp. Eko Atmojo', 'Batam View Beach Resort'],
+                ['Penerapan Manajemen Risiko Karyawan BPR', '26-Jan-2025', 'BPR Banda Raya', 'Direksi', 'Bandung'],
+            ];
+
+            foreach ($sampleTrainings as $t) {
+                \App\Models\EmployeeTraining::create([
+                    'employee_id' => $employee->id,
+                    'training_name' => $t[0],
+                    'schedule' => $t[1],
+                    'organizer' => $t[2],
+                    'trainer' => $t[3],
+                    'location' => $t[4],
+                ]);
+            }
+
+            // Seed Performance Appraisals (PA)
+            \App\Models\EmployeePerformanceAppraisal::create([
+                'employee_id' => $employee->id,
+                'period_year' => 2023,
+                'letter_grade' => 'B',
+                'score' => 3.75,
+                'notes' => 'Pencapaian KPI cabang dan kepatuhan operasional sangat memuaskan.',
+            ]);
+
+            \App\Models\EmployeePerformanceAppraisal::create([
+                'employee_id' => $employee->id,
+                'period_year' => 2024,
+                'letter_grade' => 'B',
+                'score' => 3.82,
+                'notes' => 'Peningkatan produktivitas layanan nasabah dan inisiatif kerja.',
+            ]);
+
+            \App\Models\EmployeePerformanceAppraisal::create([
+                'employee_id' => $employee->id,
+                'period_year' => 2025,
+                'letter_grade' => 'A',
+                'score' => 3.92,
+                'notes' => 'Kinerja istimewa, integritas tinggi, dan berkontribusi signifikan pada pencapaian target kantor.',
+            ]);
+        }
     }
 }

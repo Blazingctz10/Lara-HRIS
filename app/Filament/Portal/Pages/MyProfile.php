@@ -46,9 +46,20 @@ class MyProfile extends Page implements HasForms
             'branch' => $employee?->branch?->name ?? 'Kantor Pusat',
             'department' => $employee?->department?->name ?? '-',
             'position' => $employee?->position?->name ?? '-',
+            'grade' => $employee?->grade ? 'Grade ' . $employee->grade : '-',
             'employment_status' => $employee?->employment_status === 'Permanent' ? 'Pegawai Tetap' : 'Kontrak PKWT / Probation',
             'join_date' => $employee?->join_date ? $employee->join_date->format('d M Y') : '-',
+            'working_period' => $employee?->working_period ?? '-',
+            'permanent_date' => $employee?->permanent_date ? $employee->permanent_date->format('d M Y') : '-',
             'contract_end_date' => $employee?->contract_end_date ? $employee->contract_end_date->format('d M Y') : ($employee?->probation_end_date ? $employee->probation_end_date->format('d M Y') : 'Tidak Ada (Permanen)'),
+
+            // Legalitas & Pajak
+            'education' => ($employee?->education_level ?? '-') . ' ' . ($employee?->education_major ?? '') . ' - ' . ($employee?->education_institution ?? '-') . ($employee?->ipk ? ' (IPK: ' . $employee->ipk . ')' : ''),
+            'bpjs_tk' => $employee?->bpjs_tk_number ?? '-',
+            'bpjs_kes' => $employee?->bpjs_kes_number ?? '-',
+            'bank_bpr_account' => $employee?->bank_bpr_account ?? '-',
+            'ptkp_status' => $employee?->ptkp_status ?? '-',
+            'emergency_contact' => ($employee?->emergency_contact_name ?? '-') . ' (' . ($employee?->emergency_contact_relation ?? '-') . ') - ' . ($employee?->emergency_contact_phone ?? '-'),
 
             // Data Pribadi & Kontak (Dapat Diperbarui Mandiri)
             'phone' => $employee?->phone ?? '',
@@ -90,18 +101,59 @@ class MyProfile extends Page implements HasForms
                                 ->label('Jabatan Resmi')
                                 ->disabled()
                                 ->dehydrated(false),
+                            TextInput::make('grade')
+                                ->label('Tingkat Grade BPR')
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
+                        Grid::make(3)->schema([
                             TextInput::make('employment_status')
                                 ->label('Status Kepegawaian')
                                 ->disabled()
                                 ->dehydrated(false),
-                        ]),
-                        Grid::make(2)->schema([
                             TextInput::make('join_date')
                                 ->label('Tanggal Mulai Bekerja')
                                 ->disabled()
                                 ->dehydrated(false),
-                            TextInput::make('contract_end_date')
-                                ->label('Masa Jatuh Tempo Kontrak / Evaluasi')
+                            TextInput::make('working_period')
+                                ->label('Masa Kerja Aktif')
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
+                    ])
+                    ->collapsible(),
+
+                Section::make('Pendidikan, Legalitas, BPJS & Pajak')
+                    ->description('Arsip data latar belakang pendidikan, nomor jaminan sosial, dan status perpajakan PTKP.')
+                    ->icon('heroicon-m-academic-cap')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('education')
+                                ->label('Pendidikan Terakhir')
+                                ->disabled()
+                                ->dehydrated(false),
+                            TextInput::make('ptkp_status')
+                                ->label('Status Pajak (PTKP)')
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
+                        Grid::make(3)->schema([
+                            TextInput::make('bpjs_tk')
+                                ->label('BPJS Ketenagakerjaan')
+                                ->disabled()
+                                ->dehydrated(false),
+                            TextInput::make('bpjs_kes')
+                                ->label('BPJS Kesehatan')
+                                ->disabled()
+                                ->dehydrated(false),
+                            TextInput::make('bank_bpr_account')
+                                ->label('Rek. BPR Banda Raya (Rek. BR)')
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
+                        Grid::make(1)->schema([
+                            TextInput::make('emergency_contact')
+                                ->label('Kontak Darurat (Emergency Call)')
                                 ->disabled()
                                 ->dehydrated(false),
                         ]),
