@@ -116,20 +116,86 @@
     background-color: #081a10;
   }
 
-  .hero-panel-bg {
+  .hero-slides-wrapper {
     position: absolute;
     inset: 0;
-    background-image: url('{{ asset("images/login-hero.jpg") }}');
+    overflow: hidden;
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.92;
-    filter: saturate(1.1) contrast(1.04);
-    transition: transform 12s cubic-bezier(0.2, 0, 0, 1);
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1.2s ease-in-out, transform 8s cubic-bezier(0.2, 0, 0, 1);
+    filter: saturate(1.08) contrast(1.03);
   }
 
-  .hero-panel:hover .hero-panel-bg {
-    transform: scale(1.035);
+  .hero-slide.active {
+    opacity: 0.92;
+    transform: scale(1);
+    z-index: 1;
+  }
+
+  .hero-location-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.95rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.2px;
+  }
+
+  .hero-location-badge .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 8px #4ADE80;
+    animation: pulseGlow 2s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .hero-slide-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .hero-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.35);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .hero-dot:hover {
+    background: rgba(255, 255, 255, 0.75);
+  }
+
+  .hero-dot.active {
+    width: 28px;
+    background: #4ADE80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
   }
 
   /* Elegant Gradient Scrim */
@@ -557,11 +623,22 @@
          LEFT: CLEAN VISUAL HERO BANNER
          Spacious, elegant, uncluttered showcase
          ======================================================================= -->
-    <section class="hero-panel" aria-label="Visual Perusahaan PT BPR Banda Raya">
-      <div class="hero-panel-bg"></div>
+    <section class="hero-panel" aria-label="Visual Jaringan Kantor PT BPR Banda Raya">
+      <div class="hero-slides-wrapper">
+        <div class="hero-slide active" style="background-image: url('{{ asset('images/fotokantor/TAMPAK%20DEPAN%20KANTOR%20PUSAT%20JODOH.png') }}');" data-name="Kantor Pusat Jodoh" data-city="Nagoya / Jodoh, Batam"></div>
+        <div class="hero-slide" style="background-image: url('{{ asset('images/fotokantor/TAMPAK%20DEPAN%20KANTOR%20CABANG%20BOTANIA.png') }}');" data-name="Kantor Cabang Botania" data-city="Botania Garden, Batam"></div>
+        <div class="hero-slide" style="background-image: url('{{ asset('images/fotokantor/TAMPAK%20DEPAN%20KANTOR%20CABANG%20AVIARI.png') }}');" data-name="Kantor Cabang Aviari" data-city="Komp. Aviari Pratama, Batu Aji"></div>
+        <div class="hero-slide" style="background-image: url('{{ asset('images/fotokantor/TAMPAK%20DEPAN%20KANTOR%20CABANG%20BENGKONG.png') }}');" data-name="Kantor Cabang Bengkong" data-city="Bengkong Indah, Batam"></div>
+      </div>
       <div class="hero-panel-overlay"></div>
 
       <div class="hero-content">
+        <div class="hero-location-badge">
+          <span class="pulse-dot"></span>
+          <span id="hero-office-label">Kantor Pusat Jodoh</span>
+          <span id="hero-office-city" style="opacity: 0.85; font-weight: 500;">&bull; Nagoya / Jodoh, Batam</span>
+        </div>
+
         <h2 class="hero-headline">
           Tata Kelola SDM Modern, <br>
           <span class="accent">Akurat & Terintegrasi</span>
@@ -569,6 +646,14 @@
         <p class="hero-subtext">
           Mendukung operasional perbankan yang tangguh, aman, dan akuntabel di seluruh jaringan kantor operasional PT Bank Perekonomian Rakyat Banda Raya.
         </p>
+
+        <!-- Branch Slide Dots -->
+        <div class="hero-slide-nav" id="hero-slide-nav">
+          <button type="button" class="hero-dot active" onclick="goToSlide(0)" title="Kantor Pusat Jodoh" aria-label="Kantor Pusat Jodoh"></button>
+          <button type="button" class="hero-dot" onclick="goToSlide(1)" title="Kantor Cabang Botania" aria-label="Kantor Cabang Botania"></button>
+          <button type="button" class="hero-dot" onclick="goToSlide(2)" title="Kantor Cabang Aviari" aria-label="Kantor Cabang Aviari"></button>
+          <button type="button" class="hero-dot" onclick="goToSlide(3)" title="Kantor Cabang Bengkong" aria-label="Kantor Cabang Bengkong"></button>
+        </div>
       </div>
     </section>
 
@@ -760,6 +845,33 @@
       document.getElementById('email').value = email;
       document.getElementById('pass').value = password;
       document.getElementById('pass').focus();
+    }
+
+    // Interactive Slideshow for BPR Banda Raya Office Photos
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    const labelEl = document.getElementById('hero-office-label');
+    const cityEl = document.getElementById('hero-office-city');
+
+    function goToSlide(index) {
+      if (!slides.length) return;
+      slides[currentSlide].classList.remove('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+
+      currentSlide = (index + slides.length) % slides.length;
+
+      slides[currentSlide].classList.add('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+
+      if (labelEl) labelEl.textContent = slides[currentSlide].getAttribute('data-name');
+      if (cityEl) cityEl.textContent = '• ' + slides[currentSlide].getAttribute('data-city');
+    }
+
+    if (slides.length > 1) {
+      setInterval(() => {
+        goToSlide(currentSlide + 1);
+      }, 6000);
     }
   </script>
 

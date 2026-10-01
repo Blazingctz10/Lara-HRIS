@@ -98,6 +98,10 @@ class LeaveRequestsTable
                     ->color('info')
                     ->visible(fn (LeaveRequest $record) => $record->status === 'Pending' && auth()->user()->isBranchManager())
                     ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Cuti (Pincab)')
+                    ->modalDescription(fn (LeaveRequest $record) => "Apakah Anda yakin ingin menyetujui permohonan cuti untuk {$record->employee->user->name} selama {$record->total_days} hari?")
+                    ->modalSubmitActionLabel('Ya, Setujui Cuti')
+                    ->modalCancelActionLabel('Batal')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
                             'status' => 'Approved_Pincab',
@@ -116,6 +120,10 @@ class LeaveRequestsTable
                     ->color('success')
                     ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
                     ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Final Cuti (HR)')
+                    ->modalDescription(fn (LeaveRequest $record) => "Persetujuan final ini akan secara otomatis memotong {$record->total_days} hari dari saldo cuti resmi pegawai {$record->employee->user->name}. Lanjutkan?")
+                    ->modalSubmitActionLabel('Ya, Setujui Final')
+                    ->modalCancelActionLabel('Batal')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
                             'status' => 'Approved_HR',
@@ -133,6 +141,11 @@ class LeaveRequestsTable
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']))
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Penolakan Pengajuan Cuti')
+                    ->modalDescription('Mohon isi alasan penolakan sebelum memproses pembatalan pengajuan cuti ini.')
+                    ->modalSubmitActionLabel('Tolak Pengajuan')
+                    ->modalCancelActionLabel('Batal')
                     ->form([
                         Textarea::make('rejection_reason')
                             ->label('Alasan Penolakan')

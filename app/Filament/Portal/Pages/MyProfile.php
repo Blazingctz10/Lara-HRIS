@@ -165,14 +165,25 @@ class MyProfile extends Page implements HasForms
             ->statePath('data');
     }
 
+    public function saveAction(): Action
+    {
+        return Action::make('save')
+            ->label('Simpan Perubahan Profil')
+            ->icon('heroicon-m-check')
+            ->color('primary')
+            ->size('lg')
+            ->requiresConfirmation()
+            ->modalHeading('Konfirmasi Simpan Perubahan Profil')
+            ->modalDescription('Apakah Anda yakin data nomor kontak, rekening bank, alamat tempat tinggal, atau kata sandi baru yang Anda masukkan sudah benar dan valid?')
+            ->modalSubmitActionLabel('Ya, Simpan Perubahan')
+            ->modalCancelActionLabel('Batal')
+            ->action(fn () => $this->save());
+    }
+
     protected function getFormActions(): array
     {
         return [
-            Action::make('save')
-                ->label('Simpan Perubahan Profil')
-                ->submit('save')
-                ->color('primary')
-                ->icon('heroicon-m-check'),
+            $this->saveAction(),
         ];
     }
 
