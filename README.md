@@ -109,6 +109,28 @@ sequenceDiagram
 3. Sistem memunculkan popup konfirmasi otorisasi perbankan.
 4. Arsip disimpan di `storage/app/backups/` dengan penamaan timestamp unik dan dapat diunduh langsung ke komputer lokal.
 
+### 6. Alur Rekrutmen & Integrasi Email Masuk (cPanel IMAP)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Pelamar as Pelamar Kerja
+    participant cPanel as Mail Server cPanel (karir@bprbandaraya.com)
+    participant IMAP as ImapRecruitmentService (Port 993 SSL)
+    participant DB as Modul Rekrutmen (/admin/job-applicants)
+    actor HR as Tim HRD & Perekrutan
+
+    Pelamar->>cPanel: Kirim Surat Lamaran & Lampiran CV (PDF/DOCX)
+    HR->>DB: Klik "Tarik Email (cPanel IMAP)"
+    DB->>IMAP: Eksekusi koneksi TLS/SSL ke cPanel Webmail
+    IMAP->>cPanel: Baca INBOX, unduh email baru & file lampiran
+    IMAP->>DB: Simpan pelamar, ekstrak posisi, & arsip CV ke storage
+    DB-->>HR: Tampilkan daftar pelamar, preview CV, dan kelola status seleksi
+```
+1. **Otomatisasi Tanpa Buka Webmail**: Email pelamar yang masuk ke `karir@bprbandaraya.com` disedot langsung oleh sistem Lara-HRIS.
+2. **Ekstraksi CV & Posisi Otomatis**: Sistem secara otomatis mengekstrak berkas lampiran (PDF/DOCX) ke direktori privat `storage/app/public/recruitment_cv` dan mendeteksi posisi yang dilamar dari subjek email.
+3. **Penyaringan & Tahapan Seleksi**: HRD dapat mengubah tahapan kandidat (*Baru*, *Screening*, *Interview*, *Diterima*, *Ditolak*) dengan popup konfirmasi material dan catatan evaluasi.
+4. **Data Simulasi & Fallback**: Tersedia tombol *"Muat Data Simulasi"* untuk langsung menguji pipeline screening lengkap dengan 3 kandidat contoh dan berkas CV PDF.
+
 ---
 
 ## 🗄️ Diagram Relasi Basis Data (Entity Relationship Diagram - ERD)
@@ -280,6 +302,23 @@ erDiagram
         datetime published_at
         datetime expires_at
     }
+
+    JOB_APPLICANTS {
+        bigint id PK
+        string name
+        string email
+        string phone
+        string position_applied
+        string subject
+        text message
+        string cv_path
+        string cv_filename
+        string email_uid UK
+        datetime email_date
+        enum status "Baru, Screening, Interview, Diterima, Ditolak"
+        text notes
+        timestamps created_at
+    }
 ```
 
 ---
@@ -332,12 +371,12 @@ Lara-HRIS telah diperkuat dengan standar perlindungan perbankan berlapis:
 
 | Peran | Nama Pegawai | Email Login | Hak Akses |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | Administrator Sistem | `admin@bprbandaraya.co.id` | `/admin` (Akses Penuh + Backup) |
-| **HR Officer** | Ratna Dewi, S.Psi | `ratna.dewi@bprbandaraya.co.id` | `/admin` (Manajemen HR Nasional) |
-| **Pincab Botania** | Hendra Kurniawan | `pincab.botania@bprbandaraya.co.id` | `/admin` (Khusus Cabang Botania) |
-| **Teller Botania** | Siti Rahma | `teller.botania@bprbandaraya.co.id` | `/portal` (Portal Mandiri Pegawai) |
-| **CS Botania** | Budi Santoso | `cs.botania@bprbandaraya.co.id` | `/portal` (Portal Mandiri Pegawai) |
-| **AO Botania** | Fajar Nugraha | `fajar.nugraha@bprbandaraya.co.id` | `/portal` (Portal Mandiri Pegawai) |
+| **Super Admin** | Administrator Sistem | `admin@bprbandaraya.com` | `/admin` (Akses Penuh + Backup) |
+| **HR Officer** | Ratna Dewi, S.Psi | `ratna.dewi@bprbandaraya.com` | `/admin` (Manajemen HR Nasional) |
+| **Pincab Botania** | Hendra Kurniawan | `pincab.botania@bprbandaraya.com` | `/admin` (Khusus Cabang Botania) |
+| **Teller Botania** | Siti Rahma | `teller.botania@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
+| **CS Botania** | Budi Santoso | `cs.botania@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
+| **AO Botania** | Fajar Nugraha | `fajar.nugraha@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
 
 ---
 
