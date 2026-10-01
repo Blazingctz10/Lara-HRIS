@@ -16,8 +16,7 @@ Panduan ini berisi langkah-langkah praktis dan operasional untuk mengelola dan m
 
 ```text
 d:\File Magang\Codeworks\Lara-HRIS\
-├── start.bat                     # Console menu interaktif (log live & tombol matikan server)
-├── run.bat                       # Alias cepat menjalankan start.bat
+├── start.bat                     # Satu-satunya launcher server (Console interaktif & live log)
 ├── Pass.txt                      # Catatan akun default pengujian
 └── hris-system\                  # Root aplikasi Laravel & Filament
     ├── app\

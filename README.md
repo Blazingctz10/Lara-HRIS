@@ -107,7 +107,7 @@ php artisan key:generate
 php artisan migrate --seed
 
 # 5. Jalankan server lokal
-# Opsi A: Menggunakan Console Menu Interaktif (start.bat / run.bat di root)
+# Opsi A: Menggunakan Console Menu Interaktif (start.bat di root)
 ..\start.bat
 
 # Opsi B: Manual via Artisan CLI
