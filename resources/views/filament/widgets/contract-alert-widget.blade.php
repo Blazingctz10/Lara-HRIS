@@ -7,9 +7,9 @@
         .m3-contract-card {
             border-radius: 24px !important;
             background: #ffffff !important;
-            border: 1px solid rgba(14, 104, 56, 0.1) !important;
+            border: 1px solid var(--m3-outline-variant, #B6CAC0) !important;
             padding: 1.5rem !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+            box-shadow: 0 2px 8px -2px rgba(14, 104, 56, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
             margin-bottom: 1.5rem !important;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
         }
@@ -103,8 +103,8 @@
             gap: 1rem;
             padding: 1rem 1.25rem;
             border-radius: 16px;
-            background: #f8faf9;
-            border: 1px solid rgba(14, 104, 56, 0.08);
+            background: #DFEAE2;
+            border: 1px solid #B6CAC0;
             margin-bottom: 0.65rem;
             transition: all 0.2s ease;
         }

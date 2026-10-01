@@ -53,29 +53,29 @@
   }
 
   :root[data-theme="light"] {
-    --m3-bg: #F4F6F4;
+    --m3-bg: #E8EFEA;
     --m3-surface: #FFFFFF;
-    --m3-surface-container: #F0F5F2;
-    --m3-surface-container-high: #E8EFEA;
-    --m3-surface-container-highest: #DDE7E0;
-    --m3-outline: #707C74;
-    --m3-outline-variant: #C8D4CC;
+    --m3-surface-container: #DFEAE2;
+    --m3-surface-container-high: #D6E3D9;
+    --m3-surface-container-highest: #CBDCD0;
+    --m3-outline: #5E7365;
+    --m3-outline-variant: #B6CAC0;
 
-    --m3-on-surface: #131A15;
-    --m3-on-surface-variant: #404B44;
+    --m3-on-surface: #0F1E14;
+    --m3-on-surface-variant: #33473B;
 
     --m3-primary: #0E6838;
     --m3-on-primary: #FFFFFF;
-    --m3-primary-container: #D1EADB;
+    --m3-primary-container: #CCE8D7;
     --m3-on-primary-container: #03361B;
 
     --m3-secondary: #EA580C;
     --m3-secondary-container: #FFEDD5;
     --m3-on-secondary-container: #7C2D12;
 
-    --m3-toggle-bg: rgba(0, 0, 0, 0.05);
-    --m3-toggle-border: rgba(0, 0, 0, 0.12);
-    --m3-card-border: rgba(14, 104, 56, 0.12);
+    --m3-toggle-bg: rgba(14, 104, 56, 0.08);
+    --m3-toggle-border: #B6CAC0;
+    --m3-card-border: #B6CAC0;
   }
 
   *, *::before, *::after {
@@ -342,14 +342,21 @@
 
   input.m3-input {
     width: 100%;
-    background: var(--m3-surface-container);
-    border: 1px solid var(--m3-outline-variant);
+    background: #FFFFFF;
+    border: 1.5px solid var(--m3-outline-variant);
     border-radius: 16px; /* M3 Squircle */
     padding: 0.85rem 1rem 0.85rem 2.85rem;
     color: var(--m3-on-surface);
     font-size: 0.925rem;
     outline: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  :root[data-theme="dark"] input.m3-input {
+    background: var(--m3-surface-container);
+    border-color: var(--m3-outline-variant);
+    box-shadow: none;
   }
 
   input.m3-input.has-trail {
@@ -358,8 +365,13 @@
 
   input.m3-input:focus {
     border-color: var(--m3-primary);
-    box-shadow: 0 0 0 2px var(--m3-primary-container);
+    box-shadow: 0 0 0 3px rgba(14, 104, 56, 0.16);
+    background: #FFFFFF;
+  }
+
+  :root[data-theme="dark"] input.m3-input:focus {
     background: var(--m3-surface);
+    box-shadow: 0 0 0 2px var(--m3-primary-container);
   }
 
   .input-container:focus-within .input-lead-icon {

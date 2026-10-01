@@ -15,27 +15,27 @@
     --m3-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
 
-    /* Light Mode: Soft Tonal Ergonomics (No harsh 100% white glare) */
-    --m3-bg: #F4F6F4;
+    /* Light Mode: Calming Warm Sage-Mint Ergonomics (Zero eye glare, high functional contrast) */
+    --m3-bg: #E8EFEA;
     --m3-surface: #FFFFFF;
-    --m3-surface-dim: #EDF2EE;
+    --m3-surface-dim: #E1EAE3;
     --m3-surface-bright: #FFFFFF;
-    --m3-surface-container-lowest: #FFFFFF;
-    --m3-surface-container-low: #F0F5F2;
-    --m3-surface-container: #E8EFEA;
-    --m3-surface-container-high: #E0E9E3;
-    --m3-surface-container-highest: #D7E2DB;
+    --m3-surface-container-lowest: #F4F8F5;
+    --m3-surface-container-low: #DFEAE2;
+    --m3-surface-container: #D6E3D9;
+    --m3-surface-container-high: #CBDCD0;
+    --m3-surface-container-highest: #BFD3C5;
 
     /* Text & Legibility */
-    --m3-on-surface: #131A15;
-    --m3-on-surface-variant: #404B44;
-    --m3-outline: #707C74;
-    --m3-outline-variant: #C0CDC5;
+    --m3-on-surface: #0F1E14;
+    --m3-on-surface-variant: #33473B;
+    --m3-outline: #5E7365;
+    --m3-outline-variant: #B6CAC0;
 
-    /* Corporate Accents */
+    /* Corporate Accents (PT BPR Banda Raya Deep Emerald) */
     --m3-primary: #0E6838;
     --m3-on-primary: #FFFFFF;
-    --m3-primary-container: #D1EADB;
+    --m3-primary-container: #CCE8D7;
     --m3-on-primary-container: #03361B;
 
     --m3-secondary: #EA580C;
@@ -49,9 +49,9 @@
     --m3-on-tertiary-container: #713F12;
 
     /* Elevation */
-    --m3-elevation-1: 0 1px 3px 1px rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    --m3-elevation-2: 0 4px 14px 0 rgba(14, 104, 56, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.03);
-    --m3-elevation-3: 0 8px 24px -4px rgba(14, 104, 56, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+    --m3-elevation-1: 0 1px 3px rgba(14, 104, 56, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --m3-elevation-2: 0 4px 14px 0 rgba(14, 104, 56, 0.09), 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+    --m3-elevation-3: 0 8px 24px -4px rgba(14, 104, 56, 0.14), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
 }
 
 .dark {
@@ -172,10 +172,16 @@ body.fi-body {
 .fi-topbar {
     background-color: var(--m3-surface-container-lowest) !important;
     border-bottom: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: var(--m3-elevation-1) !important;
+    box-shadow: 0 1px 3px rgba(14, 104, 56, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
     overflow: visible !important;
     padding-right: 1.5rem !important;
     box-sizing: border-box !important;
+}
+
+:is(.dark) .fi-topbar {
+    background-color: var(--m3-surface-container-low) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
 }
 
 .fi-topbar nav {
@@ -275,6 +281,11 @@ body.fi-body {
 .fi-section-header {
     border-bottom: 1px solid var(--m3-outline-variant) !important;
     padding: 1.25rem 1.5rem !important;
+    background-color: var(--m3-surface-container-lowest) !important;
+}
+
+:is(.dark) .fi-section-header {
+    background-color: transparent !important;
 }
 
 .fi-section-header-title {
@@ -322,14 +333,19 @@ body.fi-body {
 }
 
 .fi-ta-header-cell {
-    background-color: var(--m3-surface-container-low) !important;
-    color: var(--m3-on-surface-variant) !important;
+    background-color: var(--m3-surface-container) !important;
+    color: var(--m3-on-surface) !important;
     font-weight: 700 !important;
     font-size: 0.78rem !important;
     letter-spacing: 0.5px !important;
     text-transform: uppercase !important;
     border-bottom: 1px solid var(--m3-outline-variant) !important;
     padding: 0.95rem 1rem !important;
+}
+
+:is(.dark) .fi-ta-header-cell {
+    background-color: var(--m3-surface-container-low) !important;
+    color: var(--m3-on-surface-variant) !important;
 }
 
 .fi-ta-row {
@@ -417,15 +433,21 @@ body.fi-body {
    ============================================================================= */
 .fi-input-wrp {
     border-radius: 14px !important; /* M3 Squircle Input */
-    background-color: var(--m3-surface-container-lowest) !important;
+    background-color: #FFFFFF !important;
     border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+:is(.dark) .fi-input-wrp {
+    background-color: var(--m3-surface-container-lowest) !important;
+    border-color: var(--m3-outline-variant) !important;
+    box-shadow: none !important;
 }
 
 .fi-input-wrp:focus-within {
     border-color: var(--m3-primary) !important;
-    box-shadow: 0 0 0 2px var(--m3-primary-container) !important;
+    box-shadow: 0 0 0 3px rgba(14, 104, 56, 0.16) !important;
 }
 
 .fi-input {
@@ -605,7 +627,7 @@ body.fi-body {
 .fi-modal-header {
     padding: 1.5rem 1.75rem 1.15rem !important;
     border-bottom: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface) !important;
+    background-color: var(--m3-surface-container-lowest) !important;
 }
 
 :is(.dark) .fi-modal-header {

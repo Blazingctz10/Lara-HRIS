@@ -17,17 +17,17 @@
             --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
             --m3-font-mono: 'JetBrains Mono', monospace;
 
-            --bg: #F4F6F4;
+            --bg: #E8EFEA;
             --surface: #FFFFFF;
-            --surface-container: #E8EFEA;
-            --surface-container-high: #D7E2DB;
-            --on-surface: #131A15;
-            --on-surface-variant: #526156;
-            --outline: #707C74;
-            --outline-variant: #C0CDC5;
+            --surface-container: #DFEAE2;
+            --surface-container-high: #D6E3D9;
+            --on-surface: #0F1E14;
+            --on-surface-variant: #33473B;
+            --outline: #5E7365;
+            --outline-variant: #B6CAC0;
 
             --primary: #0E6838;
-            --primary-container: #D1EADB;
+            --primary-container: #CCE8D7;
             --on-primary-container: #03361B;
             
             --error: #DC2626;
