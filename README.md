@@ -107,10 +107,15 @@ php artisan key:generate
 php artisan migrate --seed
 
 # 5. Jalankan server lokal
+# Opsi A: Menggunakan Console Menu Interaktif (start.bat / run.bat di root)
+..\start.bat
+
+# Opsi B: Manual via Artisan CLI
 php artisan serve
 ```
 
 Akses sistem di peramban Anda melalui: **`http://127.0.0.1:8000`**
+- **Console Menu (`start.bat`)**: Dilengkapi pilihan aksi [1-5], pemantauan log request secara real-time, dan tombol matikan server langsung di dalam CMD.
 
 ---
 

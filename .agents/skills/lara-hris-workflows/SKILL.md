@@ -16,8 +16,8 @@ Panduan ini berisi langkah-langkah praktis dan operasional untuk mengelola dan m
 
 ```text
 d:\File Magang\Codeworks\Lara-HRIS\
-├── .agents\                      # Kustomisasi AI (Rules & Skills)
-├── run.bat                       # Script launcher otomatis aplikasi
+├── start.bat                     # Console menu interaktif (log live & tombol matikan server)
+├── run.bat                       # Alias cepat menjalankan start.bat
 ├── Pass.txt                      # Catatan akun default pengujian
 └── hris-system\                  # Root aplikasi Laravel & Filament
     ├── app\
