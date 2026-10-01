@@ -5,6 +5,26 @@ namespace App\Services;
 class GeofencingService
 {
     /**
+     * Status aktif/nonaktif fitur pembatasan radius GPS Geofencing.
+     * Dinonaktifkan dahulu sesuai kebijakan operasional bank.
+     */
+    protected static ?bool $enabled = null;
+
+    public static function isEnabled(): bool
+    {
+        if (static::$enabled !== null) {
+            return static::$enabled;
+        }
+
+        return (bool) env('GEOFENCING_ENABLED', false);
+    }
+
+    public static function setEnabled(bool $state): void
+    {
+        static::$enabled = $state;
+    }
+
+    /**
      * Calculate distance between two GPS coordinates using Haversine formula (in meters)
      */
     public static function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): int
@@ -31,12 +51,16 @@ class GeofencingService
     public static function isWithinRadius(float $lat1, float $lon1, float $branchLat, float $branchLon, int $allowedRadiusMeters): array
     {
         $distance = self::calculateDistance($lat1, $lon1, $branchLat, $branchLon);
-        $isWithin = $distance <= $allowedRadiusMeters;
+        $isGeofenceActive = self::isEnabled();
+
+        // Jika geofencing dinonaktifkan, selalu valid (bebas lokasi)
+        $isWithin = $isGeofenceActive ? ($distance <= $allowedRadiusMeters) : true;
 
         return [
             'distance_meters' => $distance,
             'is_valid' => $isWithin,
             'allowed_radius' => $allowedRadiusMeters,
+            'geofencing_enabled' => $isGeofenceActive,
         ];
     }
 }

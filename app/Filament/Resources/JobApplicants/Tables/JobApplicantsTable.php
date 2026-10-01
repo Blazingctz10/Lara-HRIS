@@ -97,6 +97,53 @@ class JobApplicantsTable
                     ->url(fn (JobApplicant $record): string => asset('storage/' . $record->cv_path))
                     ->openUrlInNewTab(),
 
+                Action::make('hire_as_employee')
+                    ->label('Terima Jadi Pegawai')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->visible(fn (JobApplicant $record): bool => $record->status !== 'Diterima')
+                    ->modalHeading('Penerimaan & Pengangkatan Pegawai Baru')
+                    ->modalDescription('Pelamar ini akan otomatis didaftarkan ke direktori Pegawai Aktif, dibuatkan NIP resmi, akun login portal (@bprbandaraya.com), serta jatah cuti tahunan awal (12 hari).')
+                    ->modalSubmitActionLabel('Konfirmasi & Angkat Pegawai')
+                    ->form([
+                        \Filament\Forms\Components\Select::make('branch_id')
+                            ->label('Kantor Cabang Penempatan')
+                            ->options(\App\Models\Branch::pluck('name', 'id'))
+                            ->default(fn () => \App\Models\Branch::first()?->id)
+                            ->required(),
+
+                        \Filament\Forms\Components\Select::make('position_id')
+                            ->label('Jabatan Resmi')
+                            ->options(\App\Models\Position::pluck('name', 'id'))
+                            ->searchable()
+                            ->required(),
+
+                        \Filament\Forms\Components\DatePicker::make('join_date')
+                            ->label('Tanggal Mulai Bekerja (Join Date)')
+                            ->default(now())
+                            ->required(),
+
+                        \Filament\Forms\Components\Select::make('employment_status')
+                            ->label('Status Ikatan Kerja')
+                            ->options([
+                                'Probation' => 'Masa Percobaan (Probation 3 Bulan)',
+                                'Contract' => 'Perjanjian Kerja Waktu Tertentu (PKWT / Kontrak)',
+                                'Permanent' => 'Pegawai Tetap',
+                            ])
+                            ->default('Probation')
+                            ->required(),
+                    ])
+                    ->action(function (JobApplicant $record, array $data): void {
+                        $employee = $record->promoteToEmployee($data);
+
+                        Notification::make()
+                            ->title('Pelamar Resmi Diangkat Menjadi Pegawai!')
+                            ->body("Selamat! {$record->name} otomatis terdaftar sebagai Pegawai Aktif dengan NIP {$employee->nip}. Akun portal ({$employee->email}) telah aktif.")
+                            ->success()
+                            ->persistent()
+                            ->send();
+                    }),
+
                 Action::make('update_status')
                     ->label('Ubah Status')
                     ->icon('heroicon-o-pencil-square')
@@ -111,7 +158,7 @@ class JobApplicantsTable
                                 'Baru' => 'Baru Masuk',
                                 'Screening' => 'Screening Administrasi',
                                 'Interview' => 'Tahap Wawancara',
-                                'Diterima' => 'Diterima Kerja',
+                                'Diterima' => 'Diterima Kerja (Otomatis Masuk Direktori Pegawai)',
                                 'Ditolak' => 'Tidak Lolos / Ditolak',
                             ])
                             ->required(),
@@ -126,16 +173,25 @@ class JobApplicantsTable
                         'notes' => $record->notes,
                     ])
                     ->action(function (JobApplicant $record, array $data): void {
-                        $record->update([
-                            'status' => $data['status'],
-                            'notes' => $data['notes'] ?? $record->notes,
-                        ]);
+                        if ($data['status'] === 'Diterima') {
+                            $employee = $record->promoteToEmployee(['notes' => $data['notes']]);
+                            Notification::make()
+                                ->title('Status Diperbarui: Pelamar Diterima')
+                                ->body("{$record->name} otomatis masuk direktori Pegawai dengan NIP: {$employee->nip}")
+                                ->success()
+                                ->send();
+                        } else {
+                            $record->update([
+                                'status' => $data['status'],
+                                'notes' => $data['notes'] ?? $record->notes,
+                            ]);
 
-                        Notification::make()
-                            ->title('Status Berhasil Diperbarui')
-                            ->body("Status lamaran {$record->name} berhasil diubah menjadi {$data['status']}")
-                            ->success()
-                            ->send();
+                            Notification::make()
+                                ->title('Status Berhasil Diperbarui')
+                                ->body("Status lamaran {$record->name} berhasil diubah menjadi {$data['status']}")
+                                ->success()
+                                ->send();
+                        }
                     }),
 
                 EditAction::make(),

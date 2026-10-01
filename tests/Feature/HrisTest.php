@@ -33,6 +33,8 @@ class HrisTest extends TestCase
 
     public function test_geofencing_calculation(): void
     {
+        GeofencingService::setEnabled(true);
+
         // KC Botania coords: 1.11650000, 104.08900000
         $result = GeofencingService::isWithinRadius(
             1.11650000,
@@ -56,6 +58,17 @@ class HrisTest extends TestCase
 
         $this->assertFalse($farResult['is_valid']);
         $this->assertGreaterThan(50, $farResult['distance_meters']);
+
+        // When disabled, is_valid should be true even when far
+        GeofencingService::setEnabled(false);
+        $disabledResult = GeofencingService::isWithinRadius(
+            1.12500000,
+            104.08900000,
+            1.11650000,
+            104.08900000,
+            50
+        );
+        $this->assertTrue($disabledResult['is_valid']);
     }
 
     public function test_leave_balance_observer_deducts_on_hr_approval(): void
