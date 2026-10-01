@@ -6,15 +6,15 @@
     <title>@yield('title') &bull; Core HRIS PT BPR Banda Raya</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
 
-    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --m3-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            --m3-font-display: 'Outfit', var(--m3-font-sans);
+            --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
             --m3-font-mono: 'JetBrains Mono', monospace;
 
             --bg: #F4F6F4;

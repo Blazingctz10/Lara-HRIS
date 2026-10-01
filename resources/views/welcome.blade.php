@@ -7,10 +7,10 @@
 <title>Masuk — Core HRIS PT BPR Banda Raya</title>
 <link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
 
-<!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+<!-- Google Fonts: Plus Jakarta Sans (Unified Across Lara-HRIS) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <script>
   (function() {
@@ -21,8 +21,9 @@
 
 <style>
   /* =============================================================================
-     MATERIAL 3 EXPRESSIVE DESIGN TOKENS - SPLIT SCREEN LOGIN
-     BPR BANDA RAYA CORE HRIS
+     MATERIAL 3 EXPRESSIVE - MINIMALIST SPLIT SCREEN LOGIN
+     PT BANK PEREKONOMIAN RAKYAT BANDA RAYA
+     Strict Typography: Plus Jakarta Sans 100%
      ============================================================================= */
 
   :root[data-theme="dark"] {
@@ -46,12 +47,9 @@
     --m3-secondary-container: #7C2D12;
     --m3-on-secondary-container: #FED7AA;
 
-    --m3-tertiary: #FACC15;
-
     --m3-toggle-bg: rgba(255, 255, 255, 0.08);
-    --m3-toggle-border: rgba(255, 255, 255, 0.12);
+    --m3-toggle-border: rgba(255, 255, 255, 0.14);
     --m3-card-border: rgba(255, 255, 255, 0.08);
-    --m3-input-bg: #141E18;
   }
 
   :root[data-theme="light"] {
@@ -75,24 +73,21 @@
     --m3-secondary-container: #FFEDD5;
     --m3-on-secondary-container: #7C2D12;
 
-    --m3-tertiary: #CA8A04;
-
     --m3-toggle-bg: rgba(0, 0, 0, 0.05);
-    --m3-toggle-border: rgba(0, 0, 0, 0.1);
+    --m3-toggle-border: rgba(0, 0, 0, 0.12);
     --m3-card-border: rgba(14, 104, 56, 0.12);
-    --m3-input-bg: #FFFFFF;
   }
 
   *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 
   html, body {
     height: 100%;
     width: 100%;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background-color: var(--m3-bg);
     color: var(--m3-on-surface);
     -webkit-font-smoothing: antialiased;
@@ -108,20 +103,19 @@
   }
 
   /* =============================================================================
-     LEFT SIDE: VISUAL HERO BANNER (Modern Banking Corporate Showcase)
+     LEFT SIDE: CLEAN HERO BANNER (Visual & Narrative Focus)
      ============================================================================= */
   .hero-panel {
     flex: 1 1 50%;
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 3.5rem 3.5rem;
+    justify-content: flex-end;
+    padding: 4.5rem 4rem;
     overflow: hidden;
     background-color: #081a10;
   }
 
-  /* Background Image with Dark & Light Responsive Blend Overlay */
   .hero-panel-bg {
     position: absolute;
     inset: 0;
@@ -129,77 +123,51 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.88;
-    filter: saturate(1.15) contrast(1.05);
-    transition: transform 10s ease-out;
+    opacity: 0.92;
+    filter: saturate(1.1) contrast(1.04);
+    transition: transform 12s cubic-bezier(0.2, 0, 0, 1);
   }
 
   .hero-panel:hover .hero-panel-bg {
-    transform: scale(1.03);
+    transform: scale(1.035);
   }
 
-  /* Gradient Overlay */
+  /* Elegant Gradient Scrim */
   .hero-panel-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(8, 26, 16, 0.72) 0%,
-      rgba(10, 32, 20, 0.82) 40%,
+      rgba(8, 26, 16, 0.45) 0%,
+      rgba(10, 32, 20, 0.72) 40%,
       rgba(7, 18, 12, 0.96) 100%
     );
-    backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1px);
   }
 
   :root[data-theme="light"] .hero-panel-overlay {
     background: linear-gradient(
       180deg,
-      rgba(14, 104, 56, 0.68) 0%,
-      rgba(11, 79, 39, 0.84) 45%,
-      rgba(4, 38, 18, 0.96) 100%
+      rgba(14, 104, 56, 0.4) 0%,
+      rgba(11, 79, 39, 0.75) 45%,
+      rgba(4, 38, 18, 0.95) 100%
     );
   }
 
-  /* Content inside Left Hero Panel */
   .hero-content {
     position: relative;
     z-index: 10;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-  }
-
-  .hero-badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(12px);
-    color: #BBF7D0;
-    padding: 0.45rem 1rem;
-    border-radius: 9999px; /* M3 Full Pill */
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    width: fit-content;
-  }
-
-  .hero-title-box {
-    margin-top: auto;
-    margin-bottom: 2.25rem;
+    max-width: 580px;
   }
 
   .hero-headline {
-    font-family: 'Outfit', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
     color: #FFFFFF;
-    margin-bottom: 1.15rem;
-    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1.25rem;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
   }
 
   .hero-headline span.accent {
@@ -210,137 +178,62 @@
 
   .hero-subtext {
     font-size: 1.05rem;
-    line-height: 1.6;
+    line-height: 1.65;
     color: #D1EADB;
-    max-width: 520px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Floating Metrics / Highlights (M3 Glassmorphic Cards) */
-  .hero-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-bottom: 2.25rem;
-  }
-
-  .hero-metric-card {
-    background: rgba(20, 36, 26, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(16px);
-    border-radius: 20px;
-    padding: 1.15rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
-  }
-
-  .hero-metric-card:hover {
-    background: rgba(20, 36, 26, 0.75);
-    transform: translateY(-2px);
-    border-color: rgba(74, 222, 128, 0.4);
-  }
-
-  .hero-metric-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: rgba(74, 222, 128, 0.16);
-    color: #4ADE80;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .hero-metric-info h4 {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: #FFFFFF;
-    margin-bottom: 0.15rem;
-  }
-
-  .hero-metric-info p {
-    font-size: 0.775rem;
-    color: #A7F3D0;
-    line-height: 1.35;
-  }
-
-  /* Regulatory LPS/OJK footer */
-  .hero-footer-reg {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    font-size: 0.75rem;
-    color: #9EABA3;
-    line-height: 1.45;
-  }
-
-  .hero-footer-reg svg {
-    flex-shrink: 0;
-    color: #FACC15;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    font-weight: 400;
   }
 
   /* =============================================================================
-     RIGHT SIDE: LOGIN FORM PANEL
+     RIGHT SIDE: CLEAN LOGIN FORM PANEL
      ============================================================================= */
   .form-panel {
     flex: 1 1 50%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 2.5rem 3rem;
+    padding: 3rem 3.5rem;
     background-color: var(--m3-bg);
     position: relative;
     overflow-y: auto;
   }
 
-  /* Top Bar with Switcher */
+  /* Minimalist Top Bar: Just the Modern Icon Toggle Button */
   .form-top-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
     margin-bottom: 2rem;
   }
 
-  .portal-switch-pill {
-    display: inline-flex;
+  /* Modern Icon-Only Theme Switcher Button */
+  .modern-theme-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%; /* Modern Circular / Tactile Button */
+    display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
-    background: var(--m3-primary-container);
-    color: var(--m3-on-primary-container);
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    border: 1px solid rgba(14, 104, 56, 0.15);
-  }
-
-  .theme-toggle-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     background: var(--m3-toggle-bg);
     border: 1px solid var(--m3-toggle-border);
     color: var(--m3-on-surface);
-    padding: 0.45rem 1rem;
-    border-radius: 9999px; /* M3 Pill */
-    font-size: 0.8rem;
-    font-weight: 700;
     cursor: pointer;
     backdrop-filter: blur(12px);
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-    user-select: none;
+    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
 
-  .theme-toggle-btn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.08);
+  .modern-theme-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: var(--m3-surface-container-high);
+    border-color: var(--m3-primary);
+    color: var(--m3-primary);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  .modern-theme-btn:active {
+    transform: translateY(0) scale(0.98);
   }
 
   /* Form Container */
@@ -351,7 +244,7 @@
   }
 
   .brand-logo-wrap {
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
   }
 
   .brand-logo-img {
@@ -367,16 +260,15 @@
   }
 
   .form-header h1 {
-    font-family: 'Outfit', sans-serif;
     font-size: 1.85rem;
     font-weight: 800;
     color: var(--m3-on-surface);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
     margin-bottom: 0.35rem;
   }
 
   .form-header p {
-    font-size: 0.9rem;
+    font-size: 0.925rem;
     color: var(--m3-on-surface-variant);
     line-height: 1.5;
   }
@@ -456,7 +348,6 @@
     padding: 0.85rem 1rem 0.85rem 2.85rem;
     color: var(--m3-on-surface);
     font-size: 0.925rem;
-    font-family: inherit;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
@@ -604,25 +495,13 @@
     transform: translateY(-1px);
   }
 
-  /* Form Footer */
+  /* Clean Minimalist Footer */
   .form-footer {
-    margin-top: 2rem;
-    font-size: 0.775rem;
+    margin-top: 2.25rem;
+    font-size: 0.8rem;
     color: var(--m3-on-surface-variant);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    text-align: center;
     opacity: 0.85;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .security-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    color: var(--m3-primary);
-    font-weight: 600;
   }
 
   /* =============================================================================
@@ -635,15 +514,11 @@
 
     .hero-panel {
       padding: 3rem 2rem;
-      min-height: 380px;
+      min-height: 320px;
     }
 
     .hero-headline {
-      font-size: 2rem;
-    }
-
-    .hero-cards-grid {
-      grid-template-columns: 1fr;
+      font-size: 2.15rem;
     }
 
     .form-panel {
@@ -653,7 +528,7 @@
 
   @media (max-width: 640px) {
     .hero-panel {
-      display: none; /* Mobile view: focus entirely on ergonomic login */
+      display: none; /* Focus entirely on login */
     }
 
     .form-panel {
@@ -667,125 +542,39 @@
   <div class="split-layout">
 
     <!-- =======================================================================
-         LEFT: VISUAL HERO BANNER (Modern Banking Corporate Showcase)
+         LEFT: CLEAN VISUAL HERO BANNER
+         Spacious, elegant, uncluttered showcase
          ======================================================================= -->
-    <section class="hero-panel" aria-label="Informasi Perusahaan BPR Banda Raya">
+    <section class="hero-panel" aria-label="Visual Perusahaan PT BPR Banda Raya">
       <div class="hero-panel-bg"></div>
       <div class="hero-panel-overlay"></div>
 
       <div class="hero-content">
-        <!-- Top Pill Badge -->
-        <div class="hero-badge-pill">
-          <!-- Heroicon: shield-check -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 16px; height: 16px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-          </svg>
-          <span>Sistem Informasi SDM Terpadu</span>
-        </div>
-
-        <!-- Headline & Story -->
-        <div class="hero-title-box">
-          <h2 class="hero-headline">
-            Tata Kelola SDM Modern, <br>
-            <span class="accent">Akurat & Terintegrasi</span>
-          </h2>
-          <p class="hero-subtext">
-            Mendukung operasional perbankan yang tangguh, aman, dan akuntabel di seluruh jaringan kantor operasional PT Bank Perekonomian Rakyat Banda Raya.
-          </p>
-        </div>
-
-        <!-- Glassmorphic Highlights Grid -->
-        <div class="hero-cards-grid">
-          <div class="hero-metric-card">
-            <div class="hero-metric-icon">
-              <!-- Heroicon: clock -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 22px; height: 22px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-            </div>
-            <div class="hero-metric-info">
-              <h4>Absensi Multi-Terminal</h4>
-              <p>Biometric Solution X105 & GPS Radius Kantor Cabang</p>
-            </div>
-          </div>
-
-          <div class="hero-metric-card">
-            <div class="hero-metric-icon">
-              <!-- Heroicon: building-office-2 -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 22px; height: 22px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-              </svg>
-            </div>
-            <div class="hero-metric-info">
-              <h4>Jaringan Kantor Terpadu</h4>
-              <p>Kantor Pusat, Botania, Aviari, & Bengkong</p>
-            </div>
-          </div>
-
-          <div class="hero-metric-card">
-            <div class="hero-metric-icon">
-              <!-- Heroicon: calendar-days -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 22px; height: 22px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-              </svg>
-            </div>
-            <div class="hero-metric-info">
-              <h4>Evaluasi PKWT Otomatis</h4>
-              <p>Peringatan dini jatuh tempo kontrak & masa percobaan</p>
-            </div>
-          </div>
-
-          <div class="hero-metric-card">
-            <div class="hero-metric-icon">
-              <!-- Heroicon: banknotes -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 22px; height: 22px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v10.5m0-10.5h16.5m0 0a2.25 2.25 0 0 1 2.25 2.25v10.5m-2.25-12.75V4.5a.75.75 0 0 0-.75-.75H3.75m16.5 0a2.25 2.25 0 0 1 2.25 2.25v.75m-18 0v10.5" />
-              </svg>
-            </div>
-            <div class="hero-metric-info">
-              <h4>Payroll & Klaim Terverifikasi</h4>
-              <p>Kompensasi transparan & persetujuan berjenjang</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Regulatory Notice -->
-        <div class="hero-footer-reg">
-          <!-- Heroicon: shield-exclamation -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 18px; height: 18px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
-          </svg>
-          <span>PT Bank Perekonomian Rakyat Banda Raya berizin dan diawasi oleh Otoritas Jasa Keuangan (OJK) serta merupakan peserta penjaminan LPS.</span>
-        </div>
+        <h2 class="hero-headline">
+          Tata Kelola SDM Modern, <br>
+          <span class="accent">Akurat & Terintegrasi</span>
+        </h2>
+        <p class="hero-subtext">
+          Mendukung operasional perbankan yang tangguh, aman, dan akuntabel di seluruh jaringan kantor operasional PT Bank Perekonomian Rakyat Banda Raya.
+        </p>
       </div>
     </section>
 
     <!-- =======================================================================
-         RIGHT: LOGIN FORM PANEL
+         RIGHT: MINIMALIST LOGIN FORM PANEL
          ======================================================================= -->
     <main class="form-panel">
-      <!-- Top Action Bar -->
+      <!-- Top Action Bar: Modern Minimalist Icon Button -->
       <div class="form-top-bar">
-        <div class="portal-switch-pill">
-          <!-- Heroicon: lock-closed -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+        <button type="button" class="modern-theme-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Ganti Mode Tampilan (Terang / Gelap)" aria-label="Ganti mode tampilan">
+          <!-- Heroicon: moon (dark mode active) -->
+          <svg id="svg-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 20px; height: 20px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
           </svg>
-          <span>Single Sign-On Terpadu</span>
-        </div>
-
-        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" id="btn-theme-toggle" aria-label="Ganti mode tampilan">
-          <span id="theme-icon" style="display: flex; align-items: center;">
-            <!-- Heroicon: moon (dark mode active) -->
-            <svg id="svg-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 15px; height: 15px;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-            </svg>
-            <!-- Heroicon: sun (light mode active) -->
-            <svg id="svg-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 15px; height: 15px; display: none;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-            </svg>
-          </span>
-          <span id="theme-text">Mode Gelap</span>
+          <!-- Heroicon: sun (light mode active) -->
+          <svg id="svg-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 20px; height: 20px; display: none; color: #EA580C;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+          </svg>
         </button>
       </div>
 
@@ -899,16 +688,9 @@
         </div>
       </div>
 
-      <!-- Footer Info -->
+      <!-- Clean Minimalist Footer -->
       <footer class="form-footer">
-        <div>&copy; 2026 PT Bank Perekonomian Rakyat Banda Raya.</div>
-        <div class="security-indicator">
-          <!-- Heroicon: lock-closed -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-          </svg>
-          <span>Enkripsi SSL 256-Bit</span>
-        </div>
+        &copy; 2026 PT Bank Perekonomian Rakyat Banda Raya. Hak Cipta Dilindungi Undang-Undang.
       </footer>
     </main>
 
@@ -924,18 +706,15 @@
 
       const svgMoon = document.getElementById('svg-moon');
       const svgSun = document.getElementById('svg-sun');
-      const themeText = document.getElementById('theme-text');
       const brandLogo = document.getElementById('brand-logo');
 
       if (theme === 'light') {
         if (svgMoon) svgMoon.style.display = 'none';
         if (svgSun) svgSun.style.display = 'block';
-        if (themeText) themeText.textContent = 'Mode Terang';
         if (brandLogo) brandLogo.src = lightLogo;
       } else {
         if (svgMoon) svgMoon.style.display = 'block';
         if (svgSun) svgSun.style.display = 'none';
-        if (themeText) themeText.textContent = 'Mode Gelap';
         if (brandLogo) brandLogo.src = darkLogo;
       }
     }

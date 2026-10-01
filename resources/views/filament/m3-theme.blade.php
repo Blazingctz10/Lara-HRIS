@@ -1,18 +1,19 @@
-<!-- Google Fonts: Plus Jakarta Sans & Outfit for Material 3 Expressive -->
+<!-- Google Fonts: Plus Jakarta Sans for Material 3 Expressive -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 /* =============================================================================
    PT BPR BANDA RAYA - CORE HRIS
    MATERIAL 3 EXPRESSIVE DESIGN SYSTEM (LIGHT & DARK MODES)
    High Reader Ergonomics, Zero Eye Strain, Tactile Tonal Containers
+   Unified Font: Plus Jakarta Sans
    ============================================================================= */
 
 :root {
     --m3-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --m3-font-display: 'Outfit', var(--m3-font-sans);
+    --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
 
     /* Light Mode: Soft Tonal Ergonomics (No harsh 100% white glare) */
     --m3-bg: #F4F6F4;

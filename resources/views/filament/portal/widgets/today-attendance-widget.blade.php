@@ -81,7 +81,7 @@
         }
 
         .m3-att-greeting {
-            font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             font-size: 1.55rem;
             font-weight: 800;
             margin-top: 0.65rem;
