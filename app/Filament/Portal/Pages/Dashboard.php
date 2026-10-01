@@ -6,6 +6,7 @@ use App\Filament\Portal\Widgets\AnnouncementsWidget;
 use App\Filament\Portal\Widgets\MyLeaveBalanceWidget;
 use App\Filament\Portal\Widgets\MyRecentReimbursementsWidget;
 use App\Filament\Portal\Widgets\MyReimbursementStatsWidget;
+use App\Filament\Portal\Widgets\PortalShortcutWidget;
 use App\Filament\Portal\Widgets\TodayAttendanceWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
@@ -18,6 +19,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            PortalShortcutWidget::class,
             TodayAttendanceWidget::class,
             MyLeaveBalanceWidget::class,
             MyReimbursementStatsWidget::class,

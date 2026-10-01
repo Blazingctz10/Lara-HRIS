@@ -43,10 +43,6 @@ class PortalPanelProvider extends PanelProvider
             )
             ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
-                fn (): string => view('filament.components.portal-shortcut-bar')->render()
-            )
-            ->renderHook(
-                PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => view('filament.components.role-indicator')->render()
             )
             ->topNavigation()

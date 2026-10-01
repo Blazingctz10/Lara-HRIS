@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AdminShortcutWidget;
 use App\Filament\Widgets\BankStatsOverview;
 use App\Filament\Widgets\ContractAlertWidget;
 use App\Filament\Widgets\EmployeesByBranchChartWidget;
@@ -18,6 +19,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            AdminShortcutWidget::class,
             BankStatsOverview::class,
             RecentLeaveRequestsWidget::class,
             EmployeesByBranchChartWidget::class,
