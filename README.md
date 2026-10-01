@@ -15,7 +15,7 @@
 
 ## 📌 Ringkasan Sistem
 
-**Core HRIS PT BPR Banda Raya** adalah platform enterprise terpadu untuk tata kelola siklus hidup kepegawaian (*employee lifecycle*), presensi pintar berbasis radius geofencing GPS, persetujuan cuti berjenjang, manajemen pergerakan karir & promosi, penegakan disiplin (Surat Peringatan), slip gaji (payroll) digital, klaim reimbursement, serta manajemen arsip cadangan data sistem.
+**Core HRIS PT BPR Banda Raya** adalah platform enterprise terpadu untuk tata kelola siklus hidup kepegawaian (*employee lifecycle*), presensi pintar berbasis radius geofencing GPS, persetujuan cuti berjenjang, manajemen pergerakan karir & promosi, penegakan disiplin (Surat Peringatan), klaim reimbursement, serta manajemen arsip cadangan data sistem.
 
 Aplikasi dirancang dengan arsitektur **Dual-Panel (Backoffice HR & Portal Mandiri Karyawan)** dan mengadopsi standar **Material 3 Expressive Tonal Container**:
 - 🌲 **Deep Emerald Green (`#0E6838`)** — Identitas korporat perbankan yang stabil, aman, dan berintegritas.
@@ -42,8 +42,8 @@ graph TD
 
 | Panel | Rute URL | Akses Peran | Cakupan Fungsional |
 | :--- | :--- | :--- | :--- |
-| **Backoffice HR Panel** | `/admin` | Super Admin, HR Officer, Pimpinan Cabang (Pincab) | Tata kelola master cabang, departemen, jabatan, master pegawai, persetujuan cuti & klaim, surat peringatan, mutasi kerja, mesin fingerprint, payroll, dan pencadangan data sistem. |
-| **Portal Mandiri Pegawai (ESS)** | `/portal` | Karyawan / Staf (Teller, CS, AO, Security, Umum) | Presensi GPS Geofencing harian, riwayat kehadiran, pengajuan cuti & lembur, slip gaji mandiri, dan pembaruan biodata kontak. |
+| **Backoffice HR Panel** | `/admin` | Super Admin, HR Officer, Pimpinan Cabang (Pincab) | Tata kelola master cabang, departemen, jabatan, master pegawai, persetujuan cuti & klaim, surat peringatan, mutasi kerja, mesin fingerprint, dan pencadangan data sistem. |
+| **Portal Mandiri Pegawai (ESS)** | `/portal` | Karyawan / Staf (Teller, CS, AO, Security, Umum) | Presensi GPS Geofencing harian, riwayat kehadiran, pengajuan cuti & lembur, dan pembaruan biodata kontak. |
 
 ---
 
@@ -158,7 +158,6 @@ erDiagram
     EMPLOYEES ||--o{ ATTENDANCES : "catatan log"
     EMPLOYEES ||--o{ LEAVE_REQUESTS : "mengajukan cuti"
     EMPLOYEES ||--|| EMPLOYEE_LEAVE_BALANCES : "kuota saldo cuti"
-    EMPLOYEES ||--o{ PAYROLLS : "slip gaji"
     EMPLOYEES ||--o{ OVERTIMES : "pengajuan lembur"
     EMPLOYEES ||--o{ REIMBURSEMENTS : "klaim operasional"
     EMPLOYEES ||--o{ CAREER_MOVEMENTS : "riwayat mutasi/promosi"
@@ -264,19 +263,6 @@ erDiagram
         integer remaining_days
     }
 
-    PAYROLLS {
-        bigint id PK
-        bigint employee_id FK
-        integer period_month
-        integer period_year
-        decimal basic_salary
-        decimal allowances
-        decimal deductions
-        decimal overtime_pay
-        decimal net_salary
-        enum status "Draft, Approved, Paid"
-    }
-
     CAREER_MOVEMENTS {
         bigint id PK
         bigint employee_id FK
@@ -337,11 +323,10 @@ erDiagram
 | :--- | :---: | :---: | :---: | :---: |
 | **Login Mandiri & Ganti Tema** | ✅ | ✅ | ✅ | ✅ |
 | **Presensi GPS Geofencing** | ✅ Mandiri | ❌ | ❌ | ❌ |
-| **Lihat Riwayat & Slip Gaji** | ✅ Milik Sendiri | ❌ | ✅ Semua Pegawai | ✅ Semua Pegawai |
 | **Pengajuan Cuti & Lembur** | ✅ Ajukan | ❌ | ❌ | ❌ |
 | **Persetujuan Cuti Tahap 1 (Pincab)** | ❌ | ✅ Cabang Sendiri | ❌ | ❌ |
 | **Persetujuan Final Cuti (HR)** | ❌ | ❌ | ✅ Nasional | ✅ Nasional |
-| **Kelola Data Pegawai & Gaji** | ❌ | ❌ | ✅ Kelola | ✅ Kelola |
+| **Kelola Data Induk Pegawai** | ❌ | ❌ | ✅ Kelola | ✅ Kelola |
 | **Terbitkan SP & Mutasi Karir** | ❌ | ❌ | ✅ Terbitkan | ✅ Terbitkan |
 | **Kelola Master Cabang & Mesin** | ❌ | ❌ | ❌ | ✅ Kelola |
 | **Backup & Unduh Arsip Sistem** | ❌ | ❌ | ❌ | ✅ Khusus Super Admin |

@@ -47,18 +47,6 @@ class PositionForm
                             Toggle::make('is_active')
                                 ->label('Status Aktif')
                                 ->default(true),
-
-                            TextInput::make('min_salary')
-                                ->label('Standar Gaji Minimum (IDR)')
-                                ->numeric()
-                                ->prefix('Rp')
-                                ->placeholder('5000000'),
-
-                            TextInput::make('max_salary')
-                                ->label('Standar Gaji Maksimum (IDR)')
-                                ->numeric()
-                                ->prefix('Rp')
-                                ->placeholder('15000000'),
                         ]),
                     ]),
             ]);

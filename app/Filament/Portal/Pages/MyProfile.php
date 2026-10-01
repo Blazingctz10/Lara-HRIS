@@ -160,8 +160,8 @@ class MyProfile extends Page implements HasForms
                     ])
                     ->collapsible(),
 
-                Section::make('Biodata Kontak Pribadi & Rekening Gaji (Payroll)')
-                    ->description('Pastikan nomor telepon/WhatsApp, alamat tempat tinggal, dan rekening penggajian Anda selalu akurat dan valid.')
+                Section::make('Biodata Kontak Pribadi & Rekening Bank')
+                    ->description('Pastikan nomor telepon/WhatsApp, alamat tempat tinggal, dan nomor rekening bank Anda selalu akurat dan valid.')
                     ->icon('heroicon-m-identification')
                     ->schema([
                         Grid::make(2)->schema([
@@ -178,7 +178,7 @@ class MyProfile extends Page implements HasForms
                         ]),
                         Grid::make(2)->schema([
                             TextInput::make('bank_account_number')
-                                ->label('Nomor Rekening Payroll Bank')
+                                ->label('Nomor Rekening Bank')
                                 ->numeric()
                                 ->maxLength(30)
                                 ->placeholder('Contoh: 1200056789012'),

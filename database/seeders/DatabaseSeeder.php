@@ -10,7 +10,6 @@ use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
-use App\Models\Payroll;
 use App\Models\Position;
 use App\Models\User;
 use Carbon\Carbon;
@@ -434,34 +433,6 @@ class DatabaseSeeder extends Seeder
                     ]);
                 }
             }
-
-            // Seed sample payroll (Month 7 & 8 2026)
-            $net = $item['salary'] + $item['allowance'] - $item['deduction'];
-            Payroll::create([
-                'employee_id' => $emp->id,
-                'period_month' => 7,
-                'period_year' => 2026,
-                'basic_salary' => $item['salary'],
-                'allowances' => $item['allowance'],
-                'deductions' => $item['deduction'],
-                'net_salary' => $net,
-                'payment_date' => '2026-07-25',
-                'status' => 'Paid',
-                'notes' => 'Payroll bulan Juli 2026 telah ditransfer ke rekening pegawai.',
-            ]);
-
-            Payroll::create([
-                'employee_id' => $emp->id,
-                'period_month' => 8,
-                'period_year' => 2026,
-                'basic_salary' => $item['salary'],
-                'allowances' => $item['allowance'],
-                'deductions' => $item['deduction'],
-                'net_salary' => $net,
-                'payment_date' => '2026-08-25',
-                'status' => 'Approved',
-                'notes' => 'Payroll bulan Agustus 2026 siap disbursement.',
-            ]);
         }
 
         // Seed Sample Leave Requests

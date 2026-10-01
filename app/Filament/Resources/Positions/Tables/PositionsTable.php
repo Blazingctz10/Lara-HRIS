@@ -40,16 +40,6 @@ class PositionsTable
                     })
                     ->sortable(),
 
-                TextColumn::make('min_salary')
-                    ->label('Min Gaji')
-                    ->money('IDR')
-                    ->sortable(),
-
-                TextColumn::make('max_salary')
-                    ->label('Max Gaji')
-                    ->money('IDR')
-                    ->sortable(),
-
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),

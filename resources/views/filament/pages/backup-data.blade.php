@@ -199,7 +199,7 @@
                     Pencadangan Data Resmi Core HRIS
                 </h3>
                 <p style="font-size: 0.875rem; opacity: 0.85; line-height: 1.55;">
-                    Sesuai kepatuhan tata kelola teknologi informasi perbankan, administrator wajib melakukan pencadangan berkala terhadap seluruh data transaksi presensi, riwayat cuti, struktur organisasi, dan penggajian karyawan.
+                    Sesuai kepatuhan tata kelola teknologi informasi perbankan, administrator wajib melakukan pencadangan berkala terhadap seluruh data transaksi presensi, riwayat cuti, struktur organisasi, dan profil kepegawaian karyawan.
                 </p>
             </div>
 
@@ -303,7 +303,7 @@
         <x-heroicon-m-shield-check style="width: 26px; height: 26px; color: #0E6838; flex-shrink: 0; margin-top: 0.2rem;" />
         <div style="font-size: 0.825rem; line-height: 1.55;">
             <strong>Kepatuhan Standar Keamanan Data Perbankan (PT BPR Banda Raya):</strong>
-            Cadangan data memuat informasi rahasia kepegawaian, nomor KTP/NPWP, serta besaran payroll karyawan. File arsip cadangan yang diunduh wajib disimpan dalam media penyimpanan terenkripsi yang memenuhi regulasi Otoritas Jasa Keuangan (OJK) serta Bank Indonesia.
+            Cadangan data memuat informasi rahasia kepegawaian, nomor KTP/NPWP, serta data legalitas karyawan. File arsip cadangan yang diunduh wajib disimpan dalam media penyimpanan terenkripsi yang memenuhi regulasi Otoritas Jasa Keuangan (OJK) serta Bank Indonesia.
         </div>
     </div>
 

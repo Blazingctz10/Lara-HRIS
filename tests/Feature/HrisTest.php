@@ -8,7 +8,6 @@ use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
-use App\Models\Payroll;
 use App\Models\User;
 use App\Services\GeofencingService;
 use Carbon\Carbon;
