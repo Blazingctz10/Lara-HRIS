@@ -128,8 +128,16 @@ sequenceDiagram
 ```
 1. **Otomatisasi Tanpa Buka Webmail**: Email pelamar yang masuk ke `karir@bprbandaraya.com` disedot langsung oleh sistem Lara-HRIS.
 2. **Ekstraksi CV & Posisi Otomatis**: Sistem secara otomatis mengekstrak berkas lampiran (PDF/DOCX) ke direktori privat `storage/app/public/recruitment_cv` dan mendeteksi posisi yang dilamar dari subjek email.
-3. **Penyaringan & Tahapan Seleksi**: HRD dapat mengubah tahapan kandidat (*Baru*, *Screening*, *Interview*, *Diterima*, *Ditolak*) dengan popup konfirmasi material dan catatan evaluasi.
-4. **Data Simulasi & Fallback**: Tersedia tombol *"Muat Data Simulasi"* untuk langsung menguji pipeline screening lengkap dengan 3 kandidat contoh dan berkas CV PDF.
+### 7. Alur Migrasi & Impor Data Lama (Excel / CSV Migration Center)
+1. **Menu Akses**: Super Admin dan HR Admin dapat mengakses menu `/admin/import-data` (Grup *Pengaturan & Sistem*).
+2. **Template CSV Siap Unduh**:
+   * **Template Master Pegawai**: Memuat kolom lengkap (`NIP`, `NIK`, `Nama_Lengkap`, `Email`, `Nomor_Telepon`, `Jenis_Kelamin`, `Tanggal_Lahir`, `Alamat`, `Kantor_Cabang`, `Divisi`, `Jabatan`, `Status_Kerja`, `Tanggal_Masuk`, `Nomor_Rekening`, dll) beserta contoh data valid.
+   * **Template Log Presensi**: Memuat kolom (`NIP`, `Tanggal`, `Jam_Masuk`, `Jam_Keluar`, `Status`, `Catatan`) untuk memindahkan riwayat absensi dari mesin fingerprint lama (Solution, ZKTeco, dsb).
+3. **Fitur Auto-Discovery & Smart Mapping Cerdas**:
+   * **Auto-Create Organisasi**: Jika Cabang, Divisi, atau Jabatan dari file lama belum terdaftar di sistem, sistem otomatis membuatkannya.
+   * **Auto-Generate Akun Login**: Akun pengguna (`User`) langsung dibuatkan otomatis dengan domain resmi `@bprbandaraya.com` dan kata sandi default `password`.
+   * **Inisialisasi Kuota Cuti Otomatis**: Setiap pegawai baru yang diimpor langsung diberikan saldo kuota cuti tahunan (12 hari).
+   * **Dukungan Format Excel Regional**: Sistem otomatis mendeteksi pemisah koma (`,`) maupun titik koma (`;`) yang biasa dihasilkan Microsoft Excel berbahasa Indonesia.
 
 ---
 

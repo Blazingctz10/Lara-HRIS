@@ -37,6 +37,7 @@ class PanelRoutesTest extends TestCase
             '/admin/warning-letters',
             '/admin/backup-data',
             '/admin/job-applicants',
+            '/admin/import-data',
         ];
 
         foreach ($routes as $route) {
