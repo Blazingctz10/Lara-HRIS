@@ -271,4 +271,48 @@ class HrisTest extends TestCase
         $this->assertEquals('Approved_Direksi', $leaveRequest->fresh()->status);
         $this->assertEquals($direksiUser->id, $leaveRequest->fresh()->approved_by);
     }
+
+    public function test_bpr_working_days_includes_saturday_and_schedule_rules(): void
+    {
+        // Monday 2026-10-05 to Saturday 2026-10-10
+        $monday = \Carbon\Carbon::parse('2026-10-05');
+        $saturday = \Carbon\Carbon::parse('2026-10-10');
+
+        // At BPR Banda Raya: Monday to Saturday are working days (only Sunday excluded)
+        $daysMonToSat = $monday->diffInDaysFiltered(function (\Carbon\Carbon $date) {
+            return ! $date->isSunday();
+        }, $saturday) + 1;
+        $this->assertEquals(6, $daysMonToSat, 'Monday to Saturday must equal 6 working days');
+
+        // Monday 2026-10-05 to next Monday 2026-10-12 (crosses Sunday)
+        $nextMonday = \Carbon\Carbon::parse('2026-10-12');
+        $daysWithSunday = $monday->diffInDaysFiltered(function (\Carbon\Carbon $date) {
+            return ! $date->isSunday();
+        }, $nextMonday) + 1;
+        $this->assertEquals(7, $daysWithSunday, 'Monday to next Monday must exclude Sunday and equal 7 working days');
+
+        // Test TodayAttendanceWidget schedule logic
+        $widget = new \App\Filament\Portal\Widgets\TodayAttendanceWidget();
+
+        \Carbon\Carbon::setTestNow('2026-10-08 10:00:00'); // Thursday
+        $scheduleThu = $widget->getTodaySchedule();
+        $this->assertStringContainsString('08:00 - 16:00', $scheduleThu['hours']);
+        $this->assertTrue($scheduleThu['is_work_day']);
+
+        \Carbon\Carbon::setTestNow('2026-10-09 10:00:00'); // Friday
+        $scheduleFri = $widget->getTodaySchedule();
+        $this->assertStringContainsString('08:00 - 16:30', $scheduleFri['hours']);
+        $this->assertTrue($scheduleFri['is_work_day']);
+
+        \Carbon\Carbon::setTestNow('2026-10-10 10:00:00'); // Saturday
+        $scheduleSat = $widget->getTodaySchedule();
+        $this->assertStringContainsString('08:00 - 13:00', $scheduleSat['hours']);
+        $this->assertTrue($scheduleSat['is_work_day']);
+
+        \Carbon\Carbon::setTestNow('2026-10-11 10:00:00'); // Sunday
+        $scheduleSun = $widget->getTodaySchedule();
+        $this->assertFalse($scheduleSun['is_work_day']);
+
+        \Carbon\Carbon::setTestNow(); // reset
+    }
 }

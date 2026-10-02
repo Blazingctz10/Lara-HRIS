@@ -82,6 +82,7 @@ class LeaveRequestForm
                                 ->numeric()
                                 ->required()
                                 ->minValue(1)
+                                ->helperText('Dihitung otomatis: Senin s/d Sabtu hari kerja (hanya Minggu yang tidak dihitung)')
                                 ->rules([
                                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                                         $leaveTypeId = $get('leave_type_id');
@@ -136,7 +137,7 @@ class LeaveRequestForm
 
             if ($endDate->gte($startDate)) {
                 $days = $startDate->diffInDaysFiltered(function (Carbon $date) {
-                    return ! $date->isWeekend();
+                    return ! $date->isSunday(); // Senin s/d Sabtu adalah hari kerja BPR
                 }, $endDate) + 1;
 
                 $set('total_days', $days);

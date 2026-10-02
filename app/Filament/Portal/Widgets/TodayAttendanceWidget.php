@@ -24,4 +24,36 @@ class TodayAttendanceWidget extends Widget
             ->whereDate('date', now())
             ->first();
     }
+
+    public function getTodaySchedule(): array
+    {
+        $dayOfWeek = now()->dayOfWeek; // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat
+
+        return match ($dayOfWeek) {
+            0 => [
+                'day_name' => 'Minggu',
+                'hours' => 'Libur Operasional',
+                'is_work_day' => false,
+                'badge' => 'Libur Operasional',
+            ],
+            5 => [
+                'day_name' => 'Jumat',
+                'hours' => '08:00 - 16:30 WIB',
+                'is_work_day' => true,
+                'badge' => '08:00 - 16:30 WIB (Jumat)',
+            ],
+            6 => [
+                'day_name' => 'Sabtu',
+                'hours' => '08:00 - 13:00 WIB',
+                'is_work_day' => true,
+                'badge' => '08:00 - 13:00 WIB (Sabtu)',
+            ],
+            default => [
+                'day_name' => now()->translatedFormat('l'),
+                'hours' => '08:00 - 16:00 WIB',
+                'is_work_day' => true,
+                'badge' => '08:00 - 16:00 WIB (Senin - Kamis)',
+            ],
+        };
+    }
 }
