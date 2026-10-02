@@ -21,15 +21,25 @@ class FingerprintDeviceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-finger-print';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Presensi & Kehadiran';
+    protected static string|UnitEnum|null $navigationGroup = 'Pengaturan & Sistem';
 
-    protected static ?string $navigationLabel = 'Mesin Fingerprint (Solution X105)';
+    protected static ?string $navigationLabel = 'Mesin Presensi (Solution X105)';
 
     protected static ?string $modelLabel = 'Mesin Fingerprint Solution X105';
 
     protected static ?string $pluralModelLabel = 'Integrasi Mesin Fingerprint Solution X105';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 96;
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
+    }
 
     public static function getEloquentQuery(): Builder
     {

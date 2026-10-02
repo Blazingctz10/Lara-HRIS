@@ -30,6 +30,16 @@ class JobApplicantResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $newCount = JobApplicant::where('status', 'Baru')->count();

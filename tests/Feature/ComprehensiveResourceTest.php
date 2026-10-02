@@ -54,6 +54,10 @@ class ComprehensiveResourceTest extends TestCase
             \App\Filament\Resources\CareerMovements\Pages\CreateCareerMovement::class,
             \App\Filament\Resources\WarningLetters\Pages\ListWarningLetters::class,
             \App\Filament\Resources\WarningLetters\Pages\CreateWarningLetter::class,
+            \App\Filament\Resources\JobApplicants\Pages\ListJobApplicants::class,
+            \App\Filament\Resources\JobApplicants\Pages\CreateJobApplicant::class,
+            \App\Filament\Resources\Users\Pages\ListUsers::class,
+            \App\Filament\Resources\Users\Pages\CreateUser::class,
         ];
 
         foreach ($resources as $pageClass) {
