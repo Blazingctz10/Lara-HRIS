@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LoginLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -35,6 +37,16 @@ class AuthController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
 
+            LoginLog::create([
+                'user_id' => null,
+                'email' => (string) ($request->input('email') ?: 'Bot / Empty'),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => 'Failed',
+                'failure_reason' => 'Bot Honeypot Trap terdeteksi',
+                'login_at' => now(),
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => __('[SEC001] Permintaan tidak valid terdeteksi.'),
             ]);
@@ -50,6 +62,16 @@ class AuthController extends Controller
                 'email' => $request->input('email'),
                 'ip' => $request->ip(),
                 'seconds_remaining' => $seconds,
+            ]);
+
+            LoginLog::create([
+                'user_id' => null,
+                'email' => (string) ($request->input('email') ?: 'Unknown'),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => 'Failed',
+                'failure_reason' => "Rate Limit Terlampaui (Terkunci {$seconds} detik)",
+                'login_at' => now(),
             ]);
 
             throw ValidationException::withMessages([
@@ -78,6 +100,16 @@ class AuthController extends Controller
                 'ip' => $request->ip(),
             ]);
 
+            LoginLog::create([
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => 'Success',
+                'failure_reason' => null,
+                'login_at' => now(),
+            ]);
+
             return $this->redirectUserByRole($user);
         }
 
@@ -88,6 +120,17 @@ class AuthController extends Controller
             'email' => $request->input('email'),
             'ip' => $request->ip(),
             'attempts' => RateLimiter::attempts($throttleKey),
+        ]);
+
+        $userExists = User::where('email', $request->input('email'))->first();
+        LoginLog::create([
+            'user_id' => $userExists?->id,
+            'email' => (string) $request->input('email'),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'status' => 'Failed',
+            'failure_reason' => $userExists ? 'Kata sandi salah' : 'Email tidak terdaftar',
+            'login_at' => now(),
         ]);
 
         throw ValidationException::withMessages([

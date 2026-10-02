@@ -12,6 +12,8 @@ class TemplateDownloadController extends Controller
      */
     public function downloadEmployee(): StreamedResponse
     {
+        $this->checkAdminAccess();
+
         $service = app(DataMigrationService::class);
         $csv = $service->generateEmployeeTemplateCsv();
 
@@ -27,6 +29,8 @@ class TemplateDownloadController extends Controller
      */
     public function downloadAttendance(): StreamedResponse
     {
+        $this->checkAdminAccess();
+
         $service = app(DataMigrationService::class);
         $csv = $service->generateAttendanceTemplateCsv();
 
@@ -35,5 +39,13 @@ class TemplateDownloadController extends Controller
         }, 'template_impor_absensi_bpr.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    protected function checkAdminAccess(): void
+    {
+        $user = auth()->user();
+        if (! $user || ! in_array($user->role, ['super_admin', 'hr_admin'])) {
+            abort(403, 'Akses terbatas untuk Administrator dan HR.');
+        }
     }
 }

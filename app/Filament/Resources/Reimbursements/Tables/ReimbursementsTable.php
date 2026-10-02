@@ -71,7 +71,14 @@ class ReimbursementsTable
                     ->label('Acc Pincab')
                     ->icon('heroicon-m-check')
                     ->color('info')
+                    ->button()
                     ->visible(fn (Reimbursement $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Klaim (Pincab)')
+                    ->modalDescription(fn (Reimbursement $record) => "Apakah Anda yakin ingin menyetujui klaim reimbursement '{$record->title}' sebesar Rp " . number_format($record->amount, 0, ',', '.') . " untuk pegawai {$record->employee->full_name}?")
+                    ->modalSubmitActionLabel('Ya, Setujui Klaim')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-check-circle')
                     ->action(function (Reimbursement $record) {
                         $record->update([
                             'status' => 'Approved_Pincab',
@@ -86,10 +93,17 @@ class ReimbursementsTable
                     }),
 
                 Action::make('mark_paid')
-                    ->label('Bayar / Transfer')
+                    ->label('Bayar / Lunas')
                     ->icon('heroicon-m-banknotes')
                     ->color('success')
+                    ->button()
                     ->visible(fn (Reimbursement $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Pelunasan / Pencairan Dana Klaim')
+                    ->modalDescription(fn (Reimbursement $record) => "Apakah Anda yakin dana sebesar Rp " . number_format($record->amount, 0, ',', '.') . " untuk klaim '{$record->title}' telah dicairkan / ditransfer kepada {$record->employee->full_name}? Status klaim akan diubah menjadi 'Paid' (Lunas).")
+                    ->modalSubmitActionLabel('Ya, Konfirmasi Lunas')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-banknotes')
                     ->action(function (Reimbursement $record) {
                         $record->update([
                             'status' => 'Paid',
@@ -104,7 +118,9 @@ class ReimbursementsTable
                             ->send();
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

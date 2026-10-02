@@ -70,7 +70,14 @@ class OvertimesTable
                     ->label('Acc Pincab')
                     ->icon('heroicon-m-check')
                     ->color('info')
+                    ->button()
                     ->visible(fn (Overtime $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Lembur (Pincab)')
+                    ->modalDescription(fn (Overtime $record) => "Setujui surat perintah kerja lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam?")
+                    ->modalSubmitActionLabel('Ya, Setujui Lembur')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-check-circle')
                     ->action(function (Overtime $record) {
                         $record->update([
                             'status' => 'Approved_Pincab',
@@ -88,7 +95,14 @@ class OvertimesTable
                     ->label('Acc HR HO')
                     ->icon('heroicon-m-check-badge')
                     ->color('success')
+                    ->button()
                     ->visible(fn (Overtime $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Final Lembur (HR Head Office)')
+                    ->modalDescription(fn (Overtime $record) => "Setujui dan verifikasi lembur pegawai {$record->employee->full_name} selama {$record->duration_hours} jam untuk perhitungan insentif/uang lembur pada periode payroll?")
+                    ->modalSubmitActionLabel('Ya, Setujui HR')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-check-badge')
                     ->action(function (Overtime $record) {
                         $record->update([
                             'status' => 'Approved_HR',
@@ -102,7 +116,9 @@ class OvertimesTable
                             ->send();
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

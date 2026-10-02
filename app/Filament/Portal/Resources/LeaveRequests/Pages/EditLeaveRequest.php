@@ -10,6 +10,15 @@ class EditLeaveRequest extends EditRecord
 {
     protected static string $resource = LeaveRequestResource::class;
 
+    protected function authorizeAccess(): void
+    {
+        parent::authorizeAccess();
+
+        if ($this->getRecord()->status !== 'Pending') {
+            abort(403, 'Pengajuan cuti yang telah diproses tidak dapat diubah lagi.');
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [

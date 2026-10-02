@@ -118,4 +118,82 @@ class SecurityTest extends TestCase
         $response = $this->get('/portal');
         $response->assertStatus(200);
     }
+
+    public function test_login_audit_trail_logs_success_and_failures(): void
+    {
+        // 1. Success login
+        $this->post('/login', [
+            'email' => 'admin@bprbandaraya.com',
+            'password' => 'password',
+        ]);
+
+        $this->assertDatabaseHas('login_logs', [
+            'email' => 'admin@bprbandaraya.com',
+            'status' => 'Success',
+            'failure_reason' => null,
+        ]);
+
+        // 2. Failed password
+        $this->post('/login', [
+            'email' => 'admin@bprbandaraya.com',
+            'password' => 'wrong-pass',
+        ]);
+
+        $this->assertDatabaseHas('login_logs', [
+            'email' => 'admin@bprbandaraya.com',
+            'status' => 'Failed',
+            'failure_reason' => 'Kata sandi salah',
+        ]);
+
+        // 3. Non-existent email
+        $this->post('/login', [
+            'email' => 'unknown.hacker@evil.com',
+            'password' => 'anything',
+        ]);
+
+        $this->assertDatabaseHas('login_logs', [
+            'email' => 'unknown.hacker@evil.com',
+            'status' => 'Failed',
+            'failure_reason' => 'Email tidak terdaftar',
+        ]);
+    }
+
+    public function test_super_admin_can_access_login_logs_resource(): void
+    {
+        $superAdmin = User::where('role', 'super_admin')->first();
+        $this->actingAs($superAdmin);
+
+        $response = $this->get('/admin/login-logs');
+        $response->assertStatus(200);
+    }
+
+    public function test_non_super_admin_cannot_access_login_logs_resource(): void
+    {
+        $hrAdmin = User::where('role', 'hr_admin')->first();
+        $this->actingAs($hrAdmin);
+
+        $response = $this->get('/admin/login-logs');
+        $response->assertStatus(403);
+    }
+
+    public function test_regular_employee_cannot_download_admin_csv_templates(): void
+    {
+        $employee = User::where('role', 'employee')->first();
+        $this->actingAs($employee);
+
+        $response = $this->get(route('admin.download-template.employee'));
+        $response->assertStatus(403);
+
+        $responseAtt = $this->get(route('admin.download-template.attendance'));
+        $responseAtt->assertStatus(403);
+    }
+
+    public function test_admin_can_download_admin_csv_templates(): void
+    {
+        $admin = User::where('role', 'super_admin')->first();
+        $this->actingAs($admin);
+
+        $response = $this->get(route('admin.download-template.employee'));
+        $response->assertStatus(200);
+    }
 }

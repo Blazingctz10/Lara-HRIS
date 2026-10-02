@@ -80,8 +80,14 @@ class RecentLeaveRequestsWidget extends BaseWidget
                     ->label('Verifikasi HR')
                     ->icon('heroicon-o-document-check')
                     ->color('primary')
+                    ->button()
                     ->visible(fn (LeaveRequest $record) => $record->status === 'Pending' && (auth()->user()->isHrAdmin() && !auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
                     ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Verifikasi Berkas Cuti (HR)')
+                    ->modalDescription(fn (LeaveRequest $record) => "Verifikasi kelayakan berkas cuti untuk pegawai {$record->employee->user->name} sebelum diteruskan ke Direksi untuk persetujuan akhir.")
+                    ->modalSubmitActionLabel('Ya, Verifikasi Berkas')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-document-check')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
                             'status' => 'Approved_HR',
@@ -99,8 +105,14 @@ class RecentLeaveRequestsWidget extends BaseWidget
                     ->label('Approve Direksi (Final)')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
+                    ->button()
                     ->visible(fn (LeaveRequest $record) => $record->status === 'Approved_HR' && (auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
                     ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Final Cuti oleh Direksi')
+                    ->modalDescription(fn (LeaveRequest $record) => "Persetujuan Direksi adalah otorisasi final yang secara resmi mengesahkan permohonan cuti {$record->employee->user->name} selama {$record->total_days} hari kerja dan memotong saldo cuti tahun buku {$record->start_date->year} secara otomatis tanpa perlu hardcopy. Lanjutkan?")
+                    ->modalSubmitActionLabel('Ya, Setujui Direksi (Final)')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-check-badge')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
                             'status' => 'Approved_Direksi',

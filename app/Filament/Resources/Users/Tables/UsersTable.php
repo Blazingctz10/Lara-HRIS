@@ -93,6 +93,7 @@ class UsersTable
                     ->label('Ubah Sandi')
                     ->icon('heroicon-o-key')
                     ->color('warning')
+                    ->button()
                     ->modalHeading(fn (User $record) => "Ubah Kata Sandi - {$record->name}")
                     ->modalDescription(fn (User $record) => "Atur kata sandi baru untuk akun {$record->email}. Default sandi sistem adalah 'password'.")
                     ->modalSubmitActionLabel('Simpan Kata Sandi')
@@ -118,8 +119,11 @@ class UsersTable
                             ->send();
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined(),
                 DeleteAction::make()
+                    ->button()
                     ->hidden(fn (User $record) => $record->id === auth()->id()),
             ])
             ->toolbarActions([

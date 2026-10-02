@@ -93,6 +93,8 @@ class JobApplicantsTable
                     ->label('Unduh CV')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
+                    ->button()
+                    ->outlined()
                     ->visible(fn (JobApplicant $record): bool => ! empty($record->cv_path))
                     ->url(fn (JobApplicant $record): string => asset('storage/' . $record->cv_path))
                     ->openUrlInNewTab(),
@@ -101,6 +103,7 @@ class JobApplicantsTable
                     ->label('Terima Jadi Pegawai')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
+                    ->button()
                     ->visible(fn (JobApplicant $record): bool => $record->status !== 'Diterima')
                     ->modalHeading('Penerimaan & Pengangkatan Pegawai Baru')
                     ->modalDescription('Pelamar ini akan otomatis didaftarkan ke direktori Pegawai Aktif, dibuatkan NIP resmi, akun login portal (@bprbandaraya.com), serta jatah cuti tahunan awal (12 hari).')
@@ -148,6 +151,7 @@ class JobApplicantsTable
                     ->label('Ubah Status')
                     ->icon('heroicon-o-pencil-square')
                     ->color('warning')
+                    ->button()
                     ->modalHeading('Perbarui Status Seleksi Pelamar')
                     ->modalDescription('Pastikan keputusan seleksi telah sesuai dengan standar kualifikasi BPR Banda Raya.')
                     ->modalSubmitActionLabel('Konfirmasi & Simpan')
@@ -194,9 +198,12 @@ class JobApplicantsTable
                         }
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined(),
 
                 DeleteAction::make()
+                    ->button()
                     ->modalHeading('Hapus Data Pelamar?')
                     ->modalDescription('Apakah Anda yakin ingin menghapus data pelamar ini beserta berkas CV-nya? Tindakan ini tidak dapat dibatalkan.')
                     ->modalSubmitActionLabel('Ya, Hapus Data')

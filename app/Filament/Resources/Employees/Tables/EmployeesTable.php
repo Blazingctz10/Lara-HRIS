@@ -120,6 +120,7 @@ class EmployeesTable
                     ->label('Ubah Sandi')
                     ->icon('heroicon-o-key')
                     ->color('warning')
+                    ->button()
                     ->modalHeading(fn (Employee $record) => "Ubah Kata Sandi Akun - {$record->full_name}")
                     ->modalDescription(fn (Employee $record) => "Perbarui kata sandi akun masuk portal untuk pegawai {$record->full_name} ({$record->email}). Kata sandi default sistem adalah 'password'.")
                     ->modalSubmitActionLabel('Simpan Kata Sandi')
@@ -160,7 +161,9 @@ class EmployeesTable
                             ->send();
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
