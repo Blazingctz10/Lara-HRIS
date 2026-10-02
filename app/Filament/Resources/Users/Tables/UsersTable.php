@@ -81,7 +81,6 @@ class UsersTable
                         'super_admin' => 'IT Administrator',
                         'direksi' => 'Direksi',
                         'hr_admin' => 'HR Officer',
-                        'branch_manager' => 'Pemimpin Cabang',
                         'employee' => 'Karyawan (ESS)',
                     ]),
 

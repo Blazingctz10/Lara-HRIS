@@ -41,7 +41,6 @@ class UserForm
                                     'super_admin' => 'IT Administrator (Akses Penuh Seluruh Sistem & Backup)',
                                     'direksi' => 'Direksi (Persetujuan Final Cuti & Pengawasan Eksekutif)',
                                     'hr_admin' => 'Human Capital / HR Officer (SDM, Rekrutmen & Verifikasi Cuti)',
-                                    'branch_manager' => 'Pemimpin Cabang / Pincab (Otorisasi Operasional Cabang)',
                                     'employee' => 'Karyawan / Staf (ESS Portal Presensi, Cuti & Klaim)',
                                 ])
                                 ->default('employee')

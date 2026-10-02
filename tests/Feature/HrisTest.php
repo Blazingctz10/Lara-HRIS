@@ -235,4 +235,40 @@ class HrisTest extends TestCase
         $this->assertEquals('081299998888', $user->fresh()->employee->phone);
         $this->assertEquals('Perumahan Botania Garden No. 100', $user->fresh()->employee->address);
     }
+
+    public function test_direct_leave_flow_from_user_to_hr_to_direksi(): void
+    {
+        $employee = Employee::where('email', 'teller.botania@bprbandaraya.com')->first();
+        $leaveAnnual = LeaveType::where('code', 'ANNUAL')->first();
+
+        // 1. User submits leave -> status Pending
+        $leaveRequest = LeaveRequest::create([
+            'employee_id' => $employee->id,
+            'leave_type_id' => $leaveAnnual->id,
+            'start_date' => '2026-11-01',
+            'end_date' => '2026-11-03',
+            'total_days' => 3,
+            'reason' => 'Cuti Tahunan Digital Tanpa Hardcopy',
+            'status' => 'Pending',
+        ]);
+        $this->assertEquals('Pending', $leaveRequest->status);
+
+        // 2. HR Admin verifies leave -> status Approved_HR
+        $hrUser = User::where('role', 'hr_admin')->first();
+        $leaveRequest->update([
+            'status' => 'Approved_HR',
+            'approved_by' => $hrUser->id,
+        ]);
+        $this->assertEquals('Approved_HR', $leaveRequest->fresh()->status);
+        $this->assertEquals($hrUser->id, $leaveRequest->fresh()->approved_by);
+
+        // 3. Direksi final approval -> status Approved_Direksi
+        $direksiUser = User::where('role', 'direksi')->first();
+        $leaveRequest->update([
+            'status' => 'Approved_Direksi',
+            'approved_by' => $direksiUser->id,
+        ]);
+        $this->assertEquals('Approved_Direksi', $leaveRequest->fresh()->status);
+        $this->assertEquals($direksiUser->id, $leaveRequest->fresh()->approved_by);
+    }
 }

@@ -509,8 +509,8 @@ class DatabaseSeeder extends Seeder
                 'end_date' => Carbon::today()->addDays(19)->toDateString(),
                 'total_days' => 5,
                 'reason' => 'Pengambilan Mandatori Block Leave OJK 2026',
-                'status' => 'Approved_Pincab',
-                'approved_by' => $uPincabBotania->id,
+                'status' => 'Approved_HR',
+                'approved_by' => $uHr->id,
             ]);
         }
 

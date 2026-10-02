@@ -97,10 +97,9 @@ class LeaveRequestForm
                             Select::make('status')
                                 ->label('Status Approval')
                                 ->options([
-                                    'Pending' => 'Pending (Menunggu Approval)',
-                                    'Approved_Pincab' => 'Approved Pincab (Disetujui Cabang)',
-                                    'Approved_HR' => 'Approved HR (Verifikasi HR)',
-                                    'Approved_Direksi' => 'Approved Direksi (Persetujuan Final Direksi)',
+                                    'Pending' => 'Pending (Menunggu Verifikasi HR)',
+                                    'Approved_HR' => 'Approved HR (Menunggu Otorisasi Direksi)',
+                                    'Approved_Direksi' => 'Approved Direksi (Disetujui Final)',
                                     'Rejected' => 'Rejected (Ditolak)',
                                 ])
                                 ->default('Pending')

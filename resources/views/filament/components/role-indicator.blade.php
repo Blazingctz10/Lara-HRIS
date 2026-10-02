@@ -16,19 +16,19 @@
             'border' => 'rgba(202, 138, 4, 0.35)',
             'icon' => 'heroicon-m-command-line',
         ],
+        'direksi' => [
+            'label' => 'Direksi Eksekutif',
+            'bg' => 'rgba(16, 185, 129, 0.15)',
+            'color' => '#10b981',
+            'border' => 'rgba(16, 185, 129, 0.35)',
+            'icon' => 'heroicon-m-sparkles',
+        ],
         'hr_admin' => [
             'label' => 'Human Capital / HRD',
             'bg' => 'rgba(234, 88, 12, 0.15)',
             'color' => '#ea580c',
             'border' => 'rgba(234, 88, 12, 0.35)',
             'icon' => 'heroicon-m-user-group',
-        ],
-        'branch_manager' => [
-            'label' => 'Pemimpin Cabang',
-            'bg' => 'rgba(59, 130, 246, 0.15)',
-            'color' => '#3b82f6',
-            'border' => 'rgba(59, 130, 246, 0.35)',
-            'icon' => 'heroicon-m-building-office-2',
         ],
         default => [
             'label' => 'Karyawan / Staf',
@@ -39,7 +39,7 @@
         ],
     };
 
-    $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'branch_manager']);
+    $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'direksi']);
 @endphp
 
 <style>

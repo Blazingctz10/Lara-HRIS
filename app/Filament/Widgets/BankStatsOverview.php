@@ -107,7 +107,7 @@ class BankStatsOverview extends BaseWidget
 
         // 3. HR ADMIN
         if ($user && $user->role === 'hr_admin') {
-            $pendingHrLeaves = LeaveRequest::accessibleBy()->whereIn('status', ['Pending', 'Approved_Pincab'])->count();
+            $pendingHrLeaves = LeaveRequest::where('status', 'Pending')->count();
             $newApplicants = JobApplicant::where('status', 'Applied')->count();
 
             return [
@@ -138,32 +138,32 @@ class BankStatsOverview extends BaseWidget
             ];
         }
 
-        // 4. PEMIMPIN CABANG / OTHERS
-        $pendingBranchLeaves = LeaveRequest::accessibleBy()->where('status', 'Pending')->count();
+        // 4. GENERAL / DEFAULT OVERVIEW
+        $pendingLeaves = LeaveRequest::whereIn('status', ['Pending', 'Approved_HR'])->count();
 
         return [
-            Stat::make('Pegawai Cabang Aktif', "{$activeEmployees} / {$totalEmployees}")
-                ->description('Personel unit kerja')
+            Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
+                ->description('Status operasional bank')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
 
-            Stat::make('Presensi Cabang Hari Ini', "{$attendanceToday} Hadir")
-                ->description('Log presensi cabang')
+            Stat::make('Presensi Hari Ini', "{$attendanceToday} Hadir")
+                ->description('Kehadiran pegawai')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('info'),
 
-            Stat::make('Pengajuan Cuti Cabang', "{$pendingBranchLeaves} Berkas")
-                ->description('Menunggu rekomendasi Pincab')
+            Stat::make('Pengajuan Cuti Berjalan', "{$pendingLeaves} Berkas")
+                ->description('Dalam proses verifikasi/otorisasi')
                 ->descriptionIcon('heroicon-m-document-text')
-                ->color($pendingBranchLeaves > 0 ? 'warning' : 'gray'),
+                ->color($pendingLeaves > 0 ? 'warning' : 'gray'),
 
-            Stat::make('Klaim Reimbursement Cabang', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
+            Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
                 ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim diajukan" : 'Tidak ada klaim pending')
                 ->descriptionIcon('heroicon-m-receipt-percent')
                 ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
 
-            Stat::make('Unit Kerja', "{$totalBranches} Cabang")
-                ->description('Jaringan BPR Banda Raya')
+            Stat::make('Jaringan Kantor BPR', "{$totalBranches} Cabang")
+                ->description('Kantor operasional aktif')
                 ->descriptionIcon('heroicon-m-building-office')
                 ->color('gray'),
         ];
