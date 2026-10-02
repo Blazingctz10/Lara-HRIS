@@ -23,8 +23,19 @@ class HrisErrorCode
             $message = $e->getMessage();
             $sqlCode = $e->getCode();
 
+            // Check constraint violation
+            if (str_contains($message, 'CHECK constraint failed')) {
+                return [
+                    'code' => 'DB004',
+                    'category' => 'DATABASE_CONSTRAINT',
+                    'title' => 'Validasi Batasan Data Gagal',
+                    'description' => 'Nilai data atau status yang dimasukkan tidak memenuhi ketentuan batasan database.',
+                    'action' => 'Pastikan status atau nilai yang diproses telah sesuai dengan ketentuan operasional.',
+                ];
+            }
+
             // Unique constraint violation
-            if (str_contains($message, 'UNIQUE constraint failed') || str_contains($message, 'Duplicate entry') || $sqlCode === '23000') {
+            if (str_contains($message, 'UNIQUE constraint failed') || str_contains($message, 'Duplicate entry')) {
                 return [
                     'code' => 'DB002',
                     'category' => 'DATABASE_CONSTRAINT',
