@@ -63,6 +63,38 @@ class DataMigrationTest extends TestCase
         ]);
     }
 
+    public function test_comprehensive_employee_profile_can_be_imported_from_csv(): void
+    {
+        $service = app(DataMigrationService::class);
+        $csvContent = "NIP,NIK,Nama_Lengkap,Email_Kantor,Email_Pribadi,Nomor_Telepon,Jenis_Kelamin,Tempat_Lahir,Tanggal_Lahir,Alamat,Kantor_Cabang,Divisi,Jabatan,Tanggal_Efektif_Jabatan,Grade,Tanggal_Efektif_Grade,Status_Kerja,Tanggal_Masuk,Tanggal_Pengangkatan_Tetap,Akhir_Kontrak,Status_Pegawai,Jenjang_Pendidikan,Jurusan,Universitas,IPK,NPWP,No_BPJSTK,No_BPJS_Kes,Rekening_BPR,Nama_Bank_Lain,Nomor_Rekening_Bank_Lain,Atas_Nama_Rekening,Status_PTKP,Kontak_Darurat_Nama,Kontak_Darurat_Nomor,Kontak_Darurat_Hubungan\n"
+            . "BPR-2026-9999,2171099999999999,Budi Santoso,budi.santoso@bprbandaraya.com,budi.pribadi@gmail.com,081299998888,Male,Batam,1990-01-01,Jl. Sudirman Batam,Kantor Cabang Botania,Operasional & Pelayanan,Customer Service,2024-01-01,5,2024-01-01,Permanent,2024-01-01,2025-01-01,,Active,S-1,Manajemen,UIB,3.75,81.999.888.7-215.000,08099999,00019999,01.10.99999,BCA,8210999999,Budi Santoso,K/1,Siti Rahayu,081399998888,Istri\n";
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'csv_comp_');
+        file_put_contents($tempFile, $csvContent);
+
+        $result = $service->importEmployeesFromCsv($tempFile);
+        @unlink($tempFile);
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals(1, $result['imported']);
+
+        $this->assertDatabaseHas('employees', [
+            'nip' => 'BPR-2026-9999',
+            'grade' => 5,
+            'education_level' => 'S-1',
+            'education_institution' => 'UIB',
+            'bank_bpr_account' => '01.10.99999',
+            'bank_external_name' => 'BCA',
+            'ptkp_status' => 'K/1',
+            'emergency_contact_name' => 'Siti Rahayu',
+        ]);
+
+        $this->assertDatabaseHas('employee_families', [
+            'name' => 'Siti Rahayu',
+            'relationship' => 'Istri',
+        ]);
+    }
+
     public function test_attendances_can_be_imported_from_csv(): void
     {
         $employee = Employee::first();

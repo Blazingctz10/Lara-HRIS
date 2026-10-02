@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeFamily;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\Position;
 use App\Models\User;
@@ -17,7 +18,7 @@ use Illuminate\Support\Str;
 class DataMigrationService
 {
     /**
-     * Menghasilkan isi template CSV untuk impor data master pegawai
+     * Menghasilkan isi template CSV untuk impor data master pegawai lengkap sesuai spesifikasi BPR
      */
     public function generateEmployeeTemplateCsv(): string
     {
@@ -25,30 +26,39 @@ class DataMigrationService
             'NIP',
             'NIK',
             'Nama_Lengkap',
-            'Email',
+            'Email_Kantor',
+            'Email_Pribadi',
             'Nomor_Telepon',
             'Jenis_Kelamin',
+            'Tempat_Lahir',
             'Tanggal_Lahir',
             'Alamat',
             'Kantor_Cabang',
             'Divisi',
             'Jabatan',
+            'Tanggal_Efektif_Jabatan',
             'Grade',
+            'Tanggal_Efektif_Grade',
             'Status_Kerja',
             'Tanggal_Masuk',
-            'Tempat_Lahir',
+            'Tanggal_Pengangkatan_Tetap',
+            'Akhir_Kontrak',
+            'Status_Pegawai',
             'Jenjang_Pendidikan',
             'Jurusan',
             'Universitas',
             'IPK',
-            'Email_Pribadi',
-            'Nomor_Rekening',
-            'Atas_Nama_Rekening',
-            'Rekening_BPR',
             'NPWP',
             'No_BPJSTK',
             'No_BPJS_Kes',
+            'Rekening_BPR',
+            'Nama_Bank_Lain',
+            'Nomor_Rekening_Bank_Lain',
+            'Atas_Nama_Rekening',
             'Status_PTKP',
+            'Kontak_Darurat_Nama',
+            'Kontak_Darurat_Nomor',
+            'Kontak_Darurat_Hubungan',
         ];
 
         $sampleRows = [
@@ -57,58 +67,76 @@ class DataMigrationService
                 '2171012304950001',
                 'Hendri Prasetyo',
                 'hendri.prasetyo@bprbandaraya.com',
+                'hendri.pribadi@gmail.com',
                 '081266554411',
                 'Male',
+                'Batam',
                 '1995-04-23',
                 'Jl. Raja Ali Haji No. 12, Batam',
                 'Kantor Cabang Botania',
                 'Operasional & Pelayanan',
                 'Customer Service',
+                '2024-01-15',
                 '4',
+                '2024-01-15',
                 'Permanent',
                 '2024-01-15',
-                'Batam',
+                '2025-01-15',
+                '',
+                'Active',
                 'S-1',
                 'Manajemen Perbankan',
                 'Universitas Internasional Batam',
                 '3.45',
-                'hendri.pribadi@gmail.com',
-                '1102938475',
-                'Hendri Prasetyo',
-                '01.10.05307',
                 '81.234.567.8-215.000',
                 '08017700462',
                 '0001617375611',
+                '01.10.05307',
+                'Bank Mandiri',
+                '109-00-1514578-2',
+                'Hendri Prasetyo',
                 'K/1',
+                'Dewi Anggraini',
+                '081299887711',
+                'Istri',
             ],
             [
                 'BPR-2026-0102',
                 '2171025508980002',
                 'Siti Rahmadani',
                 'siti.rahmadani@bprbandaraya.com',
+                'siti.rahmadani@gmail.com',
                 '081377889922',
                 'Female',
+                'Padang',
                 '1998-08-15',
                 'Komplek Aviari Blok B No. 5, Batu Aji',
                 'Kantor Cabang Aviari',
                 'Kredit & Pemasaran',
-                'Account Officer',
+                'Account Officer (AO)',
+                '2024-06-01',
                 '5',
+                '2024-06-01',
                 'Contract',
                 '2024-06-01',
-                'Padang',
+                '',
+                '2027-06-01',
+                'Active',
                 'D-3',
                 'Akuntansi',
                 'Politeknik Negeri Padang',
                 '3.60',
-                'siti.rahmadani@gmail.com',
-                '1102938499',
-                'Siti Rahmadani',
-                '01.10.05308',
                 '82.345.678.9-215.000',
                 '08017700499',
                 '0001617375699',
+                '01.10.05308',
+                'BCA',
+                '8210349911',
+                'Siti Rahmadani',
                 'TK/0',
+                'Hj. Maryam',
+                '081366551122',
+                'Ibu',
             ],
         ];
 
@@ -156,7 +184,7 @@ class DataMigrationService
     }
 
     /**
-     * Eksekusi impor pegawai dari berkas CSV
+     * Eksekusi impor pegawai dari berkas CSV dengan dukungan seluruh atribut profil BPR
      */
     public function importEmployeesFromCsv(string $filePath): array
     {
@@ -211,7 +239,7 @@ class DataMigrationService
                 $data = array_combine(array_slice($header, 0, count($row)), $row);
 
                 $nip = trim($data['nip'] ?? '');
-                $fullName = trim($data['nama_lengkap'] ?? ($data['nama'] ?? ''));
+                $fullName = trim($data['nama_lengkap'] ?? ($data['nama'] ?? ($data['full_name'] ?? '')));
 
                 if (empty($nip) || empty($fullName)) {
                     $errors[] = "Baris " . ($index + 2) . ": NIP dan Nama Lengkap wajib diisi.";
@@ -219,7 +247,7 @@ class DataMigrationService
                 }
 
                 // 1. Tangani Email & Domain (.com)
-                $email = trim($data['email'] ?? '');
+                $email = trim($data['email_kantor'] ?? ($data['email'] ?? ($data['email_dinas'] ?? '')));
                 if (empty($email)) {
                     $cleanNip = Str::slug($nip);
                     $email = "pegawai.{$cleanNip}@bprbandaraya.com";
@@ -228,7 +256,7 @@ class DataMigrationService
                 $email = str_ireplace('@bprbandaraya.co.id', '@bprbandaraya.com', $email);
 
                 // 2. Hubungkan / Buat Kantor Cabang
-                $branchName = trim($data['kantor_cabang'] ?? ($data['cabang'] ?? 'Kantor Cabang Botania'));
+                $branchName = trim($data['kantor_cabang'] ?? ($data['cabang'] ?? ($data['branch'] ?? 'Kantor Cabang Botania')));
                 $branch = Branch::where('name', 'LIKE', "%{$branchName}%")->first();
                 if (! $branch) {
                     $branch = Branch::create([
@@ -243,7 +271,7 @@ class DataMigrationService
                 }
 
                 // 3. Hubungkan / Buat Divisi / Departemen
-                $deptName = trim($data['divisi'] ?? ($data['departemen'] ?? 'Operasional & Pelayanan'));
+                $deptName = trim($data['divisi'] ?? ($data['departemen'] ?? ($data['department'] ?? 'Operasional & Pelayanan')));
                 $dept = Department::where('name', 'LIKE', "%{$deptName}%")->first();
                 if (! $dept) {
                     $dept = Department::create([
@@ -253,7 +281,7 @@ class DataMigrationService
                 }
 
                 // 4. Hubungkan / Buat Jabatan
-                $posName = trim($data['jabatan'] ?? ($data['posisi'] ?? 'Staf Operasional'));
+                $posName = trim($data['jabatan'] ?? ($data['posisi'] ?? ($data['position'] ?? 'Staf Operasional')));
                 $position = Position::where('name', 'LIKE', "%{$posName}%")->first();
                 if (! $position) {
                     $position = Position::create([
@@ -276,18 +304,27 @@ class DataMigrationService
                 }
 
                 // 6. Tangani Status Kerja & Format Tanggal
-                $employmentStatus = ucfirst(strtolower(trim($data['status_kerja'] ?? 'Permanent')));
+                $employmentStatus = ucfirst(strtolower(trim($data['status_kerja'] ?? ($data['employment_status'] ?? 'Permanent'))));
                 if (! in_array($employmentStatus, ['Permanent', 'Contract', 'Probation', 'Internship'])) {
                     $employmentStatus = 'Permanent';
                 }
 
-                $gender = ucfirst(strtolower(trim($data['jenis_kelamin'] ?? 'Male')));
+                $gender = ucfirst(strtolower(trim($data['jenis_kelamin'] ?? ($data['gender'] ?? 'Male'))));
                 if (! in_array($gender, ['Male', 'Female'])) {
                     $gender = (str_contains(strtolower($gender), 'wanita') || str_contains(strtolower($gender), 'perempuan') || str_contains(strtolower($gender), 'p')) ? 'Female' : 'Male';
                 }
 
                 $birthDate = ! empty($data['tanggal_lahir']) ? Carbon::parse($data['tanggal_lahir'])->toDateString() : null;
                 $joinDate = ! empty($data['tanggal_masuk']) ? Carbon::parse($data['tanggal_masuk'])->toDateString() : now()->toDateString();
+                $jobEffectiveDate = ! empty($data['tanggal_efektif_jabatan']) ? Carbon::parse($data['tanggal_efektif_jabatan'])->toDateString() : $joinDate;
+                $gradeEffectiveDate = ! empty($data['tanggal_efektif_grade']) ? Carbon::parse($data['tanggal_efektif_grade'])->toDateString() : $joinDate;
+                $permanentDate = ! empty($data['tanggal_pengangkatan_tetap']) ? Carbon::parse($data['tanggal_pengangkatan_tetap'])->toDateString() : null;
+                $contractEndDate = ! empty($data['akhir_kontrak']) ? Carbon::parse($data['akhir_kontrak'])->toDateString() : null;
+
+                $status = trim($data['status_pegawai'] ?? ($data['status'] ?? 'Active'));
+                if (! in_array($status, ['Active', 'On Leave', 'Resigned', 'Terminated'])) {
+                    $status = 'Active';
+                }
 
                 // 7. Simpan atau Perbarui Profil Employee
                 $employee = Employee::where('nip', $nip)->first();
@@ -298,39 +335,66 @@ class DataMigrationService
                     $employee->nip = $nip;
                 }
 
+                $externalBankAcc = $data['nomor_rekening_bank_lain'] ?? ($data['nomor_rekening'] ?? ($data['bank_external_account'] ?? null));
+                $bprBankAcc = $data['rekening_bpr'] ?? ($data['rek_bpr'] ?? ($data['bank_bpr_account'] ?? null));
+
                 $employee->fill([
                     'user_id' => $user->id,
                     'nik' => $data['nik'] ?? null,
                     'full_name' => $fullName,
                     'email' => $email,
-                    'personal_email' => $data['email_pribadi'] ?? null,
-                    'phone' => $data['nomor_telepon'] ?? ($data['telepon'] ?? '081200000000'),
+                    'personal_email' => $data['email_pribadi'] ?? ($data['personal_email'] ?? null),
+                    'phone' => $data['nomor_telepon'] ?? ($data['telepon'] ?? ($data['phone'] ?? '081200000000')),
                     'gender' => $gender,
                     'birth_date' => $birthDate,
-                    'birth_place' => $data['tempat_lahir'] ?? null,
-                    'address' => $data['alamat'] ?? 'Batam, Kepulauan Riau',
+                    'birth_place' => $data['tempat_lahir'] ?? ($data['birth_place'] ?? null),
+                    'address' => $data['alamat'] ?? ($data['address'] ?? 'Batam, Kepulauan Riau'),
                     'branch_id' => $branch->id,
                     'department_id' => $dept->id,
                     'position_id' => $position->id,
+                    'job_effective_date' => $jobEffectiveDate,
                     'grade' => ! empty($data['grade']) ? (int) $data['grade'] : null,
+                    'grade_effective_date' => $gradeEffectiveDate,
                     'employment_status' => $employmentStatus,
                     'join_date' => $joinDate,
-                    'status' => 'Active',
-                    'education_level' => $data['jenjang_pendidikan'] ?? null,
-                    'education_major' => $data['jurusan'] ?? null,
-                    'education_institution' => $data['universitas'] ?? ($data['sekolah'] ?? null),
+                    'permanent_date' => $permanentDate,
+                    'contract_end_date' => $contractEndDate,
+                    'status' => $status,
+                    'education_level' => $data['jenjang_pendidikan'] ?? ($data['education_level'] ?? null),
+                    'education_major' => $data['jurusan'] ?? ($data['education_major'] ?? null),
+                    'education_institution' => $data['universitas'] ?? ($data['sekolah'] ?? ($data['education_institution'] ?? null)),
                     'ipk' => ! empty($data['ipk']) ? (float) $data['ipk'] : null,
-                    'bank_account_number' => $data['nomor_rekening'] ?? null,
-                    'bank_account_holder' => $data['atas_nama_rekening'] ?? $fullName,
-                    'bank_bpr_account' => $data['rekening_bpr'] ?? ($data['rek_bpr'] ?? null),
+                    'bank_account_number' => $externalBankAcc ?: $bprBankAcc,
+                    'bank_account_holder' => $data['atas_nama_rekening'] ?? ($data['bank_account_holder'] ?? $fullName),
+                    'bank_bpr_account' => $bprBankAcc,
+                    'bank_external_name' => $data['nama_bank_lain'] ?? ($data['bank_external_name'] ?? null),
+                    'bank_external_account' => $externalBankAcc,
                     'npwp' => $data['npwp'] ?? null,
-                    'bpjs_tk_number' => $data['no_bpjstk'] ?? ($data['bpjstk'] ?? null),
-                    'bpjs_kes_number' => $data['no_bpjs_kes'] ?? ($data['bpjs_kes'] ?? null),
-                    'ptkp_status' => $data['status_ptkp'] ?? ($data['ptkp'] ?? null),
+                    'bpjs_tk_number' => $data['no_bpjstk'] ?? ($data['bpjstk'] ?? ($data['bpjs_tk_number'] ?? null)),
+                    'bpjs_kes_number' => $data['no_bpjs_kes'] ?? ($data['bpjs_kes'] ?? ($data['bpjs_kes_number'] ?? null)),
+                    'ptkp_status' => $data['status_ptkp'] ?? ($data['ptkp'] ?? ($data['ptkp_status'] ?? null)),
+                    'emergency_contact_name' => $data['kontak_darurat_nama'] ?? ($data['emergency_contact_name'] ?? null),
+                    'emergency_contact_phone' => $data['kontak_darurat_nomor'] ?? ($data['emergency_contact_phone'] ?? null),
+                    'emergency_contact_relation' => $data['kontak_darurat_hubungan'] ?? ($data['emergency_contact_relation'] ?? null),
                 ]);
                 $employee->save();
 
-                // 8. Inisialisasi Saldo Cuti Pegawai jika belum ada
+                // 8. Tambahkan data keluarga otomatis jika kontak darurat diisi
+                if (! empty($employee->emergency_contact_name)) {
+                    EmployeeFamily::firstOrCreate(
+                        [
+                            'employee_id' => $employee->id,
+                            'name' => $employee->emergency_contact_name,
+                        ],
+                        [
+                            'relationship' => $employee->emergency_contact_relation ?: 'Keluarga',
+                            'birth_place' => $employee->birth_place ?: 'Batam',
+                            'gender' => in_array($employee->emergency_contact_relation, ['Istri', 'Ibu']) ? 'Perempuan' : 'Laki-laki',
+                        ]
+                    );
+                }
+
+                // 9. Inisialisasi Saldo Cuti Pegawai jika belum ada
                 $annualLeaveType = \App\Models\LeaveType::where('code', 'ANNUAL')->orWhere('name', 'LIKE', '%Tahunan%')->first();
                 $leaveTypeId = $annualLeaveType ? $annualLeaveType->id : 1;
 
@@ -421,10 +485,15 @@ class DataMigrationService
                 }
 
                 $row = str_getcsv($line, $delimiter);
+                if (count($row) < count($header)) {
+                    $errors[] = "Baris " . ($index + 2) . ": Format kolom tidak sesuai.";
+                    continue;
+                }
+
                 $data = array_combine(array_slice($header, 0, count($row)), $row);
 
                 $nip = trim($data['nip'] ?? '');
-                $date = trim($data['tanggal'] ?? '');
+                $date = trim($data['tanggal'] ?? ($data['date'] ?? ''));
 
                 if (empty($nip) || empty($date)) {
                     $errors[] = "Baris " . ($index + 2) . ": NIP dan Tanggal wajib diisi.";
@@ -433,18 +502,18 @@ class DataMigrationService
 
                 $employee = Employee::where('nip', $nip)->first();
                 if (! $employee) {
-                    $errors[] = "Baris " . ($index + 2) . ": Pegawai dengan NIP '{$nip}' tidak ditemukan.";
+                    $errors[] = "Baris " . ($index + 2) . ": Pegawai dengan NIP {$nip} tidak terdaftar di sistem.";
                     continue;
                 }
 
-                $clockIn = ! empty($data['jam_masuk']) ? trim($data['jam_masuk']) : null;
-                $clockOut = ! empty($data['jam_keluar']) ? trim($data['jam_keluar']) : null;
-                $status = trim($data['status'] ?? 'Present');
-
-                // Cocokkan status enum
-                if (! in_array($status, ['Present', 'Late', 'Absent', 'On_Leave'])) {
+                $clockIn = ! empty($data['jam_masuk']) ? Carbon::parse("{$date} " . $data['jam_masuk']) : Carbon::parse("{$date} 08:00:00");
+                $clockOut = ! empty($data['jam_keluar']) ? Carbon::parse("{$date} " . $data['jam_keluar']) : null;
+                $status = ucfirst(strtolower(trim($data['status'] ?? 'Present')));
+                if (! in_array($status, ['Present', 'Late', 'Absent', 'Leave', 'Holiday'])) {
                     $status = 'Present';
                 }
+
+                $notes = trim($data['catatan'] ?? 'Impor Rekapan Fingerprint');
 
                 Attendance::updateOrCreate(
                     [
@@ -452,11 +521,14 @@ class DataMigrationService
                         'date' => Carbon::parse($date)->toDateString(),
                     ],
                     [
+                        'branch_id' => $employee->branch_id,
                         'clock_in' => $clockIn,
                         'clock_out' => $clockOut,
                         'status' => $status,
-                        'notes' => $data['catatan'] ?? 'Impor dari file log absensi sistem/mesin lama',
-                        'distance_in_meters' => 0,
+                        'notes' => $notes,
+                        'lat_in' => $employee->branch?->latitude ?? 1.1185,
+                        'long_in' => $employee->branch?->longitude ?? 104.0532,
+                        'distance_in_meters' => 5,
                     ]
                 );
 
@@ -467,7 +539,7 @@ class DataMigrationService
 
             return [
                 'success' => true,
-                'message' => "Berhasil mengimpor/memperbarui {$imported} rekaman absensi.",
+                'message' => "Impor log kehadiran sukses: {$imported} catatan presensi tersimpan/diperbarui.",
                 'imported' => $imported,
                 'errors' => $errors,
             ];
@@ -476,7 +548,7 @@ class DataMigrationService
 
             return [
                 'success' => false,
-                'message' => 'Gagal mengimpor absensi: ' . $e->getMessage(),
+                'message' => 'Gagal memproses log absensi: ' . $e->getMessage(),
                 'imported' => 0,
                 'errors' => [$e->getMessage()],
             ];

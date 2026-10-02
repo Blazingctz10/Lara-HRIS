@@ -393,10 +393,34 @@
                         <td>Nama lengkap pegawai beserta gelar (jika ada)</td>
                     </tr>
                     <tr>
-                        <td><strong>Email</strong></td>
+                        <td><strong>Email_Kantor</strong></td>
                         <td>Opsional</td>
                         <td><code>hendri@bprbandaraya.com</code></td>
                         <td>Jika kosong, dibuatkan otomatis <code>pegawai.[nip]@bprbandaraya.com</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email_Pribadi</strong></td>
+                        <td>Opsional</td>
+                        <td><code>hendri.pribadi@gmail.com</code></td>
+                        <td>Email korespondensi pribadi pegawai</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nomor_Telepon</strong></td>
+                        <td>Opsional</td>
+                        <td><code>081266554411</code></td>
+                        <td>Nomor WhatsApp / HP aktif pegawai</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jenis_Kelamin</strong></td>
+                        <td>Opsional</td>
+                        <td><code>Male / Female</code></td>
+                        <td>Pilihan: Male (Laki-laki) atau Female (Perempuan)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tempat_Lahir & Tanggal_Lahir</strong></td>
+                        <td>Opsional</td>
+                        <td><code>Batam, 1995-04-23</code></td>
+                        <td>Tempat kelahiran dan tanggal lahir format <code>YYYY-MM-DD</code></td>
                     </tr>
                     <tr>
                         <td><strong>Kantor_Cabang</strong></td>
@@ -405,16 +429,16 @@
                         <td>Jika nama cabang baru, sistem otomatis membuat data cabang baru</td>
                     </tr>
                     <tr>
-                        <td><strong>Divisi</strong></td>
+                        <td><strong>Divisi & Jabatan</strong></td>
                         <td>Opsional</td>
-                        <td><code>Operasional & Pelayanan</code></td>
-                        <td>Jika divisi baru, sistem otomatis membuat divisi baru</td>
+                        <td><code>Operasional & Pelayanan / CS</code></td>
+                        <td>Otomatis dipetakan ke struktur organisasi BPR</td>
                     </tr>
                     <tr>
-                        <td><strong>Jabatan</strong></td>
+                        <td><strong>Grade & Tanggal_Efektif_Grade</strong></td>
                         <td>Opsional</td>
-                        <td><code>Customer Service</code></td>
-                        <td>Jika jabatan baru, sistem otomatis membuat jabatan baru</td>
+                        <td><code>4, 2024-01-15</code></td>
+                        <td>Tingkat grade kepangkatan perbankan (1-15) & tgl efektif SK</td>
                     </tr>
                     <tr>
                         <td><strong>Status_Kerja</strong></td>
@@ -423,10 +447,58 @@
                         <td>Pilihan: Permanent, Contract, Probation, Internship (Default: Permanent)</td>
                     </tr>
                     <tr>
-                        <td><strong>Tanggal_Masuk</strong></td>
+                        <td><strong>Tanggal_Masuk & Tanggal_Pengangkatan_Tetap</strong></td>
                         <td>Opsional</td>
-                        <td><code>2024-01-15</code></td>
-                        <td>Format standar <code>YYYY-MM-DD</code></td>
+                        <td><code>2024-01-15, 2025-01-15</code></td>
+                        <td>Tanggal mulai bekerja dan tanggal SK pengangkatan tetap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Akhir_Kontrak</strong></td>
+                        <td>Opsional</td>
+                        <td><code>2027-01-15</code></td>
+                        <td>Batas waktu perjanjian kerja waktu tertentu (PKWT)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jenjang_Pendidikan, Jurusan, Universitas</strong></td>
+                        <td>Opsional</td>
+                        <td><code>S-1, Manajemen, UIB</code></td>
+                        <td>Data riwayat pendidikan terakhir dan universitas</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IPK</strong></td>
+                        <td>Opsional</td>
+                        <td><code>3.45</code></td>
+                        <td>Indeks Prestasi Kumulatif kelulusan</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NIK & NPWP</strong></td>
+                        <td>Opsional</td>
+                        <td><code>2171012304950001</code></td>
+                        <td>Nomor KTP 16 digit dan NPWP resmi pegawai</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No_BPJSTK & No_BPJS_Kes</strong></td>
+                        <td>Opsional</td>
+                        <td><code>08017700462, 0001617375611</code></td>
+                        <td>Nomor kepesertaan BPJS Ketenagakerjaan dan Kesehatan</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rekening_BPR & Nomor_Rekening_Bank_Lain</strong></td>
+                        <td>Opsional</td>
+                        <td><code>01.10.05307, 109-00-1514578-2</code></td>
+                        <td>Rekening tabungan BPR Banda Raya dan rekening bank eksternal</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status_PTKP</strong></td>
+                        <td>Opsional</td>
+                        <td><code>K/1, TK/0, K/2</code></td>
+                        <td>Status Penghasilan Tidak Kena Pajak untuk kepatuhan perpajakan</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kontak_Darurat_Nama, Nomor, Hubungan</strong></td>
+                        <td>Opsional</td>
+                        <td><code>Dewi Anggraini, 0812..., Istri</code></td>
+                        <td>Data kontak darurat (otomatis tersinkron ke modul keluarga pegawai)</td>
                     </tr>
                 </tbody>
             </table>
