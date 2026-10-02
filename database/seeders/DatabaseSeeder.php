@@ -93,6 +93,7 @@ class DatabaseSeeder extends Seeder
         $posAo = Position::create(['department_id' => $deptLend->id, 'name' => 'Account Officer (AO)', 'grade_level' => 'Officer', 'min_salary' => 7000000, 'max_salary' => 14000000]);
         $posCs = Position::create(['department_id' => $deptOps->id, 'name' => 'Customer Service', 'grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 8500000]);
         $posTeller = Position::create(['department_id' => $deptOps->id, 'name' => 'Teller Kas & Kliring', 'grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 8500000]);
+        $posIt = Position::create(['department_id' => $deptIt->id, 'name' => 'IT System & Core Banking Officer', 'grade_level' => 'Officer']);
 
         // 4. Seed Leave Types (termasuk Block Leave OJK)
         $leaveAnnual = LeaveType::create([
@@ -141,6 +142,27 @@ class DatabaseSeeder extends Seeder
             'password' => $password,
             'role' => 'super_admin',
             'branch_id' => $ho->id,
+        ]);
+
+        $empAdmin = Employee::create([
+            'user_id' => $uAdmin->id,
+            'nip' => 'BPR-HO-0001',
+            'nik' => '2171012304900001',
+            'full_name' => 'Super Administrator BPR',
+            'email' => 'admin@bprbandaraya.com',
+            'phone' => '081270001100',
+            'gender' => 'Male',
+            'birth_date' => '1990-01-15',
+            'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1, Batam',
+            'branch_id' => $ho->id,
+            'department_id' => $deptIt->id,
+            'position_id' => $posIt->id,
+            'employment_status' => 'Permanent',
+            'join_date' => '2020-01-10',
+            'status' => 'Active',
+            'bank_account_number' => '1200000001',
+            'bank_account_holder' => 'Super Administrator BPR',
+            'npwp' => '80.111.222.3-011.000',
         ]);
 
         $uHr = User::create([
@@ -353,7 +375,7 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
-        $allEmployees = collect([$empHr, $empPincabBotania, $empPincabAviari, $empPincabBengkong]);
+        $allEmployees = collect([$empAdmin, $empHr, $empPincabBotania, $empPincabAviari, $empPincabBengkong]);
 
         foreach ($staffData as $item) {
             $user = User::create([
@@ -387,33 +409,6 @@ class DatabaseSeeder extends Seeder
 
             $allEmployees->push($emp);
 
-            // Seed/Update Leave Balances for 2026
-            EmployeeLeaveBalance::updateOrCreate(
-                [
-                    'employee_id' => $emp->id,
-                    'leave_type_id' => $leaveAnnual->id,
-                    'year' => 2026,
-                ],
-                [
-                    'initial_quota' => 12,
-                    'used_quota' => 2,
-                    'remaining_quota' => 10,
-                ]
-            );
-
-            EmployeeLeaveBalance::updateOrCreate(
-                [
-                    'employee_id' => $emp->id,
-                    'leave_type_id' => $leaveBlock->id,
-                    'year' => 2026,
-                ],
-                [
-                    'initial_quota' => 5,
-                    'used_quota' => 0,
-                    'remaining_quota' => 5,
-                ]
-            );
-
             // Seed sample attendances for past 3 days
             for ($d = 2; $d >= 0; $d--) {
                 $attDate = Carbon::today()->subDays($d);
@@ -433,6 +428,35 @@ class DatabaseSeeder extends Seeder
                     ]);
                 }
             }
+        }
+
+        // Pastikan seluruh pegawai memiliki saldo cuti tahunan dan block leave 2026
+        foreach (Employee::all() as $empItem) {
+            EmployeeLeaveBalance::firstOrCreate(
+                [
+                    'employee_id' => $empItem->id,
+                    'leave_type_id' => $leaveAnnual->id,
+                    'year' => 2026,
+                ],
+                [
+                    'initial_quota' => 12,
+                    'used_quota' => 2,
+                    'remaining_quota' => 10,
+                ]
+            );
+
+            EmployeeLeaveBalance::firstOrCreate(
+                [
+                    'employee_id' => $empItem->id,
+                    'leave_type_id' => $leaveBlock->id,
+                    'year' => 2026,
+                ],
+                [
+                    'initial_quota' => 5,
+                    'used_quota' => 0,
+                    'remaining_quota' => 5,
+                ]
+            );
         }
 
         // Seed Sample Leave Requests
