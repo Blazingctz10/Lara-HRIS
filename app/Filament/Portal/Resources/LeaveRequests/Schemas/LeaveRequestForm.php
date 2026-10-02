@@ -26,7 +26,7 @@ class LeaveRequestForm
         return $schema
             ->components([
                 Section::make('Permohonan Cuti / Izin Kerja')
-                    ->description('Isi data pengajuan cuti sesuai jatah & ketentuan perbankan')
+                    ->description('Isi data pengajuan cuti resmi BPR (Alur: Persetujuan Cabang -> Verifikasi HR -> Otorisasi Direksi)')
                     ->schema([
                         Hidden::make('employee_id')
                             ->default($employee?->id),

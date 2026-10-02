@@ -2,13 +2,19 @@
 
 namespace App\Filament\Resources\Employees\Tables;
 
+use App\Models\Employee;
+use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeesTable
 {
@@ -110,6 +116,50 @@ class EmployeesTable
                     ]),
             ])
             ->recordActions([
+                Action::make('reset_password')
+                    ->label('Ubah Sandi')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->modalHeading(fn (Employee $record) => "Ubah Kata Sandi Akun - {$record->full_name}")
+                    ->modalDescription(fn (Employee $record) => "Perbarui kata sandi akun masuk portal untuk pegawai {$record->full_name} ({$record->email}). Kata sandi default sistem adalah 'password'.")
+                    ->modalSubmitActionLabel('Simpan Kata Sandi')
+                    ->modalCancelActionLabel('Batal')
+                    ->form([
+                        TextInput::make('new_password')
+                            ->label('Kata Sandi Baru')
+                            ->password()
+                            ->revealable()
+                            ->default('password')
+                            ->required()
+                            ->helperText('Default: password. Masukkan kata sandi baru untuk akun pegawai ini.'),
+                    ])
+                    ->action(function (Employee $record, array $data) {
+                        $newPassword = $data['new_password'];
+
+                        if ($record->user) {
+                            $record->user->update([
+                                'password' => Hash::make($newPassword),
+                            ]);
+                        } else {
+                            $user = User::firstOrCreate(
+                                ['email' => $record->email],
+                                [
+                                    'name' => $record->full_name,
+                                    'password' => Hash::make($newPassword),
+                                    'role' => 'employee',
+                                    'branch_id' => $record->branch_id,
+                                ]
+                            );
+                            $record->update(['user_id' => $user->id]);
+                        }
+
+                        Notification::make()
+                            ->title('Kata sandi pegawai berhasil diperbarui!')
+                            ->body("Akun {$record->email} kini dapat masuk dengan kata sandi yang disetel.")
+                            ->success()
+                            ->send();
+                    }),
+
                 EditAction::make(),
             ])
             ->toolbarActions([

@@ -727,7 +727,7 @@
               <svg class="input-lead-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
               </svg>
-              <input id="pass" name="password" type="password" class="m3-input has-trail" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+              <input id="pass" name="password" type="password" class="m3-input has-trail" placeholder="Masukkan kata sandi (default: password)" required autocomplete="current-password">
               <button type="button" class="input-trail-btn" onclick="togglePasswordVisibility()" aria-label="Lihat kata sandi">
                 <!-- Heroicon: eye -->
                 <svg id="eye-show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 20px; height: 20px;">
@@ -768,24 +768,39 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
             </svg>
-            <span>Akses Cepat Pengujian (Password: <code>password</code>):</span>
+            <span>Akses Cepat Pengujian (Semua Password: <code>password</code>):</span>
           </div>
-          <div style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-            <span style="font-size: 0.75rem; font-weight: 700; width: 100%;">Panel Admin / HRD:</span>
-            <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Super Admin (Akses Penuh)">
+          <div style="margin-bottom: 0.45rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
+            <span style="font-size: 0.72rem; font-weight: 700; width: 100%; color: var(--m3-primary-light);">Direksi & Kantor Pusat (/admin):</span>
+            <span class="quick-pill" onclick="fillDemo('direksi@bprbandaraya.com', 'password')" title="Direksi (Persetujuan Final Cuti & Pengawasan)">
+              direksi@bprbandaraya.com
+            </span>
+            <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Super Admin (Akses Penuh Seluruh Sistem)">
               admin@bprbandaraya.com
             </span>
-            <span class="quick-pill" onclick="fillDemo('ratna.dewi@bprbandaraya.com', 'password')" title="HR Officer">
+            <span class="quick-pill" onclick="fillDemo('ratna.dewi@bprbandaraya.com', 'password')" title="HR Officer (Verifikasi & Personalia)">
               ratna.dewi@bprbandaraya.com
             </span>
-            <span class="quick-pill" onclick="fillDemo('pincab.botania@bprbandaraya.com', 'password')" title="Pincab Botania">
+          </div>
+          <div style="margin-bottom: 0.45rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
+            <span style="font-size: 0.72rem; font-weight: 700; width: 100%; color: var(--m3-primary-light);">Pemimpin Cabang (/admin):</span>
+            <span class="quick-pill" onclick="fillDemo('pincab.botania@bprbandaraya.com', 'password')" title="Pincab KC Botania">
               pincab.botania@bprbandaraya.com
+            </span>
+            <span class="quick-pill" onclick="fillDemo('pincab.aviari@bprbandaraya.com', 'password')" title="Pincab KC Aviari">
+              pincab.aviari@bprbandaraya.com
+            </span>
+            <span class="quick-pill" onclick="fillDemo('pincab.bengkong@bprbandaraya.com', 'password')" title="Pincab KC Bengkong">
+              pincab.bengkong@bprbandaraya.com
             </span>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-            <span style="font-size: 0.75rem; font-weight: 700; width: 100%;">Portal Staf (ESS):</span>
+            <span style="font-size: 0.72rem; font-weight: 700; width: 100%; color: var(--m3-primary-light);">Portal Pegawai (/portal ESS - Presensi & Cuti):</span>
             <span class="quick-pill" onclick="fillDemo('teller.botania@bprbandaraya.com', 'password')" title="Teller Botania">
               teller.botania@bprbandaraya.com
+            </span>
+            <span class="quick-pill" onclick="fillDemo('cs.botania@bprbandaraya.com', 'password')" title="CS Botania">
+              cs.botania@bprbandaraya.com
             </span>
             <span class="quick-pill" onclick="fillDemo('ao.botania@bprbandaraya.com', 'password')" title="AO Botania">
               ao.botania@bprbandaraya.com

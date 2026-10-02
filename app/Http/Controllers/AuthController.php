@@ -121,7 +121,7 @@ class AuthController extends Controller
      */
     protected function redirectUserByRole($user)
     {
-        if (in_array($user->role, ['super_admin', 'hr_admin', 'branch_manager'])) {
+        if (in_array($user->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi'])) {
             return redirect()->intended('/admin');
         }
 

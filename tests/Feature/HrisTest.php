@@ -107,11 +107,22 @@ class HrisTest extends TestCase
         $balance->refresh();
         $this->assertEquals($initialRemaining - 2, $balance->remaining_quota);
         $this->assertEquals(2 + ($initialRemaining < 12 ? (12 - $initialRemaining) : 0), $balance->used_quota);
+
+        // Status changes to Approved_Direksi (Otorisasi Final Direksi) -> Quota remains properly deducted
+        $request->update(['status' => 'Approved_Direksi']);
+        $balance->refresh();
+        $this->assertEquals($initialRemaining - 2, $balance->remaining_quota);
+
+        // When rejected/cancelled, quota is restored
+        $request->update(['status' => 'Rejected']);
+        $balance->refresh();
+        $this->assertEquals($initialRemaining, $balance->remaining_quota);
     }
 
     public function test_panel_access_contracts(): void
     {
         $admin = User::where('role', 'super_admin')->first();
+        $direksi = User::where('role', 'direksi')->first();
         $pincab = User::where('role', 'branch_manager')->first();
         $employee = User::where('role', 'employee')->first();
 
@@ -120,6 +131,12 @@ class HrisTest extends TestCase
         $portalPanel = \Filament\Facades\Filament::getPanel('portal');
 
         $this->assertTrue($admin->canAccessPanel($adminPanel));
+        if ($direksi) {
+            $this->assertTrue($direksi->canAccessPanel($adminPanel));
+            $this->assertTrue($direksi->canAccessPanel($portalPanel));
+            $this->assertTrue($direksi->isDireksi());
+            $this->assertTrue($direksi->isHrAdmin());
+        }
         $this->assertTrue($pincab->canAccessPanel($adminPanel));
         $this->assertFalse($employee->canAccessPanel($adminPanel));
 

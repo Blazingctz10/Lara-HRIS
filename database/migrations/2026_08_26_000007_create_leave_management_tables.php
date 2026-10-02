@@ -46,7 +46,7 @@ return new class extends Migration
             $table->unsignedInteger('total_days');
             $table->text('reason');
             $table->string('attachment_url')->nullable();
-            $table->enum('status', ['Pending', 'Approved_Pincab', 'Approved_HR', 'Rejected'])->default('Pending');
+            $table->enum('status', ['Pending', 'Approved_Pincab', 'Approved_HR', 'Approved_Direksi', 'Rejected'])->default('Pending');
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('rejection_reason')->nullable();
             $table->timestamps();

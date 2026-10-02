@@ -20,7 +20,7 @@ class RecentLeaveRequestsWidget extends BaseWidget
         return $table
             ->query(
                 LeaveRequest::accessibleBy()
-                    ->whereIn('status', ['Pending', 'Approved_Pincab'])
+                    ->whereIn('status', ['Pending', 'Approved_Pincab', 'Approved_HR'])
                     ->latest()
             )
             ->heading('Antrean Pengajuan Cuti Menunggu Persetujuan')
@@ -61,11 +61,20 @@ class RecentLeaveRequestsWidget extends BaseWidget
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Approved_HR' => 'success',
+                        'Approved_Direksi' => 'success',
+                        'Approved_HR' => 'primary',
                         'Approved_Pincab' => 'info',
                         'Pending' => 'warning',
                         'Rejected' => 'danger',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
+                        'Approved_HR' => 'Verifikasi HR',
+                        'Approved_Pincab' => 'Persetujuan Cabang',
+                        'Pending' => 'Menunggu Approval',
+                        'Rejected' => 'Ditolak',
+                        default => $state,
                     }),
             ])
             ->recordActions([
@@ -88,10 +97,10 @@ class RecentLeaveRequestsWidget extends BaseWidget
                     }),
 
                 Action::make('approve_hr')
-                    ->label('Approve Final HR')
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
-                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
+                    ->label('Verifikasi HR')
+                    ->icon('heroicon-o-document-check')
+                    ->color('primary')
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin() && !auth()->user()->isDireksi())
                     ->requiresConfirmation()
                     ->action(function (LeaveRequest $record) {
                         $record->update([
@@ -100,7 +109,25 @@ class RecentLeaveRequestsWidget extends BaseWidget
                         ]);
 
                         Notification::make()
-                            ->title('Cuti berhasil disetujui Final oleh HR')
+                            ->title('Diverifikasi oleh HR')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('approve_direksi')
+                    ->label('Approve Direksi (Final)')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab', 'Approved_HR']) && (auth()->user()->isDireksi() || auth()->user()->isSuperAdmin() || auth()->user()->isHrAdmin()))
+                    ->requiresConfirmation()
+                    ->action(function (LeaveRequest $record) {
+                        $record->update([
+                            'status' => 'Approved_Direksi',
+                            'approved_by' => auth()->id(),
+                        ]);
+
+                        Notification::make()
+                            ->title('Cuti berhasil disetujui Final oleh Direksi')
                             ->success()
                             ->send();
                     }),

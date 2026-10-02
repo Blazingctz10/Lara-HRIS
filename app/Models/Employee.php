@@ -97,6 +97,22 @@ class Employee extends Model
                 }
             }
         });
+
+        static::created(function (Employee $employee) {
+            if (! $employee->user_id && $employee->email) {
+                $user = User::where('email', $employee->email)->first();
+                if (! $user) {
+                    $user = User::create([
+                        'name' => $employee->full_name,
+                        'email' => $employee->email,
+                        'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                        'role' => 'employee',
+                        'branch_id' => $employee->branch_id,
+                    ]);
+                }
+                $employee->updateQuietly(['user_id' => $user->id]);
+            }
+        });
     }
 
     public function user(): BelongsTo

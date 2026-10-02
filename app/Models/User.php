@@ -51,7 +51,7 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager']);
+            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
         }
 
         if ($panel->getId() === 'portal') {
@@ -66,9 +66,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'super_admin';
     }
 
+    public function isDireksi(): bool
+    {
+        return in_array($this->role, ['direksi', 'super_admin']);
+    }
+
     public function isHrAdmin(): bool
     {
-        return in_array($this->role, ['super_admin', 'hr_admin']);
+        return in_array($this->role, ['super_admin', 'hr_admin', 'direksi']);
     }
 
     public function isBranchManager(): bool

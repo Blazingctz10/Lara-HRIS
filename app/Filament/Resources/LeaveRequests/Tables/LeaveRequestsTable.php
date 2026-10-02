@@ -67,11 +67,20 @@ class LeaveRequestsTable
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Approved_HR' => 'success',
+                        'Approved_Direksi' => 'success',
+                        'Approved_HR' => 'primary',
                         'Approved_Pincab' => 'info',
                         'Pending' => 'warning',
                         'Rejected' => 'danger',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
+                        'Approved_HR' => 'Verifikasi HR',
+                        'Approved_Pincab' => 'Persetujuan Cabang',
+                        'Pending' => 'Menunggu Approval',
+                        'Rejected' => 'Ditolak',
+                        default => $state,
                     }),
 
                 TextColumn::make('approver.name')
@@ -82,10 +91,11 @@ class LeaveRequestsTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'Pending' => 'Pending',
-                        'Approved_Pincab' => 'Approved Pincab',
-                        'Approved_HR' => 'Approved HR',
-                        'Rejected' => 'Rejected',
+                        'Pending' => 'Menunggu Approval',
+                        'Approved_Pincab' => 'Persetujuan Cabang',
+                        'Approved_HR' => 'Verifikasi HR',
+                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
+                        'Rejected' => 'Ditolak',
                     ]),
                 SelectFilter::make('leave_type_id')
                     ->relationship('leaveType', 'name')
@@ -99,7 +109,7 @@ class LeaveRequestsTable
                     ->visible(fn (LeaveRequest $record) => $record->status === 'Pending' && auth()->user()->isBranchManager())
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Persetujuan Cuti (Pincab)')
-                    ->modalDescription(fn (LeaveRequest $record) => "Apakah Anda yakin ingin menyetujui permohonan cuti untuk {$record->employee->user->name} selama {$record->total_days} hari?")
+                    ->modalDescription(fn (LeaveRequest $record) => "Apakah Anda yakin ingin menyetujui rekomendasi cuti untuk {$record->employee->user->name} selama {$record->total_days} hari?")
                     ->modalSubmitActionLabel('Ya, Setujui Cuti')
                     ->modalCancelActionLabel('Batal')
                     ->action(function (LeaveRequest $record) {
@@ -115,14 +125,14 @@ class LeaveRequestsTable
                     }),
 
                 Action::make('approve_hr')
-                    ->label('Final Approve HR')
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
-                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
+                    ->label('Verifikasi HR')
+                    ->icon('heroicon-o-document-check')
+                    ->color('primary')
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin() && !auth()->user()->isDireksi())
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Final Cuti (HR)')
-                    ->modalDescription(fn (LeaveRequest $record) => "Persetujuan final ini akan secara otomatis memotong {$record->total_days} hari dari saldo cuti resmi pegawai {$record->employee->user->name}. Lanjutkan?")
-                    ->modalSubmitActionLabel('Ya, Setujui Final')
+                    ->modalHeading('Konfirmasi Verifikasi Berkas Cuti (HR)')
+                    ->modalDescription(fn (LeaveRequest $record) => "Verifikasi kelayakan berkas cuti untuk pegawai {$record->employee->user->name} sebelum diteruskan ke Direksi untuk persetujuan akhir.")
+                    ->modalSubmitActionLabel('Ya, Verifikasi Berkas')
                     ->modalCancelActionLabel('Batal')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
@@ -131,7 +141,29 @@ class LeaveRequestsTable
                         ]);
 
                         Notification::make()
-                            ->title('Pengajuan cuti berhasil disetujui Final oleh HR')
+                            ->title('Pengajuan cuti berhasil diverifikasi HR')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('approve_direksi')
+                    ->label('Approval Direksi (Final)')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab', 'Approved_HR']) && (auth()->user()->isDireksi() || auth()->user()->isSuperAdmin() || auth()->user()->isHrAdmin()))
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Persetujuan Final Cuti oleh Direksi')
+                    ->modalDescription(fn (LeaveRequest $record) => "Persetujuan Direksi adalah otorisasi final yang secara resmi mengesahkan permohonan cuti {$record->employee->user->name} selama {$record->total_days} hari kerja dan memotong saldo cuti tahun buku {$record->start_date->year}. Lanjutkan?")
+                    ->modalSubmitActionLabel('Ya, Setujui Direksi (Final)')
+                    ->modalCancelActionLabel('Batal')
+                    ->action(function (LeaveRequest $record) {
+                        $record->update([
+                            'status' => 'Approved_Direksi',
+                            'approved_by' => auth()->id(),
+                        ]);
+
+                        Notification::make()
+                            ->title('Pengajuan cuti berhasil disetujui Final oleh Direksi')
                             ->success()
                             ->send();
                     }),
@@ -140,7 +172,7 @@ class LeaveRequestsTable
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab']))
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Pincab', 'Approved_HR']))
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Penolakan Pengajuan Cuti')
                     ->modalDescription('Mohon isi alasan penolakan sebelum memproses pembatalan pengajuan cuti ini.')

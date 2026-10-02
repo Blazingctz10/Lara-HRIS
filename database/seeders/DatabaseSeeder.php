@@ -135,7 +135,36 @@ class DatabaseSeeder extends Seeder
         // 5. Seed Users & Employees (Domain: @bprbandaraya.com)
         $password = Hash::make('password');
 
-        // A. Super Admin & Head Office HR
+        // A. Direksi, Super Admin & Head Office HR
+        $uDireksi = User::create([
+            'name' => 'Direktur Utama BPR Banda Raya',
+            'email' => 'direksi@bprbandaraya.com',
+            'password' => $password,
+            'role' => 'direksi',
+            'branch_id' => $ho->id,
+        ]);
+
+        $empDireksi = Employee::create([
+            'user_id' => $uDireksi->id,
+            'nip' => 'BPR-DIR-0001',
+            'nik' => '2171010101700001',
+            'full_name' => 'Direktur Utama BPR Banda Raya',
+            'email' => 'direksi@bprbandaraya.com',
+            'phone' => '081177000001',
+            'gender' => 'Male',
+            'birth_date' => '1970-01-01',
+            'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1, Batam',
+            'branch_id' => $ho->id,
+            'department_id' => $deptOps->id,
+            'position_id' => $posPincab->id,
+            'employment_status' => 'Permanent',
+            'join_date' => '2010-01-01',
+            'status' => 'Active',
+            'bank_account_number' => '1200000000',
+            'bank_account_holder' => 'Direktur Utama BPR',
+            'npwp' => '80.000.000.0-011.000',
+        ]);
+
         $uAdmin = User::create([
             'name' => 'Super Administrator BPR Banda Raya',
             'email' => 'admin@bprbandaraya.com',
@@ -375,7 +404,7 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
-        $allEmployees = collect([$empAdmin, $empHr, $empPincabBotania, $empPincabAviari, $empPincabBengkong]);
+        $allEmployees = collect([$empDireksi, $empAdmin, $empHr, $empPincabBotania, $empPincabAviari, $empPincabBengkong]);
 
         foreach ($staffData as $item) {
             $user = User::create([

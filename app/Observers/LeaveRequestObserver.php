@@ -20,8 +20,11 @@ class LeaveRequestObserver
             $newStatus = $leaveRequest->status;
             $year = Carbon::parse($leaveRequest->start_date)->year;
 
-            // When approved by HR, deduct balance
-            if ($newStatus === 'Approved_HR' && $originalStatus !== 'Approved_HR') {
+            $isFinalApproved = in_array($newStatus, ['Approved_Direksi', 'Approved_HR']);
+            $wasFinalApproved = in_array($originalStatus, ['Approved_Direksi', 'Approved_HR']);
+
+            // Ketika disetujui final oleh Direksi (atau HR), potong saldo cuti resmi
+            if ($isFinalApproved && ! $wasFinalApproved) {
                 DB::transaction(function () use ($leaveRequest, $year) {
                     $balance = EmployeeLeaveBalance::firstOrCreate(
                         [
@@ -44,8 +47,8 @@ class LeaveRequestObserver
                 });
             }
 
-            // If an approved leave was reversed/rejected, restore balance
-            if ($originalStatus === 'Approved_HR' && $newStatus !== 'Approved_HR') {
+            // Jika status yang sudah disetujui direksi dibatalkan/ditolak, kembalikan kuota saldo cuti
+            if ($wasFinalApproved && ! $isFinalApproved) {
                 DB::transaction(function () use ($leaveRequest, $year) {
                     $balance = EmployeeLeaveBalance::where([
                         'employee_id' => $leaveRequest->employee_id,

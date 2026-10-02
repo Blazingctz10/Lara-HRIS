@@ -42,11 +42,20 @@ class LeaveRequestsTable
                     ->label('Status Approval')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Approved_HR' => 'success',
+                        'Approved_Direksi' => 'success',
+                        'Approved_HR' => 'primary',
                         'Approved_Pincab' => 'info',
                         'Pending' => 'warning',
                         'Rejected' => 'danger',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
+                        'Approved_HR' => 'Verifikasi HR',
+                        'Approved_Pincab' => 'Persetujuan Cabang',
+                        'Pending' => 'Menunggu Approval',
+                        'Rejected' => 'Ditolak',
+                        default => $state,
                     }),
 
                 TextColumn::make('approver.name')
