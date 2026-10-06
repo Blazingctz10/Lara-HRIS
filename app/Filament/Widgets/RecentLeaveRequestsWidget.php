@@ -20,6 +20,7 @@ class RecentLeaveRequestsWidget extends BaseWidget
         return $table
             ->query(
                 LeaveRequest::accessibleBy()
+                    ->with(['employee.branch', 'leaveType'])
                     ->whereIn('status', ['Pending', 'Approved_HR'])
                     ->latest()
             )
