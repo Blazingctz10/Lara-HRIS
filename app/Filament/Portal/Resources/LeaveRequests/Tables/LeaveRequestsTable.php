@@ -11,6 +11,7 @@ class LeaveRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['leaveType']))
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('created_at')

@@ -14,6 +14,7 @@ class CareerMovementsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['employee', 'fromBranch', 'toBranch', 'toPosition']))
             ->columns([
                 TextColumn::make('employee.full_name')
                     ->label('Nama Pegawai')

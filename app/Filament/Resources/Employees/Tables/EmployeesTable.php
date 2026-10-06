@@ -21,6 +21,7 @@ class EmployeesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['branch', 'department', 'position', 'user']))
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Foto')

@@ -17,6 +17,7 @@ class ReimbursementsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['employee.branch']))
             ->columns([
                 TextColumn::make('employee.full_name')
                     ->label('Nama Pegawai')

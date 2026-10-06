@@ -17,6 +17,7 @@ class AttendancesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['employee.branch']))
             ->defaultSort('date', 'desc')
             ->columns([
                 TextColumn::make('date')

@@ -381,12 +381,12 @@ Lara-HRIS telah diperkuat dengan standar perlindungan perbankan berlapis:
 - Web Browser modern (Chrome, Edge, Firefox, Safari)
 
 ### 2. Cara Menjalankan Server
-```bash
-# Cara Praktis (Rekomendasi di Windows):
-# Jalankan start.bat di folder utama proyek
-..\start.bat
+```powershell
+# Cara Praktis (Rekomendasi di Windows PowerShell):
+# Jalankan launcher.ps1 di folder utama proyek atau di dalam hris-system
+powershell -ExecutionPolicy Bypass -File .\launcher.ps1
 ```
-Menu interaktif otomatis menguji port `8000`, menjalankan background task worker, dan menampilkan log realtime dengan opsi matikan server bersih `[X]`.
+Menu interaktif konsol otomatis menguji dependensi PHP & database, menguji port `8000`, menyediakan fitur optimasi cache performa tinggi, dan menampilkan log realtime dengan opsi matikan server bersih `[5]`.
 
 Atau via command prompt manual:
 ```bash
