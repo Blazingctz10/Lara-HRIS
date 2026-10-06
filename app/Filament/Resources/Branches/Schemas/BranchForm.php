@@ -64,28 +64,21 @@ class BranchForm
                             ->required(),
                     ]),
 
-                Section::make('Geofencing & Presensi GPS')
-                    ->description('Koordinat fisik kantor untuk validasi presensi mobile/portal staf')
+                Section::make('Titik Lokasi Fisik Kantor')
+                    ->description('Koordinat lokasi kantor cabang untuk pemetaan aset fisik dan unit kerja BPR Banda Raya')
                     ->schema([
-                        Grid::make(3)->schema([
+                        Grid::make(2)->schema([
                             TextInput::make('latitude')
-                                ->label('Latitude GPS')
+                                ->label('Latitude')
                                 ->numeric()
                                 ->placeholder('-6.19128000')
                                 ->helperText('Format derajat desimal (contoh: -6.19128000)'),
 
                             TextInput::make('longitude')
-                                ->label('Longitude GPS')
+                                ->label('Longitude')
                                 ->numeric()
                                 ->placeholder('106.82392000')
                                 ->helperText('Format derajat desimal (contoh: 106.82392000)'),
-
-                            TextInput::make('radius_meters')
-                                ->label('Radius Toleransi')
-                                ->numeric()
-                                ->default(50)
-                                ->suffix('meter')
-                                ->helperText('Jarak maksimal staf dari titik kantor saat absen'),
                         ]),
                     ]),
             ]);

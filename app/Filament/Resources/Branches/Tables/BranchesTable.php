@@ -46,10 +46,10 @@ class BranchesTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('radius_meters')
-                    ->label('Radius')
-                    ->suffix(' m')
-                    ->alignCenter(),
+                TextColumn::make('phone')
+                    ->label('Telepon')
+                    ->searchable()
+                    ->placeholder('-'),
 
                 TextColumn::make('employees_count')
                     ->counts('employees')

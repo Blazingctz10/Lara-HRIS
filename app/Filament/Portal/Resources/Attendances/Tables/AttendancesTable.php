@@ -18,10 +18,12 @@ class AttendancesTable
                     ->date('d M Y')
                     ->sortable(),
 
-                ImageColumn::make('proof_photo')
-                    ->label('Selfie')
-                    ->circular()
-                    ->defaultImageUrl('https://ui-avatars.com/api/?name=Presensi&background=f1f5f9&color=64748b'),
+                TextColumn::make('source_device')
+                    ->label('Metode Log')
+                    ->state(fn () => 'Mesin Sidik Jari')
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-finger-print'),
 
                 TextColumn::make('clock_in')
                     ->label('Jam Masuk')
@@ -45,13 +47,6 @@ class AttendancesTable
                         'Absent' => 'danger',
                         default => 'gray',
                     }),
-
-                TextColumn::make('distance_in_meters')
-                    ->label('Deviasi Jarak')
-                    ->suffix(' m')
-                    ->badge()
-                    ->color(fn ($state) => $state <= 50 ? 'success' : 'danger')
-                    ->placeholder('N/A'),
 
                 TextColumn::make('notes')
                     ->label('Catatan')

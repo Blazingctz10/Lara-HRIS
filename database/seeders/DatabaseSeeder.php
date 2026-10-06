@@ -526,10 +526,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Announcement::create([
-            'title' => 'Penerapan Geofencing GPS Presensi Online Kantor Pusat & Cabang Batam',
+            'title' => 'Pemberlakuan Presensi Biometrik Mesin Sidik Jari Cabang BPR Banda Raya',
             'category' => 'ojk_compliance',
             'priority' => 'important',
-            'content' => 'Presensi masuk dan pulang wajib dilakukan dalam radius geofencing cabang masing-masing (Kantor Pusat Nagoya 100m, KC Botania 50m, KC Aviari 50m, KC Bengkong 50m). Pastikan GPS perangkat aktif saat melakukan presensi.',
+            'content' => 'Presensi masuk dan pulang seluruh staf perbankan wajib dilakukan melalui mesin sidik jari biometrik (Solution X105) di kantor cabang masing-masing. Data kehadiran tersinkronisasi otomatis ke portal HRIS.',
             'author_id' => $uAdmin->id,
             'is_active' => true,
             'published_at' => Carbon::today()->subDays(5)->toDateString(),

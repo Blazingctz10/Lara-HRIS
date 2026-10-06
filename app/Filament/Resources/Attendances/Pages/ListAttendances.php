@@ -50,9 +50,7 @@ class ListAttendances extends ListRecords
                             'Jam Masuk',
                             'Jam Pulang',
                             'Status Kehadiran',
-                            'Deviasi Jarak GPS (Meter)',
-                            'Latitude Masuk',
-                            'Longitude Masuk',
+                            'Sumber Pencatatan',
                             'Catatan',
                         ]);
 
@@ -67,9 +65,7 @@ class ListAttendances extends ListRecords
                                 $row->clock_in ?? '-',
                                 $row->clock_out ?? '-',
                                 $row->status ?? '-',
-                                $row->distance_in_meters ?? '0',
-                                $row->lat_in ?? '-',
-                                $row->long_in ?? '-',
+                                'Mesin Fingerprint Cabang',
                                 $row->notes ?? '-',
                             ]);
                         }

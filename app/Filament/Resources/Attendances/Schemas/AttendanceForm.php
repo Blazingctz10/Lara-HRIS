@@ -18,7 +18,8 @@ class AttendanceForm
     {
         return $schema
             ->components([
-                Section::make('Data Presensi Harian')
+                Section::make('Data Presensi Biometrik (Mesin Sidik Jari)')
+                    ->description('Pencatatan kehadiran staf bersumber dari mesin sidik jari biometrik (fingerprint) kantor cabang. Form ini dipergunakan untuk penyesuaian/koreksi manual jika terjadi kendala teknis.')
                     ->schema([
                         Grid::make(3)->schema([
                             Select::make('employee_id')
@@ -52,25 +53,12 @@ class AttendanceForm
                             TimePicker::make('clock_out')
                                 ->label('Jam Pulang')
                                 ->seconds(false),
-
-                            TextInput::make('distance_in_meters')
-                                ->label('Deviasi Jarak Geofence')
-                                ->numeric()
-                                ->suffix('meter')
-                                ->helperText('Jarak aktual staf dari kantor saat absensi'),
                         ]),
 
-                        Grid::make(2)->schema([
-                            FileUpload::make('proof_photo')
-                                ->label('Foto Selfie / Bukti Presensi')
-                                ->image()
-                                ->directory('attendances/proofs')
-                                ->maxSize(5120),
-
-                            Textarea::make('notes')
-                                ->label('Catatan Kehadiran')
-                                ->rows(3),
-                        ]),
+                        Textarea::make('notes')
+                            ->label('Catatan Kehadiran / Keterangan Mesin')
+                            ->placeholder('Contoh: Terdata otomatis dari Mesin Sidik Jari Solution X105 atau Koreksi HR manual')
+                            ->rows(3),
                     ]),
             ]);
     }

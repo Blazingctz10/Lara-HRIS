@@ -24,11 +24,6 @@ class AttendancesTable
                     ->date('d M Y')
                     ->sortable(),
 
-                ImageColumn::make('proof_photo')
-                    ->label('Selfie')
-                    ->circular()
-                    ->defaultImageUrl('https://ui-avatars.com/api/?name=Presensi&background=f1f5f9&color=64748b'),
-
                 TextColumn::make('employee.nip')
                     ->label('NIP')
                     ->searchable()
@@ -70,12 +65,12 @@ class AttendancesTable
                         default => 'gray',
                     }),
 
-                TextColumn::make('distance_in_meters')
-                    ->label('Jarak GPS')
-                    ->suffix(' m')
+                TextColumn::make('source_device')
+                    ->label('Metode Presensi')
+                    ->state(fn () => 'Mesin Sidik Jari')
                     ->badge()
-                    ->color(fn ($state) => $state <= 50 ? 'success' : 'danger')
-                    ->placeholder('N/A'),
+                    ->color('success')
+                    ->icon('heroicon-m-finger-print'),
             ])
             ->filters([
                 SelectFilter::make('status')
