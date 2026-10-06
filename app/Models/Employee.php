@@ -71,6 +71,9 @@ class Employee extends Model
             'exit_date' => 'date',
             'grade' => 'integer',
             'ipk' => 'decimal:2',
+            'nik' => 'encrypted',
+            'bank_bpr_account' => 'encrypted',
+            'bank_external_account' => 'encrypted',
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Services\DataMigrationService;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Livewire\WithFileUploads;
@@ -31,6 +32,42 @@ class ImportData extends Page
     public static function canAccess(): bool
     {
         return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public function importEmployeesAction(): Action
+    {
+        return Action::make('importEmployees')
+            ->label('Mulai Impor & Migrasikan Pegawai')
+            ->icon('heroicon-o-arrow-up-tray')
+            ->color('primary')
+            ->size('lg')
+            ->requiresConfirmation()
+            ->modalHeading('Konfirmasi Migrasi Data Pegawai')
+            ->modalDescription('Apakah Anda yakin ingin memulai proses impor data pegawai dari berkas CSV yang diunggah? Akun portal login dan data profil pegawai akan disinkronkan ke dalam sistem.')
+            ->modalSubmitActionLabel('Ya, Mulai Impor Pegawai')
+            ->modalCancelActionLabel('Batal')
+            ->modalIcon('heroicon-o-arrow-up-tray')
+            ->action(function () {
+                $this->importEmployees();
+            });
+    }
+
+    public function importAttendancesAction(): Action
+    {
+        return Action::make('importAttendances')
+            ->label('Mulai Impor Log Absensi')
+            ->icon('heroicon-o-clock')
+            ->color('warning')
+            ->size('lg')
+            ->requiresConfirmation()
+            ->modalHeading('Konfirmasi Impor Log Absensi')
+            ->modalDescription('Apakah Anda yakin ingin mengimpor riwayat data presensi dari berkas CSV ini ke dalam kalender kehadiran sistem?')
+            ->modalSubmitActionLabel('Ya, Mulai Impor Absensi')
+            ->modalCancelActionLabel('Batal')
+            ->modalIcon('heroicon-o-clock')
+            ->action(function () {
+                $this->importAttendances();
+            });
     }
 
     /**

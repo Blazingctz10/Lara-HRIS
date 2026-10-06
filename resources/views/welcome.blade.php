@@ -748,7 +748,7 @@
               <input type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
               <span>Ingat sesi saya</span>
             </label>
-            <a href="javascript:void(0)" class="forgot-link" onclick="alert('Bantuan Lupa Sandi:\nSilakan hubungi Unit IT & SDM BPR Banda Raya untuk verifikasi identitas dan reset kredensial Anda.')">Lupa sandi?</a>
+            <a href="javascript:void(0)" class="forgot-link" onclick="openForgotModal()">Lupa sandi?</a>
           </div>
 
           <!-- Submit Button -->
@@ -899,5 +899,55 @@
     }
   </script>
 
+  <!-- Forgot Password Security Modal -->
+  <div id="forgotPasswordModal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); padding: 1.25rem;">
+    <div style="background: #ffffff; border-radius: 24px; max-width: 480px; width: 100%; padding: 2rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); text-align: left; animation: modalPop 0.25s ease-out;">
+      <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.2rem;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(14, 104, 56, 0.12); color: #0E6838; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827; margin: 0;">Bantuan Pemulihan Kata Sandi</h3>
+          <p style="font-size: 0.8rem; color: #6b7280; margin: 0.15rem 0 0 0;">Prosedur Keamanan Akun Core HRIS BPR</p>
+        </div>
+      </div>
+      <div style="font-size: 0.875rem; color: #374151; line-height: 1.6; margin-bottom: 1.5rem; background: #f9fafb; padding: 1.1rem; border-radius: 16px; border: 1px solid #e5e7eb;">
+        <p style="margin: 0 0 0.75rem 0;">Demi menjaga kepatuhan tata kelola teknologi perbankan, penyetelan ulang kata sandi dilakukan secara terverifikasi:</p>
+        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.825rem; color: #4b5563;">
+          <li style="margin-bottom: 0.35rem;">Hubungi <strong>Unit IT & Administrator Sistem</strong> di Kantor Pusat Nagoya Hill.</li>
+          <li style="margin-bottom: 0.35rem;">Atau informasikan ke <strong>Unit SDM / HR BPR Banda Raya</strong> untuk verifikasi NIP Anda.</li>
+          <li>Default kata sandi reset baru dapat langsung digunakan untuk login ulang.</li>
+        </ul>
+      </div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" onclick="closeForgotModal()" style="padding: 0.65rem 1.4rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-weight: 700; font-size: 0.875rem; border: none; cursor: pointer;">
+          Saya Mengerti
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+
+  <script>
+    function openForgotModal() {
+      const modal = document.getElementById('forgotPasswordModal');
+      if (modal) modal.style.display = 'flex';
+    }
+    function closeForgotModal() {
+      const modal = document.getElementById('forgotPasswordModal');
+      if (modal) modal.style.display = 'none';
+    }
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeForgotModal();
+    });
+  </script>
 </body>
 </html>

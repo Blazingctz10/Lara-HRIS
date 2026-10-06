@@ -227,26 +227,10 @@
                 </div>
             </div>
 
-            <div>
-                <button
-                    type="button"
-                    x-data
-                    @click="
-                        if (confirm('Konfirmasi Migrasi Pegawai:\n\nApakah Anda yakin ingin memulai proses impor data pegawai dari berkas CSV ini? Akun login dan data profil akan disinkronkan ke dalam sistem.')) {
-                            $wire.importEmployees();
-                        }
-                    "
-                    wire:loading.attr="disabled"
-                    style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.55rem; padding: 0.85rem 1.5rem; border-radius: 14px; background: #0E6838; color: #ffffff; font-weight: 800; font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.2s ease;"
-                    onmouseover="this.style.background='#0a4d29'"
-                    onmouseout="this.style.background='#0E6838'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px; height: 18px;" wire:loading.remove wire:target="importEmployees">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                    </svg>
-                    <span wire:loading.remove wire:target="importEmployees">Mulai Impor & Migrasikan Pegawai</span>
-                    <span wire:loading wire:target="importEmployees">Memproses Migrasi Pegawai...</span>
-                </button>
+            <div style="display: flex; justify-content: stretch;">
+                <div style="width: 100%;">
+                    {{ $this->importEmployeesAction }}
+                </div>
             </div>
         </div>
 
@@ -331,26 +315,10 @@
                 </div>
             </div>
 
-            <div>
-                <button
-                    type="button"
-                    x-data
-                    @click="
-                        if (confirm('Konfirmasi Impor Absensi:\n\nApakah Anda yakin ingin mengimpor riwayat data presensi ini ke kalender kehadiran sistem?')) {
-                            $wire.importAttendances();
-                        }
-                    "
-                    wire:loading.attr="disabled"
-                    style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.55rem; padding: 0.85rem 1.5rem; border-radius: 14px; background: #F37A20; color: #ffffff; font-weight: 800; font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.2s ease;"
-                    onmouseover="this.style.background='#d96512'"
-                    onmouseout="this.style.background='#F37A20'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px; height: 18px;" wire:loading.remove wire:target="importAttendances">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                    </svg>
-                    <span wire:loading.remove wire:target="importAttendances">Mulai Impor Log Absensi</span>
-                    <span wire:loading wire:target="importAttendances">Memproses Impor Absensi...</span>
-                </button>
+            <div style="display: flex; justify-content: stretch;">
+                <div style="width: 100%;">
+                    {{ $this->importAttendancesAction }}
+                </div>
             </div>
         </div>
     </div>
@@ -504,4 +472,6 @@
             </table>
         </div>
     </div>
+
+    <x-filament-actions::modals />
 </x-filament-panels::page>

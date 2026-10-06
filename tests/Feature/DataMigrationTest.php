@@ -83,11 +83,14 @@ class DataMigrationTest extends TestCase
             'grade' => 5,
             'education_level' => 'S-1',
             'education_institution' => 'UIB',
-            'bank_bpr_account' => '01.10.99999',
             'bank_external_name' => 'BCA',
             'ptkp_status' => 'K/1',
             'emergency_contact_name' => 'Siti Rahayu',
         ]);
+
+        $importedEmployee = Employee::where('nip', 'BPR-2026-9999')->first();
+        $this->assertNotNull($importedEmployee);
+        $this->assertEquals('01.10.99999', $importedEmployee->bank_bpr_account);
 
         $this->assertDatabaseHas('employee_families', [
             'name' => 'Siti Rahayu',

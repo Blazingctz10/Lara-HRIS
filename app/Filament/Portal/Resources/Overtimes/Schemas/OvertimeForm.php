@@ -42,6 +42,8 @@ class OvertimeForm
                                 ->numeric()
                                 ->readOnly()
                                 ->default(3.00)
+                                ->helperText('Maksimal 4 jam per hari sesuai ketentuan PP No. 35/2021.')
+                                ->rules(['lte:4'])
                                 ->required(),
 
                             TimePicker::make('start_time')

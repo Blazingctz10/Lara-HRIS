@@ -270,17 +270,8 @@
                                         Unduh
                                     </x-filament::button>
 
-                                    <!-- Hapus Button dengan Konfirmasi Langsung -->
-                                    <x-filament::button
-                                        size="xs"
-                                        color="danger"
-                                        icon="heroicon-m-trash"
-                                        wire:click="deleteBackup('{{ $backup['name'] }}')"
-                                        wire:confirm="Konfirmasi Hapus: Apakah Anda yakin ingin menghapus file cadangan '{{ $backup['name'] }}' secara permanen dari server?"
-                                        title="Hapus file cadangan dari server"
-                                    >
-                                        Hapus
-                                    </x-filament::button>
+                                    <!-- Hapus Button dengan Modal Filament Resmi -->
+                                    {{ ($this->deleteBackupAction)(['filename' => $backup['name']]) }}
                                 </div>
                             </td>
                         </tr>

@@ -140,6 +140,23 @@ class BackupData extends Page
             });
     }
 
+    public function deleteBackupAction(): Action
+    {
+        return Action::make('deleteBackup')
+            ->label('Hapus')
+            ->color('danger')
+            ->size('xs')
+            ->icon('heroicon-m-trash')
+            ->requiresConfirmation()
+            ->modalHeading('Konfirmasi Hapus Arsip Cadangan')
+            ->modalDescription(fn (array $arguments) => "Apakah Anda yakin ingin menghapus file cadangan '{$arguments['filename']}' secara permanen dari server? Tindakan ini tidak dapat dibatalkan.")
+            ->modalSubmitActionLabel('Ya, Hapus Permanen')
+            ->modalCancelActionLabel('Batal')
+            ->action(function (array $arguments) {
+                $this->deleteBackup($arguments['filename']);
+            });
+    }
+
     public function createDatabaseBackup(): void
     {
         $dir = $this->getBackupDir();
