@@ -70,6 +70,32 @@ class PanelRoutesTest extends TestCase
         }
     }
 
+    public function test_direksi_has_read_only_access_and_cannot_create_or_edit_employees_and_master_data(): void
+    {
+        $direksi = User::where('role', 'direksi')->first();
+        if (!$direksi) {
+            $direksi = User::factory()->create(['role' => 'direksi']);
+        }
+        $this->actingAs($direksi);
+
+        // Direksi CAN VIEW directory/lists
+        $this->get('/admin/employees')->assertStatus(200);
+        $this->get('/admin/positions')->assertStatus(200);
+        $this->get('/admin/departments')->assertStatus(200);
+        $this->get('/admin/branches')->assertStatus(200);
+
+        // Direksi CANNOT CREATE employees or master data (Must be 403 Forbidden)
+        $this->get('/admin/employees/create')->assertStatus(403);
+        $this->get('/admin/positions/create')->assertStatus(403);
+        $this->get('/admin/departments/create')->assertStatus(403);
+        $this->get('/admin/branches/create')->assertStatus(403);
+        $this->get('/admin/leave-types/create')->assertStatus(403);
+        $this->get('/admin/attendances/create')->assertStatus(403);
+        $this->get('/admin/warning-letters/create')->assertStatus(403);
+        $this->get('/admin/career-movements/create')->assertStatus(403);
+        $this->get('/admin/job-applicants/create')->assertStatus(403);
+    }
+
     public function test_all_portal_resources_render_successfully(): void
     {
         $employee = User::where('email', 'teller.botania@bprbandaraya.com')->first();

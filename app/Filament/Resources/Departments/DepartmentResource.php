@@ -35,6 +35,26 @@ class DepartmentResource extends Resource
         return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
     }
 
+    public static function canCreate(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);

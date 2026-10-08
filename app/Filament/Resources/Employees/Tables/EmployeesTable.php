@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
@@ -117,11 +118,16 @@ class EmployeesTable
                     ]),
             ])
             ->recordActions([
+                ViewAction::make()
+                    ->button()
+                    ->outlined(),
+
                 Action::make('reset_password')
                     ->label('Ubah Sandi')
                     ->icon('heroicon-o-key')
                     ->color('warning')
                     ->button()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->modalHeading(fn (Employee $record) => "Ubah Kata Sandi Akun - {$record->full_name}")
                     ->modalDescription(fn (Employee $record) => "Perbarui kata sandi akun masuk portal untuk pegawai {$record->full_name} ({$record->email}). Kata sandi default sistem adalah 'password'.")
                     ->modalSubmitActionLabel('Simpan Kata Sandi')

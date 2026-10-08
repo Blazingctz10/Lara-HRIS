@@ -36,6 +36,31 @@ class OvertimeResource extends Resource
         return parent::getEloquentQuery()->accessibleBy();
     }
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'branch_manager']);
+    }
+
+    public static function canCreate(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
     public static function form(Schema $schema): Schema
     {
         return OvertimeForm::configure($schema);
