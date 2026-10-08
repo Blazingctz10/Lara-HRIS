@@ -50,8 +50,10 @@ class ListAttendances extends ListRecords
                             'Jam Masuk',
                             'Jam Pulang',
                             'Status Kehadiran',
+                            'Terlambat (Menit)',
+                            'Denda Keterlambatan (Rp)',
                             'Sumber Pencatatan',
-                            'Catatan',
+                            'Catatan / Dispensasi',
                         ]);
 
                         foreach ($attendances as $row) {
@@ -65,9 +67,129 @@ class ListAttendances extends ListRecords
                                 $row->clock_in ?? '-',
                                 $row->clock_out ?? '-',
                                 $row->status ?? '-',
-                                'Mesin Fingerprint Cabang',
+                                $row->late_minutes ?? 0,
+                                number_format($row->penalty_amount ?? 0, 0, ',', '.'),
+                                $row->status === 'Excused' ? 'Logbook HR/GA' : 'Mesin Fingerprint Cabang',
                                 $row->notes ?? '-',
                             ]);
+                        }
+
+                        fclose($file);
+                    };
+
+                    return response()->stream($callback, 200, $headers);
+                }),
+
+            Action::make('export_monthly_matrix')
+                ->label('Unduh Matriks Rekap Bulanan (Buku Rekap HR)')
+                ->icon('heroicon-o-table-cells')
+                ->color('primary')
+                ->action(function (): StreamedResponse {
+                    $year = now()->year;
+                    $month = now()->month;
+                    $daysInMonth = Carbon::create($year, $month)->daysInMonth;
+
+                    $employees = \App\Models\Employee::accessibleBy()
+                        ->with(['branch', 'department'])
+                        ->where('status', 'Active')
+                        ->orderBy('branch_id')
+                        ->orderBy('nip')
+                        ->get();
+
+                    $headers = [
+                        'Content-Type' => 'text/csv; charset=UTF-8',
+                        'Content-Disposition' => 'attachment; filename="matriks_rekap_presensi_' . date('Y_m') . '_bpr_banda_raya.csv"',
+                        'Pragma' => 'no-cache',
+                        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                        'Expires' => '0',
+                    ];
+
+                    $callback = function () use ($employees, $year, $month, $daysInMonth) {
+                        $file = fopen('php://output', 'w');
+                        fputs($file, "\xEF\xBB\xBF");
+
+                        // Row 1: Judul Laporan
+                        fputcsv($file, ['PT BPR BANDA RAYA - MATRIKS REKAPITULASI PRESENSI BULANAN']);
+                        fputcsv($file, ['Periode: ' . Carbon::create($year, $month)->translatedFormat('F Y')]);
+                        fputcsv($file, []);
+
+                        // Header Columns
+                        $headerCols = ['No', 'NIK / NIP', 'Nama Pegawai', 'Kantor / Cabang'];
+                        for ($d = 1; $d <= $daysInMonth; $d++) {
+                            $pad = str_pad($d, 2, '0', STR_PAD_LEFT);
+                            $headerCols[] = "{$pad} In";
+                            $headerCols[] = "{$pad} Out";
+                        }
+                        $headerCols[] = 'Total Hadir';
+                        $headerCols[] = 'Total Terlambat';
+                        $headerCols[] = 'Total Denda (Rp)';
+                        $headerCols[] = 'Tidak Absen / Alpa';
+                        $headerCols[] = 'Keterangan Absen / Dispensasi';
+                        fputcsv($file, $headerCols);
+
+                        $no = 1;
+                        foreach ($employees as $emp) {
+                            $attendances = Attendance::where('employee_id', $emp->id)
+                                ->whereYear('date', $year)
+                                ->whereMonth('date', $month)
+                                ->get()
+                                ->keyBy(fn ($a) => Carbon::parse($a->date)->format('j'));
+
+                            $row = [
+                                $no++,
+                                $emp->nip,
+                                $emp->full_name,
+                                $emp->branch?->name ?? 'Kantor Pusat',
+                            ];
+
+                            $totalHadir = 0;
+                            $totalTerlambat = 0;
+                            $totalDenda = 0;
+                            $totalTidakAbsen = 0;
+                            $notesList = [];
+
+                            for ($d = 1; $d <= $daysInMonth; $d++) {
+                                $dateObj = Carbon::create($year, $month, $d);
+                                $isSunday = $dateObj->isSunday();
+                                $att = $attendances->get($d);
+
+                                if ($att) {
+                                    $in = $att->clock_in ? Carbon::parse($att->clock_in)->format('H:i') : '-';
+                                    $out = $att->clock_out ? Carbon::parse($att->clock_out)->format('H:i') : '-';
+                                    $row[] = $in;
+                                    $row[] = $out;
+
+                                    if (in_array($att->status, ['Present', 'Late'])) {
+                                        $totalHadir++;
+                                    }
+                                    if ($att->status === 'Late' || ($att->late_minutes ?? 0) > 0) {
+                                        $totalTerlambat++;
+                                        $totalDenda += $att->penalty_amount ?: 50000;
+                                    }
+                                    if (! empty($att->notes)) {
+                                        $notesList[] = "Tgl {$d}: {$att->notes}";
+                                    }
+                                } else {
+                                    if ($isSunday) {
+                                        $row[] = 'LIBUR';
+                                        $row[] = 'LIBUR';
+                                    } else {
+                                        $row[] = '-';
+                                        $row[] = '-';
+                                        if ($dateObj->lte(now())) {
+                                            $totalTidakAbsen++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $row[] = $totalHadir;
+                            $row[] = $totalTerlambat;
+                            $row[] = number_format($totalDenda, 0, ',', '.');
+                            $row[] = $totalTidakAbsen;
+                            $row[] = implode('; ', array_slice($notesList, 0, 3));
+
+                            fputcsv($file, $row);
                         }
 
                         fclose($file);

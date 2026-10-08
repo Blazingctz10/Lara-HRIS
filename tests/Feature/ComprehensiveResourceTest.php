@@ -38,6 +38,8 @@ class ComprehensiveResourceTest extends TestCase
             \App\Filament\Resources\Employees\Pages\CreateEmployee::class,
             \App\Filament\Resources\Attendances\Pages\ListAttendances::class,
             \App\Filament\Resources\Attendances\Pages\CreateAttendance::class,
+            \App\Filament\Resources\AttendanceDispensations\Pages\ListAttendanceDispensations::class,
+            \App\Filament\Resources\AttendanceDispensations\Pages\CreateAttendanceDispensation::class,
             \App\Filament\Resources\LeaveTypes\Pages\ListLeaveTypes::class,
             \App\Filament\Resources\LeaveTypes\Pages\CreateLeaveType::class,
             \App\Filament\Resources\LeaveRequests\Pages\ListLeaveRequests::class,

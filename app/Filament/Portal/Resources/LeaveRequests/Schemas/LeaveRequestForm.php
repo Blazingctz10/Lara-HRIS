@@ -2,6 +2,7 @@
 
 namespace App\Filament\Portal\Resources\LeaveRequests\Schemas;
 
+use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\LeaveType;
 use Carbon\Carbon;
@@ -22,11 +23,12 @@ class LeaveRequestForm
     public static function configure(Schema $schema): Schema
     {
         $employee = auth()->user()?->employee;
+        $isDireksi = auth()->user()?->role === 'direksi';
 
         return $schema
             ->components([
-                Section::make('Permohonan Cuti / Izin Kerja')
-                    ->description('Isi data pengajuan cuti resmi BPR (Alur: Persetujuan Cabang -> Verifikasi HR -> Otorisasi Direksi)')
+                Section::make('Formulir Permohonan Cuti - PT BPR Banda Raya')
+                    ->description('Format baku formulir permohonan cuti resmi. Lengkapi keperluan, tanggal, alamat, dan nomor kontak selama cuti.')
                     ->schema([
                         Hidden::make('employee_id')
                             ->default($employee?->id),
@@ -36,13 +38,27 @@ class LeaveRequestForm
 
                         Grid::make(2)->schema([
                             Select::make('leave_type_id')
-                                ->relationship('leaveType', 'name', fn ($query) => $query->where('is_active', true))
+                                ->relationship(
+                                    'leaveType',
+                                    'name',
+                                    function ($query) use ($employee) {
+                                        $query->where('is_active', true);
+                                        // Filter jenis kelamin jika ada restriksi
+                                        if ($employee && $employee->gender) {
+                                            if ($employee->gender === 'Laki-laki') {
+                                                $query->where(fn ($q) => $q->whereNull('gender_restriction')->orWhere('gender_restriction', '!=', 'female'));
+                                            } elseif ($employee->gender === 'Perempuan') {
+                                                $query->where(fn ($q) => $q->whereNull('gender_restriction')->orWhere('gender_restriction', '!=', 'male'));
+                                            }
+                                        }
+                                    }
+                                )
                                 ->label('Pilih Jenis Cuti')
                                 ->searchable()
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->helperText(function (Get $get) use ($employee) {
+                                ->helperText(function (Get $get) use ($employee, $isDireksi) {
                                     $leaveTypeId = $get('leave_type_id');
                                     if ($leaveTypeId && $employee) {
                                         $type = LeaveType::find($leaveTypeId);
@@ -52,9 +68,16 @@ class LeaveRequestForm
                                             ->first();
 
                                         $remaining = $balance ? $balance->remaining_quota : ($type->default_days ?? 0);
-                                        $msg = "Sisa Kuota Cuti Anda: {$remaining} Hari.";
+                                        $msg = "Sisa Hak Cuti Anda: {$remaining} Hari Kerja.";
+
+                                        if ($type && $type->max_consecutive_days) {
+                                            $msg .= " (Maks. {$type->max_consecutive_days} hari berturut-turut per pengajuan)";
+                                        }
                                         if ($type && $type->min_consecutive_days) {
-                                            $msg .= " (Wajib diambil minimal {$type->min_consecutive_days} hari berturut-turut sesuai regulasi OJK)";
+                                            $msg .= " (Wajib min. {$type->min_consecutive_days} hari berturut-turut)";
+                                        }
+                                        if ($isDireksi) {
+                                            $msg .= " [Aturan Direksi: Durasi <= 2 hari di-ACC HRD, durasi > 2 hari ke Dewan Komisaris]";
                                         }
                                         return $msg;
                                     }
@@ -62,7 +85,7 @@ class LeaveRequestForm
                                 }),
 
                             TextInput::make('total_days')
-                                ->label('Total Hari Kerja')
+                                ->label('Total Hari Kerja (HK)')
                                 ->numeric()
                                 ->readOnly()
                                 ->required()
@@ -72,13 +95,22 @@ class LeaveRequestForm
                                         $leaveTypeId = $get('leave_type_id');
                                         if ($leaveTypeId) {
                                             $type = LeaveType::find($leaveTypeId);
+                                            if (! $type) {
+                                                return;
+                                            }
+
                                             // 1. Validasi Min Consecutive Days (e.g. 5 days for Block Leave OJK)
-                                            if ($type && $type->min_consecutive_days && $value < $type->min_consecutive_days) {
+                                            if ($type->min_consecutive_days && $value < $type->min_consecutive_days) {
                                                 $fail("Pengajuan cuti {$type->name} mewajibkan minimal {$type->min_consecutive_days} hari kerja berturut-turut sesuai aturan OJK.");
                                             }
 
-                                            // 2. Validasi Sisa Kuota Cuti
-                                            if ($employee) {
+                                            // 2. Validasi Max Consecutive Days (e.g. 5 days for Cuti Tahunan, 2 days for Paternity)
+                                            if ($type->max_consecutive_days && $value > $type->max_consecutive_days) {
+                                                $fail("Pengajuan cuti {$type->name} maksimal {$type->max_consecutive_days} hari kerja berturut-turut per pengajuan untuk menjamin kelancaran operasional bank.");
+                                            }
+
+                                            // 3. Validasi Sisa Kuota Cuti
+                                            if ($employee && $type->code === 'ANNUAL') {
                                                 $balance = EmployeeLeaveBalance::where('employee_id', $employee->id)
                                                     ->where('leave_type_id', $leaveTypeId)
                                                     ->where('year', now()->year)
@@ -86,7 +118,7 @@ class LeaveRequestForm
 
                                                 $remaining = $balance ? $balance->remaining_quota : ($type->default_days ?? 0);
                                                 if ($value > $remaining) {
-                                                    $fail("Sisa kuota cuti Anda ({$remaining} hari) tidak mencukupi untuk mengajukan {$value} hari kerja.");
+                                                    $fail("Sisa kuota cuti tahunan Anda ({$remaining} hari) tidak mencukupi untuk mengajukan {$value} hari kerja.");
                                                 }
                                             }
                                         }
@@ -94,14 +126,14 @@ class LeaveRequestForm
                                 ]),
 
                             DatePicker::make('start_date')
-                                ->label('Tanggal Mulai')
+                                ->label('Dari Tanggal')
                                 ->required()
                                 ->native(false)
                                 ->live()
                                 ->afterStateUpdated(fn (Get $get, Set $set) => self::calculateDays($get, $set)),
 
                             DatePicker::make('end_date')
-                                ->label('Tanggal Selesai')
+                                ->label('Sampai Dengan Tanggal')
                                 ->required()
                                 ->native(false)
                                 ->live()
@@ -109,13 +141,26 @@ class LeaveRequestForm
                         ]),
 
                         Textarea::make('reason')
-                            ->label('Alasan / Keterangan Pengajuan')
+                            ->label('Untuk Keperluan / Alasan Cuti')
                             ->rows(3)
-                            ->placeholder('Jelaskan alasan atau rencana serah terima tugas pekerjaan selama cuti')
+                            ->placeholder('Tuliskan alasan permohonan cuti dan rencana serah terima pekerjaan')
                             ->required(),
 
+                        Grid::make(2)->schema([
+                            TextInput::make('leave_address')
+                                ->label('Alamat yang Dapat Dihubungi Selama Cuti')
+                                ->placeholder('Contoh: Jl. Engku Putri No. 12, Batam Center')
+                                ->required(),
+
+                            TextInput::make('contact_phone')
+                                ->label('Nomor Telepon / WhatsApp Selama Cuti')
+                                ->placeholder('Contoh: 0812-3456-7890')
+                                ->tel()
+                                ->required(),
+                        ]),
+
                         FileUpload::make('attachment_url')
-                            ->label('Lampiran Dokumen Pendukung (Surat Dokter / Undangan Nikah / dll)')
+                            ->label('Lampiran Dokumen Pendukung (Surat Dokter / Undangan / dll)')
                             ->directory('leaves/attachments')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
                             ->maxSize(5120),

@@ -70,17 +70,41 @@ function Show-Header {
 Show-Header
 Write-Host " [1/3] Memeriksa Lingkungan PHP & Kesiapan Database..." -ForegroundColor Cyan
 
-# Cek ketersediaan PHP
-$phpCmd = Get-Command "php" -ErrorAction SilentlyContinue
-if (-not $phpCmd) {
-    Write-Host "`n  [GALAT FATAL] Eksekutor 'php' tidak ditemukan dalam PATH sistem Windows!" -ForegroundColor Red
-    Write-Host "  Silakan tambahkan folder instalasi PHP (8.2+) ke System Environment Variables PATH." -ForegroundColor Yellow
-    Read-Host "`nTekan Enter untuk menutup jendela"
-    exit 1
+# Cek ketersediaan PHP (Mendukung PHP Portable Flashdisk atau Sistem PATH)
+$phpBinary = "php"
+$portablePhpPaths = @(
+    Join-Path $CurrentDir "php\php.exe",
+    Join-Path $HrisPath "php\php.exe",
+    Join-Path $CurrentDir "tools\php\php.exe"
+)
+
+$isPortable = $false
+foreach ($pPath in $portablePhpPaths) {
+    if (Test-Path $pPath) {
+        $phpBinary = $pPath
+        $isPortable = $true
+        break
+    }
 }
 
-$phpVer = & php -r "echo PHP_VERSION;" 2>$null
-Write-Host "  -> PHP Runtime Terpasang  : v$phpVer" -ForegroundColor Gray
+if ($isPortable) {
+    $portablePhpDir = Split-Path $phpBinary -Parent
+    $env:PATH = "$portablePhpDir;" + $env:PATH
+    Write-Host "  -> Menggunakan PHP Portable Flashdisk: $phpBinary" -ForegroundColor Yellow
+} else {
+    $phpCmd = Get-Command "php" -ErrorAction SilentlyContinue
+    if (-not $phpCmd) {
+        Write-Host "`n  [GALAT FATAL] PHP tidak ditemukan di sistem Windows maupun di folder Flashdisk!" -ForegroundColor Red
+        Write-Host "  SOLUSI UNTUK PENGGUNAAN DI FLASHDISK:" -ForegroundColor Yellow
+        Write-Host "  1. Salin folder 'php' portable (berisi php.exe) langsung ke dalam Flashdisk ini, ATAU" -ForegroundColor Gray
+        Write-Host "  2. Pasang PHP (versi 8.2+) di komputer ini dan tambahkan ke System PATH." -ForegroundColor Gray
+        Read-Host "`nTekan Enter untuk menutup jendela"
+        exit 1
+    }
+}
+
+$phpVer = & $phpBinary -r "echo PHP_VERSION;" 2>$null
+Write-Host "  -> PHP Runtime Terpasang  : v$phpVer $(if ($isPortable) {'[PORTABLE USB]'} else {'[SYSTEM]'})" -ForegroundColor Gray
 Write-Host "  -> Database Terkonfigurasi: SQLite ($DatabaseFile)" -ForegroundColor Gray
 
 # Validasi port 8000
@@ -123,7 +147,7 @@ if ($serverAlreadyRunning) {
     "[$((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))] Memulai Server Core HRIS PT BPR Banda Raya..." | Out-File -FilePath $LogFile -Encoding utf8 -Force
 
     $procInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $procInfo.FileName = "php"
+    $procInfo.FileName = $phpBinary
     # Menggunakan host 0.0.0.0 agar bisa diakses baik dari localhost maupun LAN kantor
     $procInfo.Arguments = "artisan serve --host=0.0.0.0 --port=$ServerPort"
     $procInfo.WorkingDirectory = $HrisPath
@@ -241,7 +265,7 @@ try {
             }
             "O" {
                 Write-Host "`n  [OPTIMASI] Mengompilasi konfigurasi, route, dan view untuk akselerasi performa..." -ForegroundColor Yellow
-                & php artisan optimize
+                & $phpBinary artisan optimize
                 Write-Host "`n  [SUKSES] Sistem telah berjalan dalam mode performa tinggi!" -ForegroundColor Green
                 Write-Host "  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
                 Read-Host
@@ -249,7 +273,7 @@ try {
             }
             "C" {
                 Write-Host "`n  [RESET CACHE] Membersihkan seluruh cache aplikasi..." -ForegroundColor Yellow
-                & php artisan optimize:clear
+                & $phpBinary artisan optimize:clear
                 Write-Host "`n  [SUKSES] Seluruh cache berhasil di-reset!" -ForegroundColor Green
                 Write-Host "  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
                 Read-Host
@@ -269,7 +293,7 @@ try {
             }
             "M" {
                 Write-Host "`n  [MIGRASI] Memeriksa dan menjalankan migrasi database..." -ForegroundColor Yellow
-                & php artisan migrate --force
+                & $phpBinary artisan migrate --force
                 Write-Host "`n  [SUKSES] Sinkronisasi struktur tabel database selesai!" -ForegroundColor Green
                 Write-Host "  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
                 Read-Host
@@ -277,8 +301,8 @@ try {
             }
             "T" {
                 Write-Host "`n  [TEST SUITE] Menyiapkan lingkungan dan menjalankan pengujian otomatis..." -ForegroundColor Yellow
-                & php artisan optimize:clear | Out-Null
-                & php artisan test
+                & $phpBinary artisan optimize:clear | Out-Null
+                & $phpBinary artisan test
                 Write-Host "`n  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
                 Read-Host
                 Print-Dashboard
@@ -302,7 +326,7 @@ try {
                 Start-Sleep -Seconds 1
 
                 $procInfo = New-Object System.Diagnostics.ProcessStartInfo
-                $procInfo.FileName = "php"
+                $procInfo.FileName = $phpBinary
                 $procInfo.Arguments = "artisan serve --host=0.0.0.0 --port=$ServerPort"
                 $procInfo.WorkingDirectory = $HrisPath
                 $procInfo.RedirectStandardOutput = $true

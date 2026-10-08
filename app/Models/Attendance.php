@@ -17,6 +17,8 @@ class Attendance extends Model
         'clock_in',
         'clock_out',
         'status',
+        'late_minutes',
+        'penalty_amount',
         'lat_in',
         'long_in',
         'lat_out',
@@ -30,12 +32,42 @@ class Attendance extends Model
     {
         return [
             'date' => 'date:Y-m-d',
+            'late_minutes' => 'integer',
+            'penalty_amount' => 'decimal:2',
             'lat_in' => 'decimal:8',
             'long_in' => 'decimal:8',
             'lat_out' => 'decimal:8',
             'long_out' => 'decimal:8',
             'distance_in_meters' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Attendance $attendance) {
+            // Kalkulasi keterlambatan & denda Rp 50.000 jika tap masuk di atas jam kerja resmi (08:00 WIB)
+            if (! empty($attendance->clock_in) && in_array($attendance->status, ['Present', 'Late'])) {
+                $dateStr = \Carbon\Carbon::parse($attendance->date ?? now())->toDateString();
+                $timeStr = \Carbon\Carbon::parse($attendance->clock_in)->format('H:i:s');
+                $clockInTime = \Carbon\Carbon::parse("{$dateStr} {$timeStr}");
+                $standardTime = \Carbon\Carbon::parse($dateStr)->setTime(8, 0, 0);
+
+                if ($clockInTime->gt($standardTime)) {
+                    $minutesLate = abs((int) $clockInTime->diffInMinutes($standardTime));
+                    if ($minutesLate >= 1) {
+                        $attendance->late_minutes = $minutesLate;
+                        $attendance->penalty_amount = 50000.00; // Denda Rp 50.000 sesuai regulasi BPR
+                        $attendance->status = 'Late';
+                    }
+                } else {
+                    $attendance->late_minutes = 0;
+                    $attendance->penalty_amount = 0.00;
+                    if ($attendance->status === 'Late') {
+                        $attendance->status = 'Present';
+                    }
+                }
+            }
+        });
     }
 
     public function setDateAttribute($value): void

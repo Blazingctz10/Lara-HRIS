@@ -66,12 +66,32 @@ class AttendancesTable
                         default => 'gray',
                     }),
 
+                TextColumn::make('late_minutes')
+                    ->label('Terlambat')
+                    ->formatStateUsing(fn ($state) => $state > 0 ? "{$state} mnt" : '-')
+                    ->color(fn ($state) => $state > 0 ? 'warning' : 'gray')
+                    ->alignCenter()
+                    ->sortable(),
+
+                TextColumn::make('penalty_amount')
+                    ->label('Denda (Rp)')
+                    ->money('IDR', locale: 'id')
+                    ->badge()
+                    ->color(fn ($state) => $state > 0 ? 'danger' : 'gray')
+                    ->sortable(),
+
                 TextColumn::make('source_device')
                     ->label('Metode Presensi')
-                    ->state(fn () => 'Mesin Sidik Jari')
+                    ->state(fn ($record) => $record->status === 'Excused' ? 'Logbook HR/GA' : 'Mesin Sidik Jari')
                     ->badge()
-                    ->color('success')
-                    ->icon('heroicon-m-finger-print'),
+                    ->color(fn ($record) => $record->status === 'Excused' ? 'info' : 'success')
+                    ->icon(fn ($record) => $record->status === 'Excused' ? 'heroicon-m-clipboard-document-list' : 'heroicon-m-finger-print'),
+
+                TextColumn::make('notes')
+                    ->label('Keterangan / Dispensasi')
+                    ->limit(30)
+                    ->tooltip(fn ($record) => $record->notes)
+                    ->placeholder('-'),
             ])
             ->filters([
                 SelectFilter::make('status')

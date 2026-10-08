@@ -16,6 +16,8 @@ class LeaveType extends Model
         'default_days',
         'is_block_leave',
         'min_consecutive_days',
+        'max_consecutive_days',
+        'gender_restriction',
         'description',
         'is_active',
     ];
@@ -26,6 +28,7 @@ class LeaveType extends Model
             'default_days' => 'integer',
             'is_block_leave' => 'boolean',
             'min_consecutive_days' => 'integer',
+            'max_consecutive_days' => 'integer',
             'is_active' => 'boolean',
         ];
     }

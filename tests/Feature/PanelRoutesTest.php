@@ -26,6 +26,7 @@ class PanelRoutesTest extends TestCase
             '/admin/positions',
             '/admin/employees',
             '/admin/attendances',
+            '/admin/attendance-dispensations',
             '/admin/leave-types',
             '/admin/leave-requests',
             '/admin/announcements',

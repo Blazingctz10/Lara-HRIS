@@ -20,10 +20,11 @@ class LeaveRequestObserver
             $newStatus = $leaveRequest->status;
             $year = Carbon::parse($leaveRequest->start_date)->year;
 
-            $isFinalApproved = in_array($newStatus, ['Approved_Direksi', 'Approved_HR']);
-            $wasFinalApproved = in_array($originalStatus, ['Approved_Direksi', 'Approved_HR']);
+            $finalStatuses = ['Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris', 'Approved_HR'];
+            $isFinalApproved = in_array($newStatus, $finalStatuses);
+            $wasFinalApproved = in_array($originalStatus, $finalStatuses);
 
-            // Ketika disetujui final oleh Direksi (atau HR), potong saldo cuti resmi
+            // Ketika disetujui final oleh Direksi, HRD, atau Komisaris, potong saldo cuti resmi & sinkronkan presensi
             if ($isFinalApproved && ! $wasFinalApproved) {
                 DB::transaction(function () use ($leaveRequest, $year) {
                     $balance = EmployeeLeaveBalance::firstOrCreate(
@@ -43,11 +44,29 @@ class LeaveRequestObserver
                     $balance->remaining_quota = max(0, $balance->initial_quota - $balance->used_quota);
                     $balance->save();
 
-                    Log::info("Leave balance deducted for employee {$leaveRequest->employee_id}: {$leaveRequest->total_days} days. Remaining: {$balance->remaining_quota}");
+                    // Sinkronisasi otomatis ke log kehadiran (status = Excused)
+                    $startDate = Carbon::parse($leaveRequest->start_date);
+                    $endDate = Carbon::parse($leaveRequest->end_date);
+                    for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
+                        if (! $d->isSunday()) {
+                            \App\Models\Attendance::updateOrCreate(
+                                [
+                                    'employee_id' => $leaveRequest->employee_id,
+                                    'date' => $d->toDateString(),
+                                ],
+                                [
+                                    'status' => 'Excused',
+                                    'notes' => '[Cuti Resmi: ' . ($leaveRequest->leaveType?->name ?? 'Cuti') . '] ' . $leaveRequest->reason,
+                                ]
+                            );
+                        }
+                    }
+
+                    Log::info("Leave balance deducted and attendance synced for employee {$leaveRequest->employee_id}: {$leaveRequest->total_days} days. Remaining: {$balance->remaining_quota}");
                 });
             }
 
-            // Jika status yang sudah disetujui direksi dibatalkan/ditolak, kembalikan kuota saldo cuti
+            // Jika status yang sudah disetujui dibatalkan/ditolak, kembalikan kuota saldo cuti
             if ($wasFinalApproved && ! $isFinalApproved) {
                 DB::transaction(function () use ($leaveRequest, $year) {
                     $balance = EmployeeLeaveBalance::where([

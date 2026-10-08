@@ -18,10 +18,15 @@ class LeaveRequest extends Model
         'end_date',
         'total_days',
         'reason',
+        'leave_address',
+        'contact_phone',
         'attachment_url',
         'status',
         'approved_by',
+        'approved_hrd_by',
+        'approved_komisaris_by',
         'rejection_reason',
+        'komisaris_notes',
     ];
 
     protected function casts(): array
@@ -46,6 +51,34 @@ class LeaveRequest extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function approverHrd(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_hrd_by');
+    }
+
+    public function approverKomisaris(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_komisaris_by');
+    }
+
+    /**
+     * Cek apakah pemohon adalah jajaran Direksi
+     */
+    public function isDireksiRequest(): bool
+    {
+        return $this->employee?->user?->role === 'direksi';
+    }
+
+    /**
+     * Aturan Direksi BPR Banda Raya:
+     * Cuti sebentar (<= 2 hari) cukup disetujui HRD.
+     * Cuti lama (> 2 hari) wajib disetujui oleh Komisaris Utama / Dewan Komisaris.
+     */
+    public function requiresKomisarisApproval(): bool
+    {
+        return $this->isDireksiRequest() && $this->total_days > 2;
     }
 
     /**

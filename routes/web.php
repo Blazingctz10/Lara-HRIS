@@ -8,6 +8,9 @@ Route::get('/login', [AuthController::class, 'showLoginForm']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Rute Cetak Formulir Cuti Resmi BPR Banda Raya
+Route::middleware('auth')->get('/leave-requests/{leaveRequest}/print', [\App\Http\Controllers\LeavePrintController::class, 'printForm'])->name('leave-requests.print');
+
 // Rute Unduh Template Migrasi CSV (Native HTTP GET untuk menghindari Livewire 419 expired)
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/download-template/employee', [\App\Http\Controllers\TemplateDownloadController::class, 'downloadEmployee'])->name('admin.download-template.employee');

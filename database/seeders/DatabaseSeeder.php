@@ -95,14 +95,16 @@ class DatabaseSeeder extends Seeder
         $posTeller = Position::create(['department_id' => $deptOps->id, 'name' => 'Teller Kas & Kliring', 'grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 8500000]);
         $posIt = Position::create(['department_id' => $deptIt->id, 'name' => 'IT System & Core Banking Officer', 'grade_level' => 'Officer']);
 
-        // 4. Seed Leave Types (termasuk Block Leave OJK)
+        // 4. Seed Leave Types (Sesuai Formulir Resmi PT BPR Banda Raya & Regulasi OJK)
         $leaveAnnual = LeaveType::create([
             'code' => 'ANNUAL',
             'name' => 'Cuti Tahunan',
             'default_days' => 12,
             'is_block_leave' => false,
             'min_consecutive_days' => null,
-            'description' => 'Hak cuti tahunan reguler bagi staf tetap/kontrak.',
+            'max_consecutive_days' => 5, // Maksimal 5 hari kerja berturut-turut per pengajuan
+            'gender_restriction' => null,
+            'description' => 'Hak cuti tahunan reguler bagi staf (Maksimal 5 hari kerja berturut-turut per pengajuan untuk kelancaran operasional bank).',
         ]);
 
         $leaveBlock = LeaveType::create([
@@ -111,6 +113,8 @@ class DatabaseSeeder extends Seeder
             'default_days' => 5,
             'is_block_leave' => true,
             'min_consecutive_days' => 5,
+            'max_consecutive_days' => 5,
+            'gender_restriction' => null,
             'description' => 'Kepatuhan regulasi perbankan OJK: Cuti berturut-turut minimal 5 hari kerja tanpa interupsi akses sistem.',
         ]);
 
@@ -120,16 +124,75 @@ class DatabaseSeeder extends Seeder
             'default_days' => 14,
             'is_block_leave' => false,
             'min_consecutive_days' => null,
-            'description' => 'Izin sakit dengan melampirkan surat keterangan dokter.',
+            'max_consecutive_days' => null,
+            'gender_restriction' => null,
+            'description' => 'Izin sakit dengan melampirkan surat keterangan dokter (SKD).',
         ]);
 
         $leaveMaternity = LeaveType::create([
             'code' => 'MATERNITY',
-            'name' => 'Cuti Melahirkan',
+            'name' => 'Cuti Melahirkan (Ibu)',
             'default_days' => 90,
             'is_block_leave' => false,
             'min_consecutive_days' => null,
-            'description' => 'Cuti melahirkan bagi pegawai perempuan (3 bulan).',
+            'max_consecutive_days' => 90,
+            'gender_restriction' => 'female',
+            'description' => 'Cuti melahirkan bagi pegawai perempuan (3 bulan / 90 hari kalender).',
+        ]);
+
+        $leavePaternity = LeaveType::create([
+            'code' => 'PATERNITY',
+            'name' => 'Cuti Istri Melahirkan',
+            'default_days' => 2,
+            'is_block_leave' => false,
+            'min_consecutive_days' => null,
+            'max_consecutive_days' => 2,
+            'gender_restriction' => 'male',
+            'description' => 'Hak cuti mendampingi istri melahirkan khusus pegawai laki-laki (2 hari kerja).',
+        ]);
+
+        $leaveBereavement = LeaveType::create([
+            'code' => 'BEREAVEMENT',
+            'name' => 'Cuti Duka',
+            'default_days' => 3,
+            'is_block_leave' => false,
+            'min_consecutive_days' => null,
+            'max_consecutive_days' => 3,
+            'gender_restriction' => null,
+            'description' => 'Cuti kedukaan: Keluarga inti (3 hari), Mertua/Saudara kandung (2 hari), Anggota keluarga serumah (1 hari).',
+        ]);
+
+        $leaveLong = LeaveType::create([
+            'code' => 'LONG_LEAVE',
+            'name' => 'Cuti Besar',
+            'default_days' => 30,
+            'is_block_leave' => false,
+            'min_consecutive_days' => null,
+            'max_consecutive_days' => 30,
+            'gender_restriction' => null,
+            'description' => 'Cuti istirahat panjang masa kerja loyalitas.',
+        ]);
+
+        $leaveReligious = LeaveType::create([
+            'code' => 'RELIGIOUS_LEAVE',
+            'name' => 'Cuti Menjalankan Ibadah Agama',
+            'default_days' => 40,
+            'is_block_leave' => false,
+            'min_consecutive_days' => null,
+            'max_consecutive_days' => 40,
+            'gender_restriction' => null,
+            'description' => 'Cuti ibadah keagamaan resmi (contoh: Ibadah Haji / Umrah).',
+        ]);
+
+        $leaveUnpaid = LeaveType::create([
+            'code' => 'UNPAID_LEAVE',
+            'name' => 'Cuti di Luar Tanggungan Perusahaan',
+            'default_days' => 0,
+            'is_block_leave' => false,
+            'min_consecutive_days' => null,
+            'max_consecutive_days' => null,
+            'gender_restriction' => null,
+            'description' => 'Cuti khusus di luar tanggungan perusahaan (tanpa gaji).',
         ]);
 
         // 5. Seed Users & Employees (Domain: @bprbandaraya.com)
