@@ -281,5 +281,38 @@ class BprLeaveAndAttendancePolicyTest extends TestCase
         $response->assertSee('0812-9988-7766');
         $response->assertSeeText('HRD & GA', false);
         $response->assertSee('Direktur Utama');
+        $response->assertSee('images/logo.png');
+        $response->assertSee('Cuti Besar (6 HK)');
+    }
+
+    public function test_cuti_besar_is_configured_for_6_days(): void
+    {
+        $longLeave = LeaveType::where('code', 'LONG_LEAVE')->first();
+        $this->assertNotNull($longLeave);
+        $this->assertEquals(6, $longLeave->default_days);
+        $this->assertEquals(6, $longLeave->max_consecutive_days);
+    }
+
+    public function test_direksi_has_read_only_access_to_employee_data(): void
+    {
+        // 1. Direksi bisa melihat daftar pegawai
+        $responseIndex = $this->actingAs($this->direksiUser)
+            ->get('/admin/employees');
+        $responseIndex->assertStatus(200);
+
+        // 2. Direksi bisa melihat halaman detail pegawai (View Record)
+        $responseView = $this->actingAs($this->direksiUser)
+            ->get("/admin/employees/{$this->employee->id}");
+        $responseView->assertStatus(200);
+
+        // 3. Direksi DILARANG mengakses halaman tambah pegawai (403 Forbidden)
+        $responseCreate = $this->actingAs($this->direksiUser)
+            ->get('/admin/employees/create');
+        $responseCreate->assertStatus(403);
+
+        // 4. Direksi DILARANG mengakses halaman edit pegawai (403 Forbidden)
+        $responseEdit = $this->actingAs($this->direksiUser)
+            ->get("/admin/employees/{$this->employee->id}/edit");
+        $responseEdit->assertStatus(403);
     }
 }

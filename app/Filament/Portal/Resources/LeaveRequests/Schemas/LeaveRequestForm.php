@@ -76,6 +76,15 @@ class LeaveRequestForm
                                         if ($type && $type->min_consecutive_days) {
                                             $msg .= " (Wajib min. {$type->min_consecutive_days} hari berturut-turut)";
                                         }
+                                        if ($type && $type->code === 'LONG_LEAVE') {
+                                            $joinDate = $employee?->join_date ? \Carbon\Carbon::parse($employee->join_date) : null;
+                                            $years = $joinDate ? (int) $joinDate->diffInYears(now()) : 0;
+                                            if ($years < 5) {
+                                                $msg .= " ⚠️ Cuti Besar hanya untuk masa kerja min. 5 tahun (Masa kerja Anda: {$years} tahun).";
+                                            } else {
+                                                $msg .= " ✅ Anda berhak Cuti Besar (Masa kerja: {$years} tahun, durasi: 6 HK).";
+                                            }
+                                        }
                                         if ($isDireksi) {
                                             $msg .= " [Aturan Direksi: Durasi <= 2 hari di-ACC HRD, durasi > 2 hari ke Dewan Komisaris]";
                                         }
@@ -109,7 +118,19 @@ class LeaveRequestForm
                                                 $fail("Pengajuan cuti {$type->name} maksimal {$type->max_consecutive_days} hari kerja berturut-turut per pengajuan untuk menjamin kelancaran operasional bank.");
                                             }
 
-                                            // 3. Validasi Sisa Kuota Cuti
+                                            // 3. Validasi Khusus Cuti Besar (Min 5 Tahun Masa Kerja & Maks 6 Hari)
+                                            if ($type->code === 'LONG_LEAVE') {
+                                                $joinDate = $employee?->join_date ? \Carbon\Carbon::parse($employee->join_date) : null;
+                                                $years = $joinDate ? (int) $joinDate->diffInYears(now()) : 0;
+                                                if ($years < 5) {
+                                                    $fail("Cuti Besar hanya dapat diajukan oleh karyawan yang telah bekerja minimal 5 tahun di PT BPR Banda Raya. Masa kerja Anda saat ini: {$years} tahun.");
+                                                }
+                                                if ($value > 6) {
+                                                    $fail("Durasi Cuti Besar maksimal adalah 6 hari kerja.");
+                                                }
+                                            }
+
+                                            // 4. Validasi Sisa Kuota Cuti
                                             if ($employee && $type->code === 'ANNUAL') {
                                                 $balance = EmployeeLeaveBalance::where('employee_id', $employee->id)
                                                     ->where('leave_type_id', $leaveTypeId)

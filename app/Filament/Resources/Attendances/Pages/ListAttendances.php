@@ -197,7 +197,9 @@ class ListAttendances extends ListRecords
 
                     return response()->stream($callback, 200, $headers);
                 }),
-            CreateAction::make()->label('Input Presensi Manual'),
+            CreateAction::make()
+                ->label('Input Presensi Manual')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }
 }

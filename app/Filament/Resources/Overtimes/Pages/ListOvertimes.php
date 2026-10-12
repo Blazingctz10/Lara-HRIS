@@ -13,7 +13,9 @@ class ListOvertimes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('Buat SPK Lembur'),
+            CreateAction::make()
+                ->label('Buat SPK Lembur')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager'])),
         ];
     }
 }

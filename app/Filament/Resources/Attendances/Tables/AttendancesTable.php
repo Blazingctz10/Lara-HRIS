@@ -110,12 +110,15 @@ class AttendancesTable
                     ->query(fn (Builder $query): Builder => $query->whereDate('date', now())),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ]);
     }
 }

@@ -13,7 +13,9 @@ class ListWarningLetters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('Terbitkan Surat Peringatan (SP)'),
+            CreateAction::make()
+                ->label('Terbitkan Surat Peringatan (SP)')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }
 }

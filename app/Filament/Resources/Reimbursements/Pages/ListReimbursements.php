@@ -13,7 +13,9 @@ class ListReimbursements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('Catat Pengajuan Klaim'),
+            CreateAction::make()
+                ->label('Catat Pengajuan Klaim')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }
 }

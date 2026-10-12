@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 1.2cm 1.5cm;
+            margin: 0;
         }
 
         body {
@@ -30,23 +30,46 @@
         }
 
         @media print {
-            body {
-                background: #ffffff;
+            html, body {
+                margin: 0 !important;
+                padding: 10mm 15mm !important;
+                background: #ffffff !important;
             }
             .paper-container {
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-                border: none;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
             .no-print {
                 display: none !important;
             }
         }
 
-        .header-title {
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .header-logo-cell {
+            width: 140px;
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        .header-logo {
+            max-height: 58px;
+            width: auto;
+            display: block;
+        }
+
+        .header-title-cell {
             text-align: center;
-            margin-bottom: 20px;
+            vertical-align: middle;
+            padding-right: 140px; /* Menjaga teks judul tetap simetris tepat di tengah kertas */
         }
 
         .header-company {
@@ -54,7 +77,7 @@
             font-weight: bold;
             color: #8b3a0f; /* Warna oranye kecokelatan resmi logo BPR Banda Raya */
             letter-spacing: 0.8px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .header-form {
@@ -160,13 +183,23 @@
             <button class="btn-print" onclick="window.print()">
                 &#128438; Cetak Formulir Cuti Resmi (Print / Save PDF)
             </button>
+            <div style="font-size: 8.5pt; color: #64748b; margin-top: 5px;">
+                *Tips Cetak: Pada jendela print browser, uncheck/hilangkan centang pada opsi <strong>"Headers and footers"</strong> agar header & footer otomatis browser (tanggal, URL web) tidak ikut tercetak.
+            </div>
         </div>
 
-        <!-- Header -->
-        <div class="header-title">
-            <div class="header-company">BANK PEREKONOMIAN RAKYAT BANDA RAYA</div>
-            <div class="header-form">FORMULIR PERMOHONAN CUTI</div>
-        </div>
+        <!-- Header Resmi dengan Logo BPR Banda Raya -->
+        <table class="header-table">
+            <tr>
+                <td class="header-logo-cell">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo BPR Banda Raya" class="header-logo">
+                </td>
+                <td class="header-title-cell">
+                    <div class="header-company">BANK PEREKONOMIAN RAKYAT BANDA RAYA</div>
+                    <div class="header-form">FORMULIR PERMOHONAN CUTI</div>
+                </td>
+            </tr>
+        </table>
 
         <!-- Identitas Pemohon -->
         <table class="box-table">
@@ -211,7 +244,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <span class="checkbox-container">{{ $code === 'LONG_LEAVE' ? 'X' : '' }}</span> Cuti Besar
+                        <span class="checkbox-container">{{ $code === 'LONG_LEAVE' ? 'X' : '' }}</span> Cuti Besar (6 HK)
                     </td>
                     <td>
                         <span class="checkbox-container">{{ $code === 'RELIGIOUS_LEAVE' ? 'X' : '' }}</span> Cuti menjalankan ibadah agama

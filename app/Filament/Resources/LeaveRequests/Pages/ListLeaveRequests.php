@@ -13,7 +13,8 @@ class ListLeaveRequests extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }
 }

@@ -67,12 +67,13 @@ class PositionsTable
                     ->outlined(),
                 EditAction::make()
                     ->button()
-                    ->outlined(),
+                    ->outlined()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ]);
     }
 }

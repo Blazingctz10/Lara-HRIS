@@ -165,12 +165,12 @@ class DatabaseSeeder extends Seeder
         $leaveLong = LeaveType::create([
             'code' => 'LONG_LEAVE',
             'name' => 'Cuti Besar',
-            'default_days' => 30,
+            'default_days' => 6,
             'is_block_leave' => false,
             'min_consecutive_days' => null,
-            'max_consecutive_days' => 30,
+            'max_consecutive_days' => 6,
             'gender_restriction' => null,
-            'description' => 'Cuti istirahat panjang masa kerja loyalitas.',
+            'description' => 'Cuti besar loyalitas bagi karyawan yang telah bekerja minimal 5 tahun (durasi 6 hari kerja).',
         ]);
 
         $leaveReligious = LeaveType::create([

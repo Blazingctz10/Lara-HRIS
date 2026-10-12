@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Employees\Tables;
 
+use App\Filament\Resources\Employees\EmployeeResource;
 use App\Models\Employee;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -23,6 +24,12 @@ class EmployeesTable
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['branch', 'department', 'position', 'user']))
+            ->recordUrl(fn (Employee $record): string => auth()->user()?->role === 'direksi'
+                ? EmployeeResource::getUrl('view', ['record' => $record])
+                : (in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])
+                    ? EmployeeResource::getUrl('edit', ['record' => $record])
+                    : EmployeeResource::getUrl('view', ['record' => $record]))
+            )
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Foto')
@@ -170,12 +177,13 @@ class EmployeesTable
 
                 EditAction::make()
                     ->button()
-                    ->outlined(),
+                    ->outlined()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ]);
     }
 }

@@ -13,7 +13,9 @@ class ListAttendanceDispensations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('Catat Dispensasi Baru (HR/GA)'),
+            CreateAction::make()
+                ->label('Catat Dispensasi Baru (HR/GA)')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager'])),
         ];
     }
 }

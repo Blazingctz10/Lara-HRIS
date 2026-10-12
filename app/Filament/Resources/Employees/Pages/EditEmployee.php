@@ -11,6 +11,15 @@ class EditEmployee extends EditRecord
 {
     protected static string $resource = EmployeeResource::class;
 
+    public function mount(int | string $record): void
+    {
+        if (auth()->user()?->role === 'direksi') {
+            abort(403, 'Akses ditolak. Akun Direksi hanya memiliki hak pengawasan (Read-Only) data pegawai.');
+        }
+
+        parent::mount($record);
+    }
+
     protected function getHeaderActions(): array
     {
         return [

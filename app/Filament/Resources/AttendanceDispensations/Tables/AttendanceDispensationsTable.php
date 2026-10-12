@@ -88,12 +88,15 @@ class AttendanceDispensationsTable
                     ->label('Cabang'),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->button()
+                    ->outlined()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager'])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ]);
     }
 }

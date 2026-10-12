@@ -45,7 +45,7 @@ class PortalPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => view('filament.components.role-indicator')->render()
             )
-            ->topNavigation()
+            ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Portal/Resources'), for: 'App\\Filament\\Portal\\Resources')
             ->discoverPages(in: app_path('Filament/Portal/Pages'), for: 'App\\Filament\\Portal\\Pages')
             ->pages([

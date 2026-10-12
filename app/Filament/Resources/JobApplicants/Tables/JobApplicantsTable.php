@@ -104,7 +104,7 @@ class JobApplicantsTable
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->button()
-                    ->visible(fn (JobApplicant $record): bool => $record->status !== 'Diterima')
+                    ->visible(fn (JobApplicant $record): bool => $record->status !== 'Diterima' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->modalHeading('Penerimaan & Pengangkatan Pegawai Baru')
                     ->modalDescription('Pelamar ini akan otomatis didaftarkan ke direktori Pegawai Aktif, dibuatkan NIP resmi, akun login portal (@bprbandaraya.com), serta jatah cuti tahunan awal (12 hari).')
                     ->modalSubmitActionLabel('Konfirmasi & Angkat Pegawai')
@@ -152,6 +152,7 @@ class JobApplicantsTable
                     ->icon('heroicon-o-pencil-square')
                     ->color('warning')
                     ->button()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->modalHeading('Perbarui Status Seleksi Pelamar')
                     ->modalDescription('Pastikan keputusan seleksi telah sesuai dengan standar kualifikasi BPR Banda Raya.')
                     ->modalSubmitActionLabel('Konfirmasi & Simpan')
@@ -200,10 +201,12 @@ class JobApplicantsTable
 
                 EditAction::make()
                     ->button()
-                    ->outlined(),
+                    ->outlined()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
 
                 DeleteAction::make()
                     ->button()
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->modalHeading('Hapus Data Pelamar?')
                     ->modalDescription('Apakah Anda yakin ingin menghapus data pelamar ini beserta berkas CV-nya? Tindakan ini tidak dapat dibatalkan.')
                     ->modalSubmitActionLabel('Ya, Hapus Data')
@@ -215,7 +218,7 @@ class JobApplicantsTable
                         ->modalHeading('Hapus Pelamar Terpilih?')
                         ->modalDescription('Semua data pelamar yang dipilih akan dihapus permanen dari sistem.')
                         ->requiresConfirmation(),
-                ]),
+                ])->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
             ]);
     }
 }

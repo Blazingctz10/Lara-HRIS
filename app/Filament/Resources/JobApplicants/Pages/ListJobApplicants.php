@@ -21,6 +21,7 @@ class ListJobApplicants extends ListRecords
                 ->label('Tarik Email (cPanel IMAP)')
                 ->icon('heroicon-o-arrow-path')
                 ->color('primary')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                 ->modalHeading('Tarik Email Pelamar via cPanel IMAP')
                 ->modalDescription('Sistem akan terhubung ke mail server cPanel BPR Banda Raya (Port 993 SSL / 143 TLS) dan mengunduh email pelamar baru beserta lampiran CV.')
                 ->modalSubmitActionLabel('Mulai Tarik Email')
@@ -55,6 +56,7 @@ class ListJobApplicants extends ListRecords
                 ->label('Muat Data Simulasi')
                 ->icon('heroicon-o-sparkles')
                 ->color('gray')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                 ->requiresConfirmation()
                 ->modalHeading('Muat Data Contoh Pelamar?')
                 ->modalDescription('Sistem akan membuat 5 data pelamar simulasi lengkap dengan berkas CV format PDF untuk uji coba fitur rekrutmen.')
@@ -70,7 +72,8 @@ class ListJobApplicants extends ListRecords
                 }),
 
             CreateAction::make()
-                ->label('Tambah Pelamar Manual'),
+                ->label('Tambah Pelamar Manual')
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }
 }
