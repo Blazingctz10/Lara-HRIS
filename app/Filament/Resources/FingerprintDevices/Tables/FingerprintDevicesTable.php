@@ -40,52 +40,22 @@ class FingerprintDevicesTable
                     ->badge()
                     ->color('gray'),
 
-                TextColumn::make('status')
-                    ->label('Koneksi')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Online' => 'success',
-                        'Standby' => 'warning',
-                        'Offline' => 'danger',
-                        default => 'gray',
-                    }),
-
                 TextColumn::make('total_logs_count')
-                    ->label('Log Tersimpan')
+                    ->label('Total Log Terdaftar')
                     ->suffix(' Data')
                     ->alignCenter(),
 
-                TextColumn::make('last_sync_at')
-                    ->label('Sinkronisasi Terakhir')
-                    ->since()
-                    ->placeholder('Belum pernah'),
-
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label('Terminal Aktif')
                     ->boolean()
                     ->alignCenter(),
             ])
             ->recordActions([
-                Action::make('sync_now')
-                    ->label('Tarik Log')
-                    ->icon('heroicon-m-arrow-path')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading(fn (FingerprintDevice $record) => 'Tarik Data Log Presensi dari ' . $record->name)
-                    ->modalDescription(fn (FingerprintDevice $record) => 'Sistem akan membaca socket ZK Protocol pada IP ' . $record->ip_address . ':' . $record->port . ' dan menyinkronkan rekaman sidik jari pegawai ke database presensi HRIS.')
-                    ->action(function (FingerprintDevice $record) {
-                        $record->update([
-                            'last_sync_at' => now(),
-                            'total_logs_count' => $record->total_logs_count + rand(3, 12),
-                            'status' => 'Online',
-                        ]);
-
-                        Notification::make()
-                            ->title('Sinkronisasi Mesin ' . $record->name . ' Berhasil!')
-                            ->body('Data log kehadiran mesin Solution X105 (' . $record->ip_address . ') telah berhasil ditarik dan disinkronkan ke daftar kehadiran.')
-                            ->success()
-                            ->send();
-                    }),
+                Action::make('upload_log')
+                    ->label('Unggah Log Mesin')
+                    ->icon('heroicon-m-arrow-up-tray')
+                    ->color('primary')
+                    ->url(url('/admin/attendances')),
                 EditAction::make(),
             ])
             ->toolbarActions([

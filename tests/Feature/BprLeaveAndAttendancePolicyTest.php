@@ -315,4 +315,118 @@ class BprLeaveAndAttendancePolicyTest extends TestCase
             ->get("/admin/employees/{$this->employee->id}/edit");
         $responseEdit->assertStatus(403);
     }
+
+    public function test_attendance_import_and_export_merges_with_leave_and_dispensation(): void
+    {
+        $testDate = '2026-10-15';
+
+        // 1. Employee 1 memiliki Cuti Resmi yang disetujui
+        $leave = LeaveRequest::create([
+            'employee_id' => $this->employee->id,
+            'leave_type_id' => $this->annualLeave->id,
+            'start_date' => $testDate,
+            'end_date' => $testDate,
+            'total_days' => 1,
+            'reason' => 'Keperluan keluarga penting',
+            'status' => 'Approved_Direksi',
+        ]);
+
+        // 2. Buat pegawai kedua dengan Dispensasi Logbook HRD/GA
+        $emp2 = Employee::create([
+            'user_id' => User::create([
+                'name' => 'Staf Operasional 2',
+                'email' => 'staf2@bprbandaraya.com',
+                'password' => bcrypt('password'),
+                'role' => 'employee',
+            ])->id,
+            'nip' => 'BNK-TEST-002',
+            'full_name' => 'Staf Operasional 2',
+            'email' => 'staf2@bprbandaraya.com',
+            'branch_id' => $this->employee->branch_id,
+            'status' => 'Active',
+            'join_date' => '2023-01-01',
+        ]);
+
+        AttendanceDispensation::create([
+            'employee_id' => $emp2->id,
+            'date' => $testDate,
+            'dispensation_type' => 'Sakit (Izin Chat WA/DM)',
+            'custom_reason' => 'Demam mendadak izin via WA',
+            'status' => 'Excused',
+            'recorded_by_id' => $this->hrUser->id,
+        ]);
+
+        // 3. Simulasikan impor CSV log mesin presensi
+        $csvContent = "nip,tanggal,jam_masuk,jam_keluar,status,catatan\n"
+            . "{$this->employee->nip},{$testDate},08:15:00,17:00:00,Present,Tap Mesin Fingerprint\n"
+            . "{$emp2->nip},{$testDate},,,Absent,Tidak Tap Mesin\n";
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'att_test_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $service = app(\App\Services\DataMigrationService::class);
+        $result = $service->importAttendancesFromCsv($tempFile);
+        $this->assertTrue($result['success']);
+
+        unlink($tempFile);
+
+        // 4. Verifikasi Employee 1 tetap tercatat sebagai Cuti Resmi (tidak kena penalti/terlambat)
+        $att1 = Attendance::where('employee_id', $this->employee->id)->whereDate('date', $testDate)->first();
+        $this->assertNotNull($att1);
+        $this->assertEquals('Excused', $att1->status);
+        $this->assertStringContainsString('Cuti Resmi', $att1->notes);
+        $this->assertEquals(0, $att1->late_minutes);
+
+        // 5. Verifikasi Employee 2 tetap tercatat sebagai Izin/Sakit Dispensasi (bukan Alpa)
+        $att2 = Attendance::where('employee_id', $emp2->id)->whereDate('date', $testDate)->first();
+        $this->assertNotNull($att2);
+        $this->assertEquals('Excused', $att2->status);
+        $this->assertStringContainsString('Dispensasi HRD/GA', $att2->notes);
+    }
+
+    public function test_late_arrival_dispensation_counts_as_present_and_waives_penalty(): void
+    {
+        $testDate = '2026-08-20';
+
+        // 1. Employee mengajukan izin datang terlambat (misal karena ban bocor / kendala jalan)
+        AttendanceDispensation::create([
+            'employee_id' => $this->employee->id,
+            'date' => $testDate,
+            'dispensation_type' => 'Izin Telat Masuk',
+            'custom_reason' => 'Izin telat masuk karena ban bocor di jalan',
+            'recorded_by' => $this->hrUser->id,
+        ]);
+
+        // 2. Tarik / impor presensi dari mesin biometric (karyawan datang jam 08:35)
+        $csvContent = "Name,Date,Timetable,On duty,Off duty,Clock In,Clock Out,OT Time\n"
+            . "{$this->employee->full_name},20/08/2026,SENIN - KAMIS,08.00,16.00,08.35,16.15,\n";
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'att_late_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $service = app(\App\Services\DataMigrationService::class);
+        $result = $service->importAttendancesFromFile($tempFile);
+        $this->assertTrue($result['success']);
+        unlink($tempFile);
+
+        // 3. Verifikasi karyawan tetap tercatat sebagai Present (Hadir), bukan Excused atau Late denda
+        $att = Attendance::where('employee_id', $this->employee->id)->whereDate('date', $testDate)->first();
+        $this->assertNotNull($att);
+        $this->assertEquals('Present', $att->status, 'Pegawai dengan izin telat masuk harus tetap terhitung Hadir.');
+        $this->assertEquals(0, (float) $att->penalty_amount, 'Denda pegawai dengan izin telat masuk harus Rp0.');
+        $this->assertEquals(35, $att->late_minutes, 'Menit keterlambatan tetap tercatat untuk histori.');
+        $this->assertStringContainsString('Dispensasi Telat', $att->notes);
+    }
+
+    public function test_biometric_xls_template_imports_successfully(): void
+    {
+        $xlsPath = base_path('../Template/absen.xls');
+        $this->assertFileExists($xlsPath);
+
+        $service = app(\App\Services\DataMigrationService::class);
+        $result = $service->importAttendancesFromFile($xlsPath);
+
+        $this->assertTrue($result['success']);
+        $this->assertGreaterThan(0, $result['imported']);
+    }
 }

@@ -46,10 +46,10 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-m-users')
                     ->color('primary'),
 
-                Stat::make('Mesin Presensi Solution', "{$onlineDevices} / {$totalDevices} Online")
-                    ->description('Status koneksi IP/Ethernet')
-                    ->descriptionIcon('heroicon-m-cpu-chip')
-                    ->color($onlineDevices === $totalDevices && $totalDevices > 0 ? 'success' : 'warning'),
+                Stat::make('Terminal Mesin Cabang', "{$totalDevices} Terminal")
+                    ->description('Penarikan berkas presensi cabang')
+                    ->descriptionIcon('heroicon-m-building-office-2')
+                    ->color('primary'),
 
                 Stat::make('Master Pegawai', "{$activeEmployees} / {$totalEmployees}")
                     ->description('Data pegawai aktif di sistem')

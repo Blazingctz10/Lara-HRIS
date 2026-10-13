@@ -40,23 +40,24 @@ class AttendanceDispensationForm
                                 ->native(false),
 
                             Select::make('dispensation_type')
-                                ->label('Kategori Dispensasi')
-                                ->options([
-                                    'Izin via Chat/WhatsApp' => 'Izin via Chat / WhatsApp (DM Atasan/HR)',
-                                    'Tugas Lapangan GA' => 'Tugas Lapangan GA (General Affairs / Logistik Cabang)',
-                                    'Tugas Dinas Luar' => 'Tugas Dinas Luar / Kunjungan Nasabah',
-                                    'Sakit Mendadak' => 'Sakit Mendadak (Surat Dokter Menyusul)',
-                                    'Lainnya / Isi Sendiri' => 'Lainnya / Opsi Bebas (Isi Sendiri)',
-                                ])
-                                ->default('Izin via Chat/WhatsApp')
-                                ->required()
-                                ->live(),
+                                 ->label('Kategori Dispensasi')
+                                 ->options([
+                                     'Izin Telat Masuk' => 'Izin Datang Terlambat / Masuk Siang (Dispensasi Keterlambatan)',
+                                     'Izin via Chat/WhatsApp' => 'Izin via Chat / WhatsApp (DM Atasan/HR)',
+                                     'Tugas Lapangan GA' => 'Tugas Lapangan GA (General Affairs / Logistik Cabang)',
+                                     'Tugas Dinas Luar' => 'Tugas Dinas Luar / Kunjungan Nasabah',
+                                     'Sakit Mendadak' => 'Sakit Mendadak (Surat Dokter Menyusul)',
+                                     'Lainnya / Isi Sendiri' => 'Lainnya / Opsi Bebas (Isi Sendiri)',
+                                 ])
+                                 ->default('Izin Telat Masuk')
+                                 ->required()
+                                 ->live(),
 
                             TextInput::make('custom_reason')
                                 ->label('Alasan / Keterangan Bebas (Isi Sendiri)')
                                 ->placeholder('Contoh: Izin terlambat karena kendala di jalan, urusan darurat keluarga, dll.')
-                                ->required(fn (Get $get) => in_array($get('dispensation_type'), ['Izin via Chat/WhatsApp', 'Lainnya / Isi Sendiri']))
-                                ->visible(fn (Get $get) => in_array($get('dispensation_type'), ['Izin via Chat/WhatsApp', 'Lainnya / Isi Sendiri']))
+                                ->required(fn (Get $get) => in_array($get('dispensation_type'), ['Izin Telat Masuk', 'Izin via Chat/WhatsApp', 'Lainnya / Isi Sendiri']))
+                                ->visible(fn (Get $get) => in_array($get('dispensation_type'), ['Izin Telat Masuk', 'Izin via Chat/WhatsApp', 'Lainnya / Isi Sendiri']))
                                 ->helperText('Ketikkan alasan langsung sesuai pesan WhatsApp/DM atau keperluan khusus yang dilaporkan ke HRD/GA.'),
 
                             TextInput::make('reference_contact')

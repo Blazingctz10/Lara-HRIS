@@ -4,6 +4,7 @@
         $branch = $employee?->branch;
         $attendance = $this->getTodayAttendance();
         $schedule = $this->getTodaySchedule();
+        $statusInfo = $this->getTodayStatusInfo();
     @endphp
 
     <style>
@@ -207,11 +208,11 @@
                         <span>Jam Kerja: {{ $schedule['badge'] }}</span>
                     </span>
 
-                    <span class="m3-badge-branch" style="background: rgba(16, 185, 129, 0.22); color: #a7f3d0; font-weight: 700;">
+                    <span class="m3-badge-branch" style="background: {{ $statusInfo['type'] === 'leave' ? 'rgba(59, 130, 246, 0.28)' : ($statusInfo['type'] === 'dispensation' ? 'rgba(234, 88, 12, 0.28)' : 'rgba(16, 185, 129, 0.22)') }}; color: {{ $statusInfo['type'] === 'leave' ? '#93c5fd' : ($statusInfo['type'] === 'dispensation' ? '#fed7aa' : '#a7f3d0') }}; font-weight: 700;">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 13px; height: 13px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
-                        <span>Sumber: Mesin Sidik Jari Biometrik</span>
+                        <span>{{ $statusInfo['badge'] }}</span>
                     </span>
                 </div>
 
@@ -221,6 +222,11 @@
                 <div class="m3-att-sub">
                     {{ $employee?->position?->name ?? 'Staf' }} &bull; {{ $employee?->department?->name ?? 'Operasional' }} &bull; NIP: {{ $employee?->nip ?? '-' }}
                 </div>
+                @if(! empty($statusInfo['notes']))
+                    <div style="font-size: 0.8rem; opacity: 0.95; margin-top: 0.35rem; color: #fef08a; font-weight: 600;">
+                        Catatan: {{ $statusInfo['notes'] }}
+                    </div>
+                @endif
             </div>
 
             <div class="m3-stat-group">

@@ -45,6 +45,9 @@ class Attendance extends Model
     protected static function booted(): void
     {
         static::saving(function (Attendance $attendance) {
+            // Cek apakah ada dispensasi keterlambatan sah (Izin Telat Masuk)
+            $isLateExcused = str_contains($attendance->notes ?? '', 'Dispensasi Telat');
+
             // Kalkulasi keterlambatan & denda Rp 50.000 jika tap masuk di atas jam kerja resmi (08:00 WIB)
             if (! empty($attendance->clock_in) && in_array($attendance->status, ['Present', 'Late'])) {
                 $dateStr = \Carbon\Carbon::parse($attendance->date ?? now())->toDateString();
@@ -54,10 +57,16 @@ class Attendance extends Model
 
                 if ($clockInTime->gt($standardTime)) {
                     $minutesLate = abs((int) $clockInTime->diffInMinutes($standardTime));
-                    if ($minutesLate >= 1) {
-                        $attendance->late_minutes = $minutesLate;
-                        $attendance->penalty_amount = 50000.00; // Denda Rp 50.000 sesuai regulasi BPR
+                    $attendance->late_minutes = $minutesLate;
+
+                    if ($isLateExcused) {
+                        // Memiliki Dispensasi Keterlambatan Sah: Status tetap Hadir (Present) dan bebas denda (0.00)
+                        $attendance->status = 'Present';
+                        $attendance->penalty_amount = 0.00;
+                    } else {
+                        // Tanpa dispensasi: Terlambat dan terkena denda Rp 50.000 regulasi BPR
                         $attendance->status = 'Late';
+                        $attendance->penalty_amount = 50000.00;
                     }
                 } else {
                     $attendance->late_minutes = 0;

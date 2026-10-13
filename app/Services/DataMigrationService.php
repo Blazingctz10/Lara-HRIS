@@ -444,87 +444,247 @@ class DataMigrationService
     }
 
     /**
-     * Eksekusi impor log presensi dari berkas CSV
+     * Membaca berkas biner BIFF2/BIFF8 hasil ekspor mesin presensi biometric Solution/ZK (.xls)
+     */
+    public function parseBiometricXls(string $filePath): array
+    {
+        $fp = @fopen($filePath, 'rb');
+        if (! $fp) {
+            return [];
+        }
+
+        $grid = [];
+        while (! feof($fp)) {
+            $hdr = fread($fp, 4);
+            if (strlen($hdr) < 4) {
+                break;
+            }
+            $u = unpack('vopcode/vlength', $hdr);
+            $opcode = $u['opcode'];
+            $len = $u['length'];
+            $data = $len > 0 ? fread($fp, $len) : '';
+
+            // 0x0004: BIFF2 LABEL record (row, col, attr, len, string data)
+            if ($opcode === 0x0004 && $len >= 8) {
+                $c = unpack('vrow/vcol/C3attr/Clen', substr($data, 0, 8));
+                $str = substr($data, 8, $c['len']);
+                $grid[$c['row']][$c['col']] = trim($str);
+            }
+        }
+        fclose($fp);
+        ksort($grid);
+
+        return array_values($grid);
+    }
+
+    /**
+     * Eksekusi impor log presensi dari berkas CSV atau XLS mesin cabang
      */
     public function importAttendancesFromCsv(string $filePath): array
+    {
+        return $this->importAttendancesFromFile($filePath);
+    }
+
+    /**
+     * Eksekusi impor log presensi dari berkas CSV atau XLS mesin cabang terpadu
+     */
+    public function importAttendancesFromFile(string $filePath): array
     {
         if (! file_exists($filePath) || ! is_readable($filePath)) {
             return [
                 'success' => false,
-                'message' => 'Berkas CSV tidak ditemukan.',
+                'message' => 'Berkas log presensi tidak ditemukan atau tidak dapat dibaca.',
                 'imported' => 0,
                 'errors' => [],
             ];
         }
 
-        $content = file_get_contents($filePath);
-        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
-        $lines = preg_split('/\r\n|\r|\n/', trim($content));
+        $isXls = false;
+        $fp = @fopen($filePath, 'rb');
+        if ($fp) {
+            $magic = fread($fp, 2);
+            fclose($fp);
+            // 0x0809 (BIFF8/5) atau 0x0009 (BIFF2) atau ekstensi .xls
+            if ($magic === "\x09\x08" || $magic === "\x09\x00" || str_ends_with(strtolower($filePath), '.xls')) {
+                $isXls = true;
+            }
+        }
 
-        if (count($lines) < 2) {
+        $rows = [];
+        if ($isXls) {
+            $rows = $this->parseBiometricXls($filePath);
+        } else {
+            $content = file_get_contents($filePath);
+            $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+            $lines = preg_split('/\r\n|\r|\n/', trim($content));
+            if (! empty($lines)) {
+                $delimiter = strpos($lines[0], ';') !== false && strpos($lines[0], ',') === false ? ';' : ',';
+                foreach ($lines as $line) {
+                    if (trim($line) !== '') {
+                        $rows[] = str_getcsv($line, $delimiter);
+                    }
+                }
+            }
+        }
+
+        if (count($rows) < 2) {
             return [
                 'success' => false,
-                'message' => 'Berkas CSV tidak memiliki data.',
+                'message' => 'Berkas presensi tidak memiliki baris data.',
                 'imported' => 0,
                 'errors' => [],
             ];
         }
 
-        $delimiter = strpos($lines[0], ';') !== false && strpos($lines[0], ',') === false ? ';' : ',';
-        $header = str_getcsv(array_shift($lines), $delimiter);
-        $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', $h))), $header);
+        $rawHeader = array_shift($rows);
+        $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', (string) $h))), $rawHeader);
 
         $imported = 0;
         $errors = [];
 
         DB::beginTransaction();
         try {
-            foreach ($lines as $index => $line) {
-                if (empty(trim($line))) {
+            foreach ($rows as $index => $rowValues) {
+                if (empty($rowValues)) {
                     continue;
                 }
 
-                $row = str_getcsv($line, $delimiter);
-                if (count($row) < count($header)) {
-                    $errors[] = "Baris " . ($index + 2) . ": Format kolom tidak sesuai.";
+                $data = [];
+                foreach ($header as $hIdx => $hKey) {
+                    $data[$hKey] = isset($rowValues[$hIdx]) ? trim((string) $rowValues[$hIdx]) : '';
+                }
+
+                // Resolusi Identitas Pegawai (NIP atau Nama Lengkap)
+                $identifier = $data['nip'] ?? ($data['name'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? '')));
+                if (empty($identifier)) {
                     continue;
                 }
 
-                $data = array_combine(array_slice($header, 0, count($row)), $row);
-
-                $nip = trim($data['nip'] ?? '');
-                $date = trim($data['tanggal'] ?? ($data['date'] ?? ''));
-
-                if (empty($nip) || empty($date)) {
-                    $errors[] = "Baris " . ($index + 2) . ": NIP dan Tanggal wajib diisi.";
-                    continue;
-                }
-
-                $employee = Employee::where('nip', $nip)->first();
+                $employee = Employee::where('nip', $identifier)->first();
                 if (! $employee) {
-                    $errors[] = "Baris " . ($index + 2) . ": Pegawai dengan NIP {$nip} tidak terdaftar di sistem.";
+                    $employee = Employee::whereRaw('LOWER(full_name) = ?', [strtolower($identifier)])->first();
+                }
+                if (! $employee) {
+                    $cleanName = trim(preg_replace('/,.*$/', '', $identifier));
+                    $employee = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first();
+                }
+                if (! $employee) {
+                    $errors[] = "Baris " . ($index + 2) . ": Pegawai '{$identifier}' tidak terdaftar di sistem HRIS.";
                     continue;
                 }
 
-                $clockIn = ! empty($data['jam_masuk']) ? Carbon::parse("{$date} " . $data['jam_masuk']) : Carbon::parse("{$date} 08:00:00");
-                $clockOut = ! empty($data['jam_keluar']) ? Carbon::parse("{$date} " . $data['jam_keluar']) : null;
-                $status = ucfirst(strtolower(trim($data['status'] ?? 'Present')));
-                if (! in_array($status, ['Present', 'Late', 'Absent', 'Leave', 'Holiday'])) {
-                    $status = 'Present';
+                // Resolusi Tanggal Presensi (Mendukung DD/MM/YYYY dan YYYY-MM-DD)
+                $rawDate = $data['tanggal'] ?? ($data['date'] ?? '');
+                if (empty($rawDate)) {
+                    $errors[] = "Baris " . ($index + 2) . ": Tanggal presensi wajib diisi.";
+                    continue;
                 }
 
-                $notes = trim($data['catatan'] ?? 'Impor Rekapan Fingerprint');
+                if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $rawDate, $m)) {
+                    $dateParsed = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                } else {
+                    $dateParsed = Carbon::parse($rawDate)->toDateString();
+                }
+
+                // Resolusi Jam Masuk & Jam Keluar (Format titik 07.31 atau titik dua 07:31)
+                $rawIn = $data['jam_masuk'] ?? ($data['clock_in'] ?? '');
+                $rawOut = $data['jam_keluar'] ?? ($data['clock_out'] ?? '');
+
+                $cleanIn = str_replace('.', ':', $rawIn);
+                $cleanOut = str_replace('.', ':', $rawOut);
+
+                $hasActualClockIn = ! empty($cleanIn) && $cleanIn !== '-' && $cleanIn !== '00:00';
+                $hasActualClockOut = ! empty($cleanOut) && $cleanOut !== '-' && $cleanOut !== '00:00';
+
+                $clockIn = $hasActualClockIn ? Carbon::parse("{$dateParsed} {$cleanIn}") : null;
+                $clockOut = $hasActualClockOut ? Carbon::parse("{$dateParsed} {$cleanOut}") : null;
+
+                $fileStatus = ucfirst(strtolower(trim($data['status'] ?? 'Present')));
+                $lateMinutes = 0;
+                $penaltyAmount = 0;
+
+                // 1. Cek Cuti Resmi yang disetujui pada tanggal ini
+                $approvedLeave = \App\Models\LeaveRequest::where('employee_id', $employee->id)
+                    ->where(fn ($q) => $q->where('status', 'LIKE', 'Approved%')->orWhere('status', 'approved'))
+                    ->whereDate('start_date', '<=', $dateParsed)
+                    ->whereDate('end_date', '>=', $dateParsed)
+                    ->with('leaveType')
+                    ->first();
+
+                // 2. Cek Logbook Dispensasi HRD/GA pada tanggal ini
+                $dispensation = \App\Models\AttendanceDispensation::where('employee_id', $employee->id)
+                    ->whereDate('date', $dateParsed)
+                    ->first();
+
+                if ($approvedLeave) {
+                    // Cuti resmi disetujui: status Excused/Cuti, tanpa denda
+                    $status = 'Excused';
+                    $lateMinutes = 0;
+                    $penaltyAmount = 0;
+                    $notes = '[Cuti Resmi: ' . ($approvedLeave->leaveType?->name ?? 'Cuti') . '] ' . ($approvedLeave->reason ?: 'Permohonan Cuti Disetujui');
+                } elseif ($dispensation) {
+                    $isLateDisp = $dispensation->isLateArrivalDispensation();
+                    $dispReason = ! empty($dispensation->custom_reason)
+                        ? ($dispensation->dispensation_type === 'Lainnya / Isi Sendiri' ? $dispensation->custom_reason : "{$dispensation->dispensation_type} - {$dispensation->custom_reason}")
+                        : $dispensation->dispensation_type;
+
+                    if ($isLateDisp && $hasActualClockIn) {
+                        // Karyawan izin telat masuk dan tetap hadir di kantor (ada rekaman jam masuk mesin)
+                        $status = 'Present'; // Hadir!
+                        $standardStart = Carbon::parse("{$dateParsed} 08:00:00");
+                        if ($clockIn && $clockIn->gt($standardStart)) {
+                            $lateMinutes = $clockIn->diffInMinutes($standardStart);
+                        }
+                        $penaltyAmount = 0; // Bebas denda keterlambatan karena izin telat sah
+                        $notes = "[Dispensasi Telat: {$dispReason}] Jam masuk " . ($clockIn ? $clockIn->format('H:i') : '') . " tercatat. Status Hadir (Denda ditiadakan).";
+                    } elseif ($isLateDisp && ! $hasActualClockIn) {
+                        // Izin telat masuk tapi tidak ada rekaman jam masuk mesin sama sekali
+                        $status = 'Excused';
+                        $lateMinutes = 0;
+                        $penaltyAmount = 0;
+                        $notes = "[Dispensasi Telat: {$dispReason}] Tidak ada rekaman jam masuk di mesin presensi.";
+                    } else {
+                        // Dispensasi Izin Penuh / Sakit seharian
+                        $status = 'Excused';
+                        $lateMinutes = 0;
+                        $penaltyAmount = 0;
+                        $notes = "[Dispensasi HRD/GA: {$dispReason}] " . ($dispensation->description ?: '');
+                    }
+                } else {
+                    // Murni presensi mesin tanpa cuti maupun dispensasi
+                    if ($hasActualClockIn) {
+                        $standardStart = Carbon::parse("{$dateParsed} 08:00:00");
+                        if ($clockIn && $clockIn->gt($standardStart)) {
+                            $lateMinutes = $clockIn->diffInMinutes($standardStart);
+                            $status = 'Late';
+                            $penaltyAmount = $lateMinutes * 50000; // Denda standar Rp50.000 / menit
+                        } else {
+                            $status = 'Present';
+                            $lateMinutes = 0;
+                            $penaltyAmount = 0;
+                        }
+                        $notes = trim($data['catatan'] ?? ($data['notes'] ?? 'Tarik Berkas Mesin Presensi Cabang'));
+                    } else {
+                        // Tidak ada jam masuk dan tidak ada izin/cuti -> Alpa
+                        $status = 'Absent';
+                        $lateMinutes = 0;
+                        $penaltyAmount = 0;
+                        $notes = 'Tidak Ada Rekaman Mesin Presensi (Alpa)';
+                    }
+                }
 
                 Attendance::updateOrCreate(
                     [
                         'employee_id' => $employee->id,
-                        'date' => Carbon::parse($date)->toDateString(),
+                        'date' => $dateParsed,
                     ],
                     [
                         'branch_id' => $employee->branch_id,
                         'clock_in' => $clockIn,
                         'clock_out' => $clockOut,
                         'status' => $status,
+                        'late_minutes' => $lateMinutes,
+                        'penalty_amount' => $penaltyAmount,
                         'notes' => $notes,
                         'lat_in' => $employee->branch?->latitude ?? 1.1185,
                         'long_in' => $employee->branch?->longitude ?? 104.0532,

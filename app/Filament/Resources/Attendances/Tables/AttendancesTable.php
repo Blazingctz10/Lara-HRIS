@@ -58,8 +58,20 @@ class AttendancesTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Present' => 'success',
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($state === 'Present' && str_contains($record->notes ?? '', 'Dispensasi Telat')) {
+                            return 'Hadir (Dispensasi)';
+                        }
+                        return match ($state) {
+                            'Present' => 'Hadir',
+                            'Late' => 'Terlambat',
+                            'Excused' => str_contains($record->notes ?? '', 'Cuti') ? 'Cuti Resmi' : 'Izin / Sakit',
+                            'Absent' => 'Alpa',
+                            default => $state,
+                        };
+                    })
+                    ->color(fn (string $state, $record): string => match ($state) {
+                        'Present' => str_contains($record->notes ?? '', 'Dispensasi Telat') ? 'info' : 'success',
                         'Late' => 'warning',
                         'Excused' => 'info',
                         'Absent' => 'danger',
@@ -82,10 +94,25 @@ class AttendancesTable
 
                 TextColumn::make('source_device')
                     ->label('Metode Presensi')
-                    ->state(fn ($record) => $record->status === 'Excused' ? 'Logbook HR/GA' : 'Mesin Sidik Jari')
+                    ->state(function ($record) {
+                        if (str_contains($record->notes ?? '', 'Dispensasi Telat')) {
+                            return 'Mesin + Izin Telat WA';
+                        }
+                        return $record->status === 'Excused' ? 'Logbook HR/GA' : 'Mesin Presensi Cabang';
+                    })
                     ->badge()
-                    ->color(fn ($record) => $record->status === 'Excused' ? 'info' : 'success')
-                    ->icon(fn ($record) => $record->status === 'Excused' ? 'heroicon-m-clipboard-document-list' : 'heroicon-m-finger-print'),
+                    ->color(function ($record) {
+                        if (str_contains($record->notes ?? '', 'Dispensasi Telat')) {
+                            return 'warning';
+                        }
+                        return $record->status === 'Excused' ? 'info' : 'success';
+                    })
+                    ->icon(function ($record) {
+                        if (str_contains($record->notes ?? '', 'Dispensasi Telat')) {
+                            return 'heroicon-m-clock';
+                        }
+                        return $record->status === 'Excused' ? 'heroicon-m-clipboard-document-list' : 'heroicon-m-finger-print';
+                    }),
 
                 TextColumn::make('notes')
                     ->label('Keterangan / Dispensasi')

@@ -45,10 +45,12 @@ class BackupTest extends TestCase
         $backupDir = storage_path('app/backups');
         $files = File::files($backupDir);
 
-        $this->assertNotEmpty($files, 'Backup file should have been generated');
+        $newFiles = collect($files)->filter(fn ($f) => str_starts_with($f->getFilename(), 'backup_hris_db_'));
 
-        // Cleanup generated test files
-        foreach ($files as $file) {
+        $this->assertNotEmpty($newFiles, 'Backup file should have been generated');
+
+        // Only cleanup test files generated in this test
+        foreach ($newFiles as $file) {
             File::delete($file->getPathname());
         }
     }
@@ -65,16 +67,33 @@ class BackupTest extends TestCase
         $backupDir = storage_path('app/backups');
         $files = File::files($backupDir);
 
-        $this->assertNotEmpty($files, 'Full backup ZIP file should have been generated');
+        $zipFiles = collect($files)->filter(fn ($f) => str_starts_with($f->getFilename(), 'backup_hris_full_'));
 
-        $zipFound = false;
-        foreach ($files as $file) {
-            if (str_ends_with($file->getFilename(), '.zip')) {
-                $zipFound = true;
-            }
+        $this->assertNotEmpty($zipFiles, 'Full backup ZIP file should have been generated');
+
+        foreach ($zipFiles as $file) {
             File::delete($file->getPathname());
         }
+    }
 
-        $this->assertTrue($zipFound, 'A .zip backup file should be generated');
+    public function test_backup_history_is_displayed_on_page(): void
+    {
+        $admin = User::where('role', 'super_admin')->first();
+        $backupDir = storage_path('app/backups');
+        if (! File::exists($backupDir)) {
+            File::makeDirectory($backupDir, 0755, true);
+        }
+
+        $dummyFilename = 'backup_hris_db_test_history.sqlite';
+        $dummyPath = $backupDir . DIRECTORY_SEPARATOR . $dummyFilename;
+        File::put($dummyPath, 'DUMMY_DATABASE_CONTENT');
+
+        $response = $this->actingAs($admin)->get('/admin/backup-data');
+        $response->assertStatus(200);
+        $response->assertSee($dummyFilename);
+        $response->assertSee('Cadangkan Database Saja');
+        $response->assertSee('Cadangkan Arsip Lengkap');
+
+        File::delete($dummyPath);
     }
 }

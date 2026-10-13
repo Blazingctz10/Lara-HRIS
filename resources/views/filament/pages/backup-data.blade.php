@@ -259,12 +259,13 @@
                             </td>
                             <td style="text-align: right;">
                                 <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <!-- Unduh Button -->
+                                    <!-- Unduh Button via Native Route -->
                                     <x-filament::button
+                                        tag="a"
+                                        href="{{ route('admin.backup.download', ['filename' => $backup['name']]) }}"
                                         size="xs"
                                         color="primary"
                                         icon="heroicon-m-arrow-down-tray"
-                                        wire:click="downloadBackup('{{ $backup['name'] }}')"
                                         title="Unduh berkas cadangan ke komputer"
                                     >
                                         Unduh

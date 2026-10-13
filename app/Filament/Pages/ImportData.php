@@ -151,10 +151,10 @@ class ImportData extends Page
     public function importAttendances(): void
     {
         $this->validate([
-            'attendanceFile' => 'required|file|mimes:csv,txt|max:15360',
+            'attendanceFile' => 'required|file|mimes:csv,txt,xls|max:15360',
         ], [
-            'attendanceFile.required' => 'Silakan pilih berkas CSV log absensi terlebih dahulu.',
-            'attendanceFile.mimes' => 'Format berkas harus berupa CSV (.csv) atau TXT.',
+            'attendanceFile.required' => 'Silakan pilih berkas log absensi terlebih dahulu.',
+            'attendanceFile.mimes' => 'Format berkas harus berupa CSV (.csv), TXT, atau Excel (.xls).',
             'attendanceFile.max' => 'Ukuran berkas maksimal 15 MB.',
         ]);
 

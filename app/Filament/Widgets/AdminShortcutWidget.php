@@ -35,7 +35,7 @@ class AdminShortcutWidget extends Widget
             ->count();
 
         $totalUsersCount = \App\Models\User::count();
-        $fingerprintOnlineCount = \App\Models\FingerprintDevice::where('status', 'Online')->count();
+        $dispensationCount = \App\Models\AttendanceDispensation::count();
         $overtimePendingCount = \App\Models\Overtime::accessibleBy()->where('status', 'Pending')->count();
 
         return [
@@ -44,7 +44,7 @@ class AdminShortcutWidget extends Widget
             'pendingLeaveCount' => $pendingLeaveCount,
             'newApplicantsCount' => $newApplicantsCount,
             'totalUsersCount' => $totalUsersCount,
-            'fingerprintOnlineCount' => $fingerprintOnlineCount,
+            'dispensationCount' => $dispensationCount,
             'overtimePendingCount' => $overtimePendingCount,
         ];
     }
