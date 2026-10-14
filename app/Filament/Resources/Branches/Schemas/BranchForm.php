@@ -16,30 +16,29 @@ class BranchForm
     {
         return $schema
             ->components([
-                Section::make('Informasi Kantor Cabang')
-                    ->description('Identitas unit kerja & klasifikasi kantor perbankan')
+                Section::make('Informasi Kantor')
+                    ->description('Identitas unit kerja & klasifikasi kantor perbankan (Pusat, Cabang, Kas)')
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('code')
-                                ->label('Kode Cabang')
-                                ->placeholder('Contoh: KC-001 / HO-001')
+                                ->label('Kode Kantor')
+                                ->placeholder('Contoh: PUSAT-01 / CBG-01 / KAS-01')
                                 ->required()
                                 ->unique(ignoreRecord: true),
 
                             TextInput::make('name')
-                                ->label('Nama Kantor / Cabang')
-                                ->placeholder('Contoh: KC Jakarta Thamrin')
+                                ->label('Nama Kantor')
+                                ->placeholder('Contoh: Kantor Pusat BPR Banda Raya / Kantor Cabang Botania')
                                 ->required(),
 
                             Select::make('type')
                                 ->label('Tipe Kantor')
                                 ->options([
-                                    'Head Office' => 'Head Office (Kantor Pusat)',
-                                    'Main Branch' => 'Main Branch (KC)',
-                                    'Sub Branch' => 'Sub Branch (KCP)',
-                                    'Cash Office' => 'Cash Office (KK)',
+                                    'Pusat' => 'Pusat (Kantor Pusat)',
+                                    'Cabang' => 'Cabang (Kantor Cabang)',
+                                    'Kas' => 'Kas (Kantor Kas)',
                                 ])
-                                ->default('Main Branch')
+                                ->default('Cabang')
                                 ->required(),
 
                             TextInput::make('city')
@@ -65,7 +64,7 @@ class BranchForm
                     ]),
 
                 Section::make('Titik Lokasi Fisik Kantor')
-                    ->description('Koordinat lokasi kantor cabang untuk pemetaan aset fisik dan unit kerja BPR Banda Raya')
+                    ->description('Koordinat lokasi kantor untuk pemetaan aset fisik dan unit kerja BPR Banda Raya')
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('latitude')

@@ -188,29 +188,38 @@
                 </div>
 
                 {{-- Unduh Native (Bukan wire:click agar tidak memicu 419 expired) --}}
-                <div style="margin-bottom: 1.25rem;">
+                <div style="margin-bottom: 1.25rem; display: flex; gap: 0.65rem; flex-wrap: wrap;">
                     <a
-                        href="{{ route('admin.download-template.employee') }}"
-                        download="template_migrasi_pegawai_bpr.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.25rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease;"
+                        href="{{ route('admin.download-template.employee-xls') }}"
+                        download="template_migrasi_pegawai_bpr.xls"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25);"
                         onmouseover="this.style.background='#0a4d29'"
                         onmouseout="this.style.background='#0E6838'"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
-                        <span>Unduh Template CSV Pegawai</span>
+                        <span>Unduh Template Excel (.xls)</span>
+                    </a>
+                    <a
+                        href="{{ route('admin.download-template.employee') }}"
+                        download="template_migrasi_pegawai_bpr.csv"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #f1f5f9; color: #334155; font-size: 0.82rem; font-weight: 600; text-decoration: none; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
+                        onmouseover="this.style.background='#e2e8f0'"
+                        onmouseout="this.style.background='#f1f5f9'"
+                    >
+                        <span>Format CSV (.csv)</span>
                     </a>
                 </div>
 
                 <div style="border-top: 1px dashed var(--m3-outline-variant, #b6cac0); padding-top: 1.25rem; margin-bottom: 1.25rem;">
                     <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        Pilih Berkas CSV yang Sudah Diisi:
+                        Pilih Berkas Excel (.xls) atau CSV yang Sudah Diisi:
                     </label>
                     <input
                         type="file"
                         wire:model="employeeFile"
-                        accept=".csv,.txt"
+                        accept=".xls,.csv,.txt"
                         style="display: block; width: 100%; font-size: 0.85rem; padding: 0.6rem; border: 1px solid var(--m3-outline-variant, #b6cac0); border-radius: 12px; background: var(--m3-surface, #ffffff);"
                     />
                     @error('employeeFile')
@@ -276,29 +285,38 @@
                 </div>
 
                 {{-- Unduh Native (Bukan wire:click agar tidak memicu 419 expired) --}}
-                <div style="margin-bottom: 1.25rem;">
+                <div style="margin-bottom: 1.25rem; display: flex; gap: 0.65rem; flex-wrap: wrap;">
                     <a
-                        href="{{ route('admin.download-template.attendance') }}"
-                        download="template_impor_absensi_bpr.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.25rem; border-radius: 12px; background: #F37A20; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease;"
+                        href="{{ route('admin.download-template.attendance-xls') }}"
+                        download="template_impor_absensi_bpr.xls"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #F37A20; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(243, 122, 32, 0.25);"
                         onmouseover="this.style.background='#d96512'"
                         onmouseout="this.style.background='#F37A20'"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
-                        <span>Unduh Template CSV Absensi</span>
+                        <span>Unduh Template Excel (.xls)</span>
+                    </a>
+                    <a
+                        href="{{ route('admin.download-template.attendance') }}"
+                        download="template_impor_absensi_bpr.csv"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #f1f5f9; color: #334155; font-size: 0.82rem; font-weight: 600; text-decoration: none; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
+                        onmouseover="this.style.background='#e2e8f0'"
+                        onmouseout="this.style.background='#f1f5f9'"
+                    >
+                        <span>Format CSV (.csv)</span>
                     </a>
                 </div>
 
                 <div style="border-top: 1px dashed var(--m3-outline-variant, #b6cac0); padding-top: 1.25rem; margin-bottom: 1.25rem;">
                     <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        Pilih Berkas CSV Log Presensi:
+                        Pilih Berkas Excel (.xls) atau CSV Log Presensi:
                     </label>
                     <input
                         type="file"
                         wire:model="attendanceFile"
-                        accept=".csv,.txt"
+                        accept=".xls,.csv,.txt"
                         style="display: block; width: 100%; font-size: 0.85rem; padding: 0.6rem; border: 1px solid var(--m3-outline-variant, #b6cac0); border-radius: 12px; background: var(--m3-surface, #ffffff);"
                     />
                     @error('attendanceFile')

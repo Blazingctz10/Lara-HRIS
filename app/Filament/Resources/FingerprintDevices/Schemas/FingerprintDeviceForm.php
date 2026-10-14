@@ -31,7 +31,7 @@ class FingerprintDeviceForm
 
                             Select::make('branch_id')
                                 ->relationship('branch', 'name')
-                                ->label('Kantor Cabang Penempatan')
+                                ->label('Unit Kantor Penempatan')
                                 ->required()
                                 ->searchable()
                                 ->preload(),

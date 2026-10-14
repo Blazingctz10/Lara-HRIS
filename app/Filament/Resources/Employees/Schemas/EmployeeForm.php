@@ -99,7 +99,7 @@ class EmployeeForm
                                         Grid::make(3)->schema([
                                             Select::make('branch_id')
                                                 ->relationship('branch', 'name')
-                                                ->label('Unit Kerja / Kantor Cabang')
+                                                ->label('Unit Kerja / Kantor')
                                                 ->searchable()
                                                 ->preload()
                                                 ->required(),

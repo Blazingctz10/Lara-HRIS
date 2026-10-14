@@ -5,7 +5,6 @@ namespace App\Filament\Widgets;
 use App\Models\Attendance;
 use App\Models\Branch;
 use App\Models\Employee;
-use App\Models\FingerprintDevice;
 use App\Models\JobApplicant;
 use App\Models\LeaveRequest;
 use App\Models\Reimbursement;
@@ -37,8 +36,6 @@ class BankStatsOverview extends BaseWidget
         // 1. IT ADMIN / SUPER ADMIN
         if ($user && $user->role === 'super_admin') {
             $totalUsers = User::count();
-            $onlineDevices = FingerprintDevice::where('status', 'Online')->count();
-            $totalDevices = FingerprintDevice::count();
 
             return [
                 Stat::make('Total Akun Sistem', "{$totalUsers} Akun")
@@ -46,8 +43,8 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-m-users')
                     ->color('primary'),
 
-                Stat::make('Terminal Mesin Cabang', "{$totalDevices} Terminal")
-                    ->description('Penarikan berkas presensi cabang')
+                Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
+                    ->description('Kantor Pusat, Cabang & Kas')
                     ->descriptionIcon('heroicon-m-building-office-2')
                     ->color('primary'),
 
@@ -65,11 +62,6 @@ class BankStatsOverview extends BaseWidget
                     ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : 'Tidak ada antrean klaim')
                     ->descriptionIcon('heroicon-m-receipt-percent')
                     ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
-
-                Stat::make('Jaringan Kantor Aktif', "{$totalBranches} Cabang")
-                    ->description('Infrastruktur unit kerja BPR')
-                    ->descriptionIcon('heroicon-m-building-office')
-                    ->color('gray'),
             ];
         }
 
@@ -162,8 +154,8 @@ class BankStatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-receipt-percent')
                 ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
 
-            Stat::make('Jaringan Kantor BPR', "{$totalBranches} Cabang")
-                ->description('Kantor operasional aktif')
+            Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
+                ->description('Kantor Pusat, Cabang & Kas')
                 ->descriptionIcon('heroicon-m-building-office')
                 ->color('gray'),
         ];

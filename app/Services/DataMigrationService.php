@@ -153,6 +153,170 @@ class DataMigrationService
     }
 
     /**
+     * Menghasilkan template Microsoft Excel (.xls) resmi lengkap dengan format kolom & data percontohan
+     */
+    public function generateEmployeeTemplateXls(): string
+    {
+        $headers = [
+            'NIP', 'NIK', 'Nama_Lengkap', 'Email_Kantor', 'Email_Pribadi',
+            'Nomor_Telepon', 'Jenis_Kelamin', 'Tempat_Lahir', 'Tanggal_Lahir', 'Alamat',
+            'Kantor_Cabang', 'Divisi', 'Jabatan', 'Tanggal_Efektif_Jabatan',
+            'Grade', 'Tanggal_Efektif_Grade', 'Status_Kerja', 'Tanggal_Masuk',
+            'Tanggal_Pengangkatan_Tetap', 'Akhir_Kontrak', 'Status_Pegawai',
+            'Jenjang_Pendidikan', 'Jurusan', 'Universitas', 'IPK',
+            'NPWP', 'No_BPJSTK', 'No_BPJS_Kes', 'Rekening_BPR', 'Nama_Bank_Lain',
+            'Nomor_Rekening_Bank_Lain', 'Atas_Nama_Rekening', 'Status_PTKP',
+            'Kontak_Darurat_Nama', 'Kontak_Darurat_Nomor', 'Kontak_Darurat_Hubungan',
+        ];
+
+        $sampleRows = [
+            [
+                'BPR-2026-0101', '2171012304950001', 'Hendri Prasetyo', 'hendri.prasetyo@bprbandaraya.com', 'hendri.pribadi@gmail.com',
+                '081266554411', 'Male', 'Batam', '1995-04-23', 'Jl. Raja Ali Haji No. 12, Batam',
+                'Kantor Pusat BPR Banda Raya', 'Operasional & Pelayanan', 'Customer Service', '2024-01-15',
+                '4', '2024-01-15', 'Permanent', '2024-01-15',
+                '2024-01-15', '', 'Active',
+                'S-1', 'Manajemen Perbankan', 'Universitas Internasional Batam', '3.45',
+                '81.234.567.8-215.000', '08017700462', '0001617375611', '01.10.05307', 'Bank Mandiri',
+                '109-00-1514578-2', 'Hendri Prasetyo', 'K/1',
+                'Dewi Anggraini', '081299887711', 'Istri',
+            ],
+            [
+                'BPR-2026-0102', '2171025508980002', 'Siti Rahmadani', 'siti.rahmadani@bprbandaraya.com', 'siti.rahmadani@gmail.com',
+                '081377889922', 'Female', 'Padang', '1998-08-15', 'Komplek Botania Garden Blok B No. 5, Batam',
+                'Kantor Cabang Botania', 'Kredit & Pemasaran', 'Account Officer (AO)', '2024-06-01',
+                '5', '2024-06-01', 'Contract', '2024-06-01',
+                '', '2027-06-01', 'Active',
+                'D-3', 'Akuntansi', 'Politeknik Negeri Padang', '3.60',
+                '82.345.678.9-215.000', '08017700499', '0001617375699', '01.10.05308', 'BCA',
+                '8210349911', 'Siti Rahmadani', 'TK/0',
+                'Hj. Maryam', '081366551122', 'Ibu',
+            ],
+        ];
+
+        $html = '<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--[if gte mso 9]>
+<xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name>Master Pegawai</x:Name>
+    <x:WorksheetOptions>
+     <x:DisplayGridlines/>
+     <x:FreezePanes/>
+     <x:FrozenNoSplit/>
+     <x:SplitHorizontal>4</x:SplitHorizontal>
+     <x:TopRowBottomPane>4</x:TopRowBottomPane>
+     <x:SplitVertical>3</x:SplitVertical>
+     <x:LeftColumnRightPane>3</x:LeftColumnRightPane>
+     <x:ActivePane>0</x:ActivePane>
+    </x:WorksheetOptions>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+ </x:ExcelWorkbook>
+</xml>
+<![endif]-->
+<style>
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 11px; }
+  table { border-collapse: collapse; }
+  .title-main { font-size: 14px; font-weight: bold; color: #0E6838; }
+  .instructions { font-size: 10px; color: #555555; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px; }
+  .th-header { background-color: #0E6838; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #084022; padding: 6px 10px; }
+  .td-text { mso-number-format: "\@"; border: 1px solid #cbd5e1; padding: 4px 6px; }
+</style>
+</head>
+<body>
+<table>
+  <tr><td colspan="' . count($headers) . '" class="title-main">PT BPR BANDA RAYA - TEMPLATE IMPORT DATA MASTER PEGAWAI LENGKAP</td></tr>
+  <tr><td colspan="' . count($headers) . '" class="instructions">Petunjuk: Jangan mengubah nama baris header di bawah ini. Kolom NIK, No BPJS, Rekening, dan Telepon otomatis bertipe teks agar angka 0 tidak terpotong. Simpan dalam format XLS atau CSV saat mengunggah.</td></tr>
+  <tr><td colspan="' . count($headers) . '">&nbsp;</td></tr>
+  <thead>
+    <tr>';
+        foreach ($headers as $h) {
+            $html .= '<th class="th-header">' . htmlspecialchars($h) . '</th>';
+        }
+        $html .= '</tr>
+  </thead>
+  <tbody>';
+
+        foreach ($sampleRows as $row) {
+            $html .= '<tr>';
+            foreach ($row as $val) {
+                $html .= '<td class="td-text">' . htmlspecialchars($val) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody>
+</table>
+</body>
+</html>';
+
+        return $html;
+    }
+
+    /**
+     * Menghasilkan template Microsoft Excel (.xls) resmi untuk Log Absensi Mesin
+     */
+    public function generateAttendanceTemplateXls(): string
+    {
+        $headers = ['NIP', 'Tanggal', 'Jam_Masuk', 'Jam_Keluar', 'Status', 'Catatan'];
+        $sampleRows = [
+            ['BPR-2026-0101', '2026-10-01', '07:55:00', '17:05:00', 'Present', 'Log mesin fingerprint utama'],
+            ['BPR-2026-0102', '2026-10-01', '08:14:00', '17:00:00', 'Late', 'Keterlambatan 14 menit'],
+        ];
+
+        $html = '<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 11px; }
+  table { border-collapse: collapse; }
+  .title-main { font-size: 14px; font-weight: bold; color: #0E6838; }
+  .instructions { font-size: 10px; color: #555555; background-color: #fefce8; border: 1px solid #fef08a; padding: 6px; }
+  .th-header { background-color: #0E6838; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #084022; padding: 6px 10px; }
+  .td-text { mso-number-format: "\@"; border: 1px solid #cbd5e1; padding: 4px 6px; }
+</style>
+</head>
+<body>
+<table>
+  <tr><td colspan="6" class="title-main">PT BPR BANDA RAYA - TEMPLATE IMPORT LOG ABSENSI</td></tr>
+  <tr><td colspan="6" class="instructions">Format Status: Present (Tepat Waktu), Late (Terlambat), Excused (Izin/Cuti), Absent (Alpa). Format Tanggal: YYYY-MM-DD.</td></tr>
+  <tr><td colspan="6">&nbsp;</td></tr>
+  <thead>
+    <tr>';
+        foreach ($headers as $h) {
+            $html .= '<th class="th-header">' . htmlspecialchars($h) . '</th>';
+        }
+        $html .= '</tr>
+  </thead>
+  <tbody>';
+
+        foreach ($sampleRows as $row) {
+            $html .= '<tr>';
+            foreach ($row as $val) {
+                $html .= '<td class="td-text">' . htmlspecialchars($val) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody>
+</table>
+</body>
+</html>';
+
+        return $html;
+    }
+
+    /**
      * Menghasilkan isi template CSV untuk impor data absensi / fingerprint
      */
     public function generateAttendanceTemplateCsv(): string
@@ -201,23 +365,70 @@ class DataMigrationService
         $content = file_get_contents($filePath);
         // Hilangkan UTF-8 BOM jika ada
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
-        $lines = preg_split('/\r\n|\r|\n/', trim($content));
 
-        if (count($lines) < 2) {
-            return [
-                'success' => false,
-                'message' => 'Berkas CSV kosong atau tidak memiliki baris data.',
-                'imported' => 0,
-                'updated' => 0,
-                'errors' => [],
-            ];
+        $parsedRows = [];
+
+        // 1. Cek jika berkas merupakan Excel berformat HTML / XML Table (.xls)
+        if (stripos($content, '<table') !== false) {
+            preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $content, $trMatches);
+            foreach ($trMatches[1] as $trHtml) {
+                preg_match_all('/<(?:td|th)[^>]*>(.*?)<\/(?:td|th)>/is', $trHtml, $tdMatches);
+                $rowCells = array_map(function ($cell) {
+                    $clean = html_entity_decode(strip_tags($cell), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    return trim($clean);
+                }, $tdMatches[1]);
+
+                if (! empty(array_filter($rowCells, fn ($c) => $c !== ''))) {
+                    $parsedRows[] = $rowCells;
+                }
+            }
+
+            // Cari baris header yang mengandung NIP
+            $headerIndex = -1;
+            foreach ($parsedRows as $idx => $r) {
+                $joined = strtolower(implode(' ', $r));
+                if (str_contains($joined, 'nip')) {
+                    $headerIndex = $idx;
+                    break;
+                }
+            }
+
+            if ($headerIndex === -1 || count($parsedRows) <= $headerIndex + 1) {
+                return [
+                    'success' => false,
+                    'message' => 'Berkas Excel (.xls) tidak memiliki baris header atau kolom NIP tidak ditemukan.',
+                    'imported' => 0,
+                    'updated' => 0,
+                    'errors' => [],
+                ];
+            }
+
+            $rawHeader = $parsedRows[$headerIndex];
+            $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', $h))), $rawHeader);
+            $dataRows = array_slice($parsedRows, $headerIndex + 1);
+        } else {
+            // 2. Berkas CSV / Text Biasa
+            $lines = preg_split('/\r\n|\r|\n/', trim($content));
+            if (count($lines) < 2) {
+                return [
+                    'success' => false,
+                    'message' => 'Berkas CSV kosong atau tidak memiliki baris data.',
+                    'imported' => 0,
+                    'updated' => 0,
+                    'errors' => [],
+                ];
+            }
+
+            $delimiter = strpos($lines[0], ';') !== false && strpos($lines[0], ',') === false ? ';' : ',';
+            $header = str_getcsv(array_shift($lines), $delimiter);
+            $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', $h))), $header);
+
+            $dataRows = [];
+            foreach ($lines as $line) {
+                if (empty(trim($line))) continue;
+                $dataRows[] = str_getcsv($line, $delimiter);
+            }
         }
-
-        // Deteksi pemisah delimiter (koma atau titik koma)
-        $delimiter = strpos($lines[0], ';') !== false && strpos($lines[0], ',') === false ? ';' : ',';
-
-        $header = str_getcsv(array_shift($lines), $delimiter);
-        $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', $h))), $header);
 
         $imported = 0;
         $updated = 0;
@@ -225,12 +436,10 @@ class DataMigrationService
 
         DB::beginTransaction();
         try {
-            foreach ($lines as $index => $line) {
-                if (empty(trim($line))) {
+            foreach ($dataRows as $index => $row) {
+                if (count($row) < 2) {
                     continue;
                 }
-
-                $row = str_getcsv($line, $delimiter);
                 if (count($row) < count($header)) {
                     $errors[] = "Baris " . ($index + 2) . ": Jumlah kolom tidak sesuai dengan header.";
                     continue;
@@ -555,7 +764,7 @@ class DataMigrationService
                 }
 
                 // Resolusi Identitas Pegawai (NIP atau Nama Lengkap)
-                $identifier = $data['nip'] ?? ($data['name'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? '')));
+                $identifier = trim(preg_replace('/\s+/', ' ', (string) ($data['nip'] ?? ($data['name'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? ''))))));
                 if (empty($identifier)) {
                     continue;
                 }
@@ -573,31 +782,44 @@ class DataMigrationService
                     continue;
                 }
 
-                // Resolusi Tanggal Presensi (Mendukung DD/MM/YYYY dan YYYY-MM-DD)
-                $rawDate = $data['tanggal'] ?? ($data['date'] ?? '');
+                // Resolusi Tanggal Presensi (Mendukung DD/MM/YYYY, DD-MM-YYYY, dan YYYY-MM-DD)
+                $rawDate = trim((string) ($data['tanggal'] ?? ($data['date'] ?? '')));
                 if (empty($rawDate)) {
                     $errors[] = "Baris " . ($index + 2) . ": Tanggal presensi wajib diisi.";
                     continue;
                 }
 
-                if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $rawDate, $m)) {
+                if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $rawDate, $m)) {
                     $dateParsed = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
                 } else {
                     $dateParsed = Carbon::parse($rawDate)->toDateString();
                 }
 
                 // Resolusi Jam Masuk & Jam Keluar (Format titik 07.31 atau titik dua 07:31)
-                $rawIn = $data['jam_masuk'] ?? ($data['clock_in'] ?? '');
-                $rawOut = $data['jam_keluar'] ?? ($data['clock_out'] ?? '');
+                $rawIn = trim((string) ($data['jam_masuk'] ?? ($data['clock_in'] ?? '')));
+                $rawOut = trim((string) ($data['jam_keluar'] ?? ($data['clock_out'] ?? '')));
 
                 $cleanIn = str_replace('.', ':', $rawIn);
                 $cleanOut = str_replace('.', ':', $rawOut);
 
-                $hasActualClockIn = ! empty($cleanIn) && $cleanIn !== '-' && $cleanIn !== '00:00';
-                $hasActualClockOut = ! empty($cleanOut) && $cleanOut !== '-' && $cleanOut !== '00:00';
+                $hasActualClockIn = ! empty($cleanIn) && $cleanIn !== '-' && $cleanIn !== '00:00' && $cleanIn !== '00:00:00';
+                $hasActualClockOut = ! empty($cleanOut) && $cleanOut !== '-' && $cleanOut !== '00:00' && $cleanOut !== '00:00:00';
 
                 $clockIn = $hasActualClockIn ? Carbon::parse("{$dateParsed} {$cleanIn}") : null;
                 $clockOut = $hasActualClockOut ? Carbon::parse("{$dateParsed} {$cleanOut}") : null;
+
+                // Jadwal Baku (On Duty) dari template mesin Solution X105 jika tersedia
+                $onDutyRaw = trim((string) ($data['on_duty'] ?? ''));
+                $onDutyClean = str_replace('.', ':', $onDutyRaw);
+                $standardStart = (! empty($onDutyClean) && $onDutyClean !== '-' && $onDutyClean !== '00:00' && preg_match('/^\d{1,2}:\d{2}/', $onDutyClean))
+                    ? Carbon::parse("{$dateParsed} {$onDutyClean}")
+                    : Carbon::parse("{$dateParsed} 08:00:00");
+
+                // Lembur Mesin (OT Time) dari template mesin Solution X105 jika tersedia
+                $otRaw = trim((string) ($data['ot_time'] ?? ''));
+                $otNote = (! empty($otRaw) && $otRaw !== '-' && $otRaw !== '00:00' && $otRaw !== '00.00')
+                    ? " (Lembur: {$otRaw})"
+                    : '';
 
                 $fileStatus = ucfirst(strtolower(trim($data['status'] ?? 'Present')));
                 $lateMinutes = 0;
@@ -631,12 +853,11 @@ class DataMigrationService
                     if ($isLateDisp && $hasActualClockIn) {
                         // Karyawan izin telat masuk dan tetap hadir di kantor (ada rekaman jam masuk mesin)
                         $status = 'Present'; // Hadir!
-                        $standardStart = Carbon::parse("{$dateParsed} 08:00:00");
                         if ($clockIn && $clockIn->gt($standardStart)) {
                             $lateMinutes = $clockIn->diffInMinutes($standardStart);
                         }
                         $penaltyAmount = 0; // Bebas denda keterlambatan karena izin telat sah
-                        $notes = "[Dispensasi Telat: {$dispReason}] Jam masuk " . ($clockIn ? $clockIn->format('H:i') : '') . " tercatat. Status Hadir (Denda ditiadakan).";
+                        $notes = "[Dispensasi Telat: {$dispReason}] Jam masuk " . ($clockIn ? $clockIn->format('H:i') : '') . " tercatat. Status Hadir (Denda ditiadakan).{$otNote}";
                     } elseif ($isLateDisp && ! $hasActualClockIn) {
                         // Izin telat masuk tapi tidak ada rekaman jam masuk mesin sama sekali
                         $status = 'Excused';
@@ -653,8 +874,7 @@ class DataMigrationService
                 } else {
                     // Murni presensi mesin tanpa cuti maupun dispensasi
                     if ($hasActualClockIn) {
-                        $standardStart = Carbon::parse("{$dateParsed} 08:00:00");
-                        if ($clockIn && $clockIn->gt($standardStart)) {
+                        if ($clockIn->gt($standardStart)) {
                             $lateMinutes = $clockIn->diffInMinutes($standardStart);
                             $status = 'Late';
                             $penaltyAmount = $lateMinutes * 50000; // Denda standar Rp50.000 / menit
@@ -663,7 +883,8 @@ class DataMigrationService
                             $lateMinutes = 0;
                             $penaltyAmount = 0;
                         }
-                        $notes = trim($data['catatan'] ?? ($data['notes'] ?? 'Tarik Berkas Mesin Presensi Cabang'));
+                        $baseNote = trim($data['catatan'] ?? ($data['notes'] ?? 'Tarik Berkas Mesin Presensi Cabang'));
+                        $notes = $baseNote . $otNote;
                     } else {
                         // Tidak ada jam masuk dan tidak ada izin/cuti -> Alpa
                         $status = 'Absent';

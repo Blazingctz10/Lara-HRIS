@@ -10,7 +10,7 @@ class EmployeesByBranchChartWidget extends ChartWidget
 {
     protected static ?int $sort = 3;
 
-    protected ?string $heading = 'Komposisi SDM per Jaringan Kantor Cabang';
+    protected ?string $heading = 'Komposisi SDM per Jaringan Kantor';
 
     protected int|string|array $columnSpan = [
         'default' => 'full',

@@ -31,7 +31,7 @@ class CareerMovementForm
                             Select::make('type')
                                 ->label('Jenis Perubahan Karir')
                                 ->options([
-                                    'Mutasi Cabang' => 'Mutasi Antar Kantor Cabang',
+                                    'Mutasi Cabang' => 'Mutasi Antar Kantor (Pusat / Cabang / Kas)',
                                     'Promosi Jabatan' => 'Promosi Kenaikan Jabatan',
                                     'Rotasi Divisi' => 'Rotasi Antar Divisi / Bagian',
                                     'Pengangkatan Tetap' => 'Pengangkatan Pegawai Tetap (PKWTT)',

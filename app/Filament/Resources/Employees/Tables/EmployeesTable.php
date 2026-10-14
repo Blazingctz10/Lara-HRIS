@@ -48,7 +48,7 @@ class EmployeesTable
                     ->sortable(),
 
                 TextColumn::make('branch.name')
-                    ->label('Kantor Cabang')
+                    ->label('Unit Kantor')
                     ->badge()
                     ->color('info')
                     ->searchable()
@@ -103,7 +103,7 @@ class EmployeesTable
             ->filters([
                 SelectFilter::make('branch_id')
                     ->relationship('branch', 'name')
-                    ->label('Kantor Cabang'),
+                    ->label('Unit Kantor'),
                 SelectFilter::make('department_id')
                     ->relationship('department', 'name')
                     ->label('Divisi'),

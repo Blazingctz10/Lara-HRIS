@@ -34,11 +34,16 @@ class BranchesTable
                 TextColumn::make('type')
                     ->label('Tipe')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Pusat', 'Head Office' => 'Pusat',
+                        'Cabang', 'Main Branch', 'Sub Branch' => 'Cabang',
+                        'Kas', 'Cash Office' => 'Kas',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
-                        'Head Office' => 'danger',
-                        'Main Branch' => 'success',
-                        'Sub Branch' => 'info',
-                        'Cash Office' => 'warning',
+                        'Pusat', 'Head Office' => 'danger',
+                        'Cabang', 'Main Branch', 'Sub Branch' => 'success',
+                        'Kas', 'Cash Office' => 'info',
                         default => 'gray',
                     }),
 
@@ -67,10 +72,9 @@ class BranchesTable
                 SelectFilter::make('type')
                     ->label('Tipe Kantor')
                     ->options([
-                        'Head Office' => 'Head Office',
-                        'Main Branch' => 'Main Branch',
-                        'Sub Branch' => 'Sub Branch',
-                        'Cash Office' => 'Cash Office',
+                        'Pusat' => 'Pusat',
+                        'Cabang' => 'Cabang',
+                        'Kas' => 'Kas',
                     ]),
                 TernaryFilter::make('is_active')
                     ->label('Status Operasional'),

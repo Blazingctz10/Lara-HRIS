@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $ho = Branch::create([
             'code' => 'HO-001',
             'name' => 'Kantor Pusat BPR Banda Raya',
-            'type' => 'Head Office',
+            'type' => 'Pusat',
             'city' => 'Batam',
             'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1-3, Batam',
             'phone' => '(0778) 424100',
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         $kcBotania = Branch::create([
             'code' => 'KC-BOTANIA',
             'name' => 'Kantor Cabang Botania',
-            'type' => 'Main Branch',
+            'type' => 'Cabang',
             'city' => 'Batam',
             'address' => 'Komp. Ruko Botania Garden Blok B2 No. 1-2, Batam Centre, Batam',
             'phone' => '(0778) 7495 400',
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
         $kcAviari = Branch::create([
             'code' => 'KC-AVIARI',
             'name' => 'Kantor Cabang Aviari',
-            'type' => 'Main Branch',
+            'type' => 'Cabang',
             'city' => 'Batam',
             'address' => 'Komp. Pertokoan Aviari Pratama Blok B No. 12-14, Batu Aji, Batam',
             'phone' => '(0778) 361100',
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
         $kcBengkong = Branch::create([
             'code' => 'KC-BENGKONG',
             'name' => 'Kantor Cabang Bengkong',
-            'type' => 'Main Branch',
+            'type' => 'Cabang',
             'city' => 'Batam',
             'address' => 'Komp. Ruko Golden City Blok A No. 5-6, Bengkong, Batam',
             'phone' => '(0778) 4888152',

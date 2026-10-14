@@ -22,11 +22,11 @@ class BranchResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Master Organisasi';
 
-    protected static ?string $navigationLabel = 'Kantor Cabang';
+    protected static ?string $navigationLabel = 'Daftar Kantor';
 
-    protected static ?string $modelLabel = 'Kantor Cabang';
+    protected static ?string $modelLabel = 'Kantor';
 
-    protected static ?string $pluralModelLabel = 'Daftar Kantor Cabang';
+    protected static ?string $pluralModelLabel = 'Daftar Kantor';
 
     protected static ?int $navigationSort = 1;
 

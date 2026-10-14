@@ -25,6 +25,23 @@ class TemplateDownloadController extends Controller
     }
 
     /**
+     * Download template Excel (.xls) Master Pegawai via Native HTTP GET
+     */
+    public function downloadEmployeeXls(): StreamedResponse
+    {
+        $this->checkAdminAccess();
+
+        $service = app(DataMigrationService::class);
+        $xls = $service->generateEmployeeTemplateXls();
+
+        return response()->streamDownload(function () use ($xls) {
+            echo "\xEF\xBB\xBF" . $xls;
+        }, 'template_migrasi_pegawai_bpr.xls', [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+        ]);
+    }
+
+    /**
      * Download template CSV Log Absensi via Native HTTP GET
      */
     public function downloadAttendance(): StreamedResponse
@@ -38,6 +55,23 @@ class TemplateDownloadController extends Controller
             echo $csv;
         }, 'template_impor_absensi_bpr.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Download template Excel (.xls) Log Absensi via Native HTTP GET
+     */
+    public function downloadAttendanceXls(): StreamedResponse
+    {
+        $this->checkAdminAccess();
+
+        $service = app(DataMigrationService::class);
+        $xls = $service->generateAttendanceTemplateXls();
+
+        return response()->streamDownload(function () use ($xls) {
+            echo "\xEF\xBB\xBF" . $xls;
+        }, 'template_impor_absensi_bpr.xls', [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
         ]);
     }
 

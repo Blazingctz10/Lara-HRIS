@@ -47,11 +47,11 @@ class UserForm
                                 ->required(),
 
                             Select::make('branch_id')
-                                ->label('Kantor Penempatan / Cabang')
+                                ->label('Kantor Penempatan')
                                 ->relationship('branch', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->placeholder('Pilih Kantor Cabang')
+                                ->placeholder('Pilih Kantor Penempatan')
                                 ->helperText('Kantor penempatan resmi pegawai di lingkungan BPR Banda Raya'),
 
                             TextInput::make('password')

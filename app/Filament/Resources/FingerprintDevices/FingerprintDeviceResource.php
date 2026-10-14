@@ -38,7 +38,9 @@ class FingerprintDeviceResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->isSuperAdmin() ?? false;
+        // Dinonaktifkan dari navigasi sidebar karena penarikan presensi menggunakan
+        // unggah berkas offline (absen.xls / CSV) dan tidak menggunakan plugin online IP.
+        return false;
     }
 
     public static function getEloquentQuery(): Builder

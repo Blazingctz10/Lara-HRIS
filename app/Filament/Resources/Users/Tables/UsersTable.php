@@ -56,7 +56,7 @@ class UsersTable
                     ->sortable(),
 
                 TextColumn::make('branch.name')
-                    ->label('Kantor Cabang')
+                    ->label('Unit Kantor')
                     ->badge()
                     ->color('info')
                     ->placeholder('Kantor Pusat / Semua')
@@ -86,7 +86,7 @@ class UsersTable
 
                 SelectFilter::make('branch_id')
                     ->relationship('branch', 'name')
-                    ->label('Kantor Cabang'),
+                    ->label('Unit Kantor'),
             ])
             ->recordActions([
                 Action::make('reset_password')

@@ -25,7 +25,7 @@ class OvertimesTable
                     ->weight('bold'),
 
                 TextColumn::make('employee.branch.name')
-                    ->label('Kantor Cabang')
+                    ->label('Unit Kantor')
                     ->badge()
                     ->color('primary')
                     ->sortable(),

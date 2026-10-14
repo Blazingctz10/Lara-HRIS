@@ -131,7 +131,7 @@ class AttendancesTable
                     ]),
                 SelectFilter::make('branch')
                     ->relationship('employee.branch', 'name')
-                    ->label('Kantor Cabang'),
+                    ->label('Unit Kantor'),
                 Filter::make('today')
                     ->label('Hari Ini')
                     ->query(fn (Builder $query): Builder => $query->whereDate('date', now())),
