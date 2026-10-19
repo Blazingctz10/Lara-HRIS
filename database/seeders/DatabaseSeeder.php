@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
-use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\Position;
 use App\Models\User;
@@ -20,839 +18,873 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (User::where('email', 'admin@bprbandaraya.com')->exists()) {
-            return;
-        }
+        $defaultPassword = Hash::make('password');
 
-        // 1. Seed Branches (Sesuai Data Resmi BPR Banda Raya Batam)
-        $ho = Branch::create([
-            'code' => 'HO-001',
-            'name' => 'Kantor Pusat BPR Banda Raya',
-            'type' => 'Pusat',
-            'city' => 'Batam',
-            'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1-3, Batam',
-            'phone' => '(0778) 424100',
-            'latitude' => 1.14410000,
-            'longitude' => 104.01350000,
-            'radius_meters' => 100,
-            'is_active' => true,
-        ]);
-
-        $kcBotania = Branch::create([
-            'code' => 'KC-BOTANIA',
-            'name' => 'Kantor Cabang Botania',
-            'type' => 'Cabang',
-            'city' => 'Batam',
-            'address' => 'Komp. Ruko Botania Garden Blok B2 No. 1-2, Batam Centre, Batam',
-            'phone' => '(0778) 7495 400',
-            'latitude' => 1.11650000,
-            'longitude' => 104.08900000,
-            'radius_meters' => 50,
-            'is_active' => true,
-        ]);
-
-        $kcAviari = Branch::create([
-            'code' => 'KC-AVIARI',
-            'name' => 'Kantor Cabang Aviari',
-            'type' => 'Cabang',
-            'city' => 'Batam',
-            'address' => 'Komp. Pertokoan Aviari Pratama Blok B No. 12-14, Batu Aji, Batam',
-            'phone' => '(0778) 361100',
-            'latitude' => 1.05050000,
-            'longitude' => 103.97800000,
-            'radius_meters' => 50,
-            'is_active' => true,
-        ]);
-
-        $kcBengkong = Branch::create([
-            'code' => 'KC-BENGKONG',
-            'name' => 'Kantor Cabang Bengkong',
-            'type' => 'Cabang',
-            'city' => 'Batam',
-            'address' => 'Komp. Ruko Golden City Blok A No. 5-6, Bengkong, Batam',
-            'phone' => '(0778) 4888152',
-            'latitude' => 1.16100000,
-            'longitude' => 104.03200000,
-            'radius_meters' => 50,
-            'is_active' => true,
-        ]);
-
-        // 2. Seed Departments
-        $deptHc = Department::create(['code' => 'HC', 'name' => 'Human Capital & SDM', 'description' => 'Pengelolaan Sumber Daya Manusia & Organisasi BPR']);
-        $deptRisk = Department::create(['code' => 'RISK', 'name' => 'Kepatuhan & Manajemen Risiko', 'description' => 'Kepatuhan Regulasi OJK & Mitigasi Risiko Perbankan']);
-        $deptOps = Department::create(['code' => 'OPS', 'name' => 'Operasional & Layanan Kas', 'description' => 'Frontliner, Teller, Customer Service, & Kliring']);
-        $deptLend = Department::create(['code' => 'LEND', 'name' => 'Kredit & Bisnis Komersial', 'description' => 'Penyaluran Pembiayaan & Analis Kredit UMKM']);
-        $deptAudit = Department::create(['code' => 'AUDIT', 'name' => 'Satuan Kerja Audit Internal (SKAI)', 'description' => 'Pemeriksaan & Pengawasan Kepatuhan Internal']);
-        $deptIt = Department::create(['code' => 'IT', 'name' => 'Teknologi Informasi & Digital Core', 'description' => 'Core Banking & Infrastruktur TI']);
-
-        // 3. Seed Positions
-        $posPincab = Position::create(['department_id' => $deptOps->id, 'name' => 'Pemimpin Cabang (Pincab)', 'grade_level' => 'Manager', 'min_salary' => 20000000, 'max_salary' => 35000000]);
-        $posHrManager = Position::create(['department_id' => $deptHc->id, 'name' => 'Human Capital Manager', 'grade_level' => 'Manager', 'min_salary' => 18000000, 'max_salary' => 30000000]);
-        $posHrOfficer = Position::create(['department_id' => $deptHc->id, 'name' => 'HC Operations Officer', 'grade_level' => 'Officer', 'min_salary' => 8000000, 'max_salary' => 14000000]);
-        $posRiskOfficer = Position::create(['department_id' => $deptRisk->id, 'name' => 'Risk & Compliance Officer', 'grade_level' => 'Officer', 'min_salary' => 9000000, 'max_salary' => 16000000]);
-        $posAo = Position::create(['department_id' => $deptLend->id, 'name' => 'Account Officer (AO)', 'grade_level' => 'Officer', 'min_salary' => 7000000, 'max_salary' => 14000000]);
-        $posCs = Position::create(['department_id' => $deptOps->id, 'name' => 'Customer Service', 'grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 8500000]);
-        $posTeller = Position::create(['department_id' => $deptOps->id, 'name' => 'Teller Kas & Kliring', 'grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 8500000]);
-        $posIt = Position::create(['department_id' => $deptIt->id, 'name' => 'IT System & Core Banking Officer', 'grade_level' => 'Officer']);
-
-        // 4. Seed Leave Types (Sesuai Formulir Resmi PT BPR Banda Raya & Regulasi OJK)
-        $leaveAnnual = LeaveType::create([
-            'code' => 'ANNUAL',
-            'name' => 'Cuti Tahunan',
-            'default_days' => 12,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 5, // Maksimal 5 hari kerja berturut-turut per pengajuan
-            'gender_restriction' => null,
-            'description' => 'Hak cuti tahunan reguler bagi staf (Maksimal 5 hari kerja berturut-turut per pengajuan untuk kelancaran operasional bank).',
-        ]);
-
-        $leaveBlock = LeaveType::create([
-            'code' => 'BLOCK_LEAVE',
-            'name' => 'Block Leave (Wajib OJK)',
-            'default_days' => 5,
-            'is_block_leave' => true,
-            'min_consecutive_days' => 5,
-            'max_consecutive_days' => 5,
-            'gender_restriction' => null,
-            'description' => 'Kepatuhan regulasi perbankan OJK: Cuti berturut-turut minimal 5 hari kerja tanpa interupsi akses sistem.',
-        ]);
-
-        $leaveSick = LeaveType::create([
-            'code' => 'SICK',
-            'name' => 'Cuti Sakit',
-            'default_days' => 14,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => null,
-            'gender_restriction' => null,
-            'description' => 'Izin sakit dengan melampirkan surat keterangan dokter (SKD).',
-        ]);
-
-        $leaveMaternity = LeaveType::create([
-            'code' => 'MATERNITY',
-            'name' => 'Cuti Melahirkan (Ibu)',
-            'default_days' => 90,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 90,
-            'gender_restriction' => 'female',
-            'description' => 'Cuti melahirkan bagi pegawai perempuan (3 bulan / 90 hari kalender).',
-        ]);
-
-        $leavePaternity = LeaveType::create([
-            'code' => 'PATERNITY',
-            'name' => 'Cuti Istri Melahirkan',
-            'default_days' => 2,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 2,
-            'gender_restriction' => 'male',
-            'description' => 'Hak cuti mendampingi istri melahirkan khusus pegawai laki-laki (2 hari kerja).',
-        ]);
-
-        $leaveBereavement = LeaveType::create([
-            'code' => 'BEREAVEMENT',
-            'name' => 'Cuti Duka',
-            'default_days' => 3,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 3,
-            'gender_restriction' => null,
-            'description' => 'Cuti kedukaan: Keluarga inti (3 hari), Mertua/Saudara kandung (2 hari), Anggota keluarga serumah (1 hari).',
-        ]);
-
-        $leaveLong = LeaveType::create([
-            'code' => 'LONG_LEAVE',
-            'name' => 'Cuti Besar',
-            'default_days' => 6,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 6,
-            'gender_restriction' => null,
-            'description' => 'Cuti besar loyalitas bagi karyawan yang telah bekerja minimal 5 tahun (durasi 6 hari kerja).',
-        ]);
-
-        $leaveReligious = LeaveType::create([
-            'code' => 'RELIGIOUS_LEAVE',
-            'name' => 'Cuti Menjalankan Ibadah Agama',
-            'default_days' => 40,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => 40,
-            'gender_restriction' => null,
-            'description' => 'Cuti ibadah keagamaan resmi (contoh: Ibadah Haji / Umrah).',
-        ]);
-
-        $leaveUnpaid = LeaveType::create([
-            'code' => 'UNPAID_LEAVE',
-            'name' => 'Cuti di Luar Tanggungan Perusahaan',
-            'default_days' => 0,
-            'is_block_leave' => false,
-            'min_consecutive_days' => null,
-            'max_consecutive_days' => null,
-            'gender_restriction' => null,
-            'description' => 'Cuti khusus di luar tanggungan perusahaan (tanpa gaji).',
-        ]);
-
-        // 5. Seed Users & Employees (Domain: @bprbandaraya.com)
-        $password = Hash::make('password');
-
-        // A. Direksi, Super Admin & Head Office HR
-        $uDireksi = User::create([
-            'name' => 'Direktur Utama BPR Banda Raya',
-            'email' => 'direksi@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'direksi',
-            'branch_id' => $ho->id,
-        ]);
-
-        $empDireksi = Employee::create([
-            'user_id' => $uDireksi->id,
-            'nip' => 'BPR-DIR-0001',
-            'nik' => '2171010101700001',
-            'full_name' => 'Direktur Utama BPR Banda Raya',
-            'email' => 'direksi@bprbandaraya.com',
-            'phone' => '081177000001',
-            'gender' => 'Male',
-            'birth_date' => '1970-01-01',
-            'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1, Batam',
-            'branch_id' => $ho->id,
-            'department_id' => $deptOps->id,
-            'position_id' => $posPincab->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2010-01-01',
-            'status' => 'Active',
-            'bank_account_number' => '1200000000',
-            'bank_account_holder' => 'Direktur Utama BPR',
-            'npwp' => '80.000.000.0-011.000',
-        ]);
-
-        $uAdmin = User::create([
-            'name' => 'Super Administrator BPR Banda Raya',
-            'email' => 'admin@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'super_admin',
-            'branch_id' => $ho->id,
-        ]);
-
-        $empAdmin = Employee::create([
-            'user_id' => $uAdmin->id,
-            'nip' => 'BPR-HO-0001',
-            'nik' => '2171012304900001',
-            'full_name' => 'Super Administrator BPR',
-            'email' => 'admin@bprbandaraya.com',
-            'phone' => '081270001100',
-            'gender' => 'Male',
-            'birth_date' => '1990-01-15',
-            'address' => 'Komplek Pertokoan Nagoya Hill Blok G No. 1, Batam',
-            'branch_id' => $ho->id,
-            'department_id' => $deptIt->id,
-            'position_id' => $posIt->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2020-01-10',
-            'status' => 'Active',
-            'bank_account_number' => '1200000001',
-            'bank_account_holder' => 'Super Administrator BPR',
-            'npwp' => '80.111.222.3-011.000',
-        ]);
-
-        $uHr = User::create([
-            'name' => 'Ratna Dewi, S.Psi',
-            'email' => 'ratna.dewi@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'hr_admin',
-            'branch_id' => $ho->id,
-        ]);
-
-        $empHr = Employee::create([
-            'user_id' => $uHr->id,
-            'nip' => 'BPR-HO-0002',
-            'nik' => '2171012304920001',
-            'full_name' => 'Ratna Dewi, S.Psi',
-            'email' => 'ratna.dewi@bprbandaraya.com',
-            'phone' => '081288991122',
-            'gender' => 'Female',
-            'birth_date' => '1992-04-23',
-            'address' => 'Komp. Nagoya City Centre Blok B No. 8, Batam',
-            'branch_id' => $ho->id,
-            'department_id' => $deptHc->id,
-            'position_id' => $posHrOfficer->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2020-03-01',
-            'status' => 'Active',
-            'bank_account_number' => '1200098765432',
-            'bank_account_holder' => 'Ratna Dewi',
-            'npwp' => '71.234.567.8-012.000',
-        ]);
-
-        // B. Pincab KC Botania
-        $uPincabBotania = User::create([
-            'name' => 'Budi Santoso, S.E., M.M.',
-            'email' => 'pincab.botania@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'branch_manager',
-            'branch_id' => $kcBotania->id,
-        ]);
-
-        $empPincabBotania = Employee::create([
-            'user_id' => $uPincabBotania->id,
-            'nip' => 'BPR-BOT-0001',
-            'nik' => '2171081508800002',
-            'full_name' => 'Budi Santoso, S.E., M.M.',
-            'email' => 'pincab.botania@bprbandaraya.com',
-            'phone' => '081199887766',
-            'gender' => 'Male',
-            'birth_date' => '1980-08-15',
-            'address' => 'Perumahan Botania Garden Tahap 1 Blok D No. 12, Batam',
-            'branch_id' => $kcBotania->id,
-            'department_id' => $deptOps->id,
-            'position_id' => $posPincab->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2015-06-01',
-            'status' => 'Active',
-            'bank_account_number' => '1200012345678',
-            'bank_account_holder' => 'Budi Santoso',
-            'npwp' => '70.111.222.3-015.000',
-        ]);
-
-        // C. Pincab KC Aviari
-        $uPincabAviari = User::create([
-            'name' => 'Ahmad Fauzi, S.E.',
-            'email' => 'pincab.aviari@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'branch_manager',
-            'branch_id' => $kcAviari->id,
-        ]);
-
-        $empPincabAviari = Employee::create([
-            'user_id' => $uPincabAviari->id,
-            'nip' => 'BPR-AVI-0001',
-            'nik' => '2171011211820003',
-            'full_name' => 'Ahmad Fauzi, S.E.',
-            'email' => 'pincab.aviari@bprbandaraya.com',
-            'phone' => '081322334455',
-            'gender' => 'Male',
-            'birth_date' => '1982-11-12',
-            'address' => 'Perumahan Buana Vista Blok A No. 15, Batu Aji, Batam',
-            'branch_id' => $kcAviari->id,
-            'department_id' => $deptOps->id,
-            'position_id' => $posPincab->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2017-02-15',
-            'status' => 'Active',
-            'bank_account_number' => '1200034567890',
-            'bank_account_holder' => 'Ahmad Fauzi',
-            'npwp' => '72.333.444.5-021.000',
-        ]);
-
-        // D. Pincab KC Bengkong
-        $uPincabBengkong = User::create([
-            'name' => 'Hendra Wijaya, S.E.',
-            'email' => 'pincab.bengkong@bprbandaraya.com',
-            'password' => $password,
-            'role' => 'branch_manager',
-            'branch_id' => $kcBengkong->id,
-        ]);
-
-        $empPincabBengkong = Employee::create([
-            'user_id' => $uPincabBengkong->id,
-            'nip' => 'BPR-BNG-0001',
-            'nik' => '2171032506850004',
-            'full_name' => 'Hendra Wijaya, S.E.',
-            'email' => 'pincab.bengkong@bprbandaraya.com',
-            'phone' => '081277889900',
-            'gender' => 'Male',
-            'birth_date' => '1985-06-25',
-            'address' => 'Perumahan Bengkong Laut Blok C No. 5, Batam',
-            'branch_id' => $kcBengkong->id,
-            'department_id' => $deptOps->id,
-            'position_id' => $posPincab->id,
-            'employment_status' => 'Permanent',
-            'join_date' => '2018-04-10',
-            'status' => 'Active',
-            'bank_account_number' => '1200056789012',
-            'bank_account_holder' => 'Hendra Wijaya',
-            'npwp' => '73.444.555.6-022.000',
-        ]);
-
-        // E. Staff per Cabang (Teller, CS, AO)
-        $staffData = [
-            // Staff KC Botania
+        // =========================================================================
+        // 1. DAFTAR KANTOR (Pusat, Cabang, dan Kas - Wilayah Batam)
+        // =========================================================================
+        $ho = Branch::updateOrCreate(
+            ['code' => 'HO-001'],
             [
-                'name' => 'Siti Nurhaliza',
-                'email' => 'teller.botania@bprbandaraya.com',
-                'nip' => 'BPR-BOT-0010',
-                'branch' => $kcBotania,
-                'dept' => $deptOps,
-                'pos' => $posTeller,
+                'name' => 'Kantor Pusat BPR Banda Raya',
+                'type' => 'Pusat',
+                'city' => 'Batam Kota',
+                'address' => 'Jl. Duyung, Komp. Marina Centre No 8-9, Sei Jodoh, Batam',
+                'phone' => '(0778) 424100',
+                'latitude' => 1.15120000,
+                'longitude' => 104.01560000,
+                'radius_meters' => 100,
+                'is_active' => true,
+            ]
+        );
+
+        $kcBotania = Branch::updateOrCreate(
+            ['code' => 'KC-BOTANIA'],
+            [
+                'name' => 'Kantor Cabang Botania',
+                'type' => 'Cabang',
+                'city' => 'Batam Centre',
+                'address' => 'Komp. Ruko Botania Garden Blok B2 No. 1-2, Batam Centre, Batam',
+                'phone' => '(0778) 7495 400',
+                'latitude' => 1.11650000,
+                'longitude' => 104.08900000,
+                'radius_meters' => 50,
+                'is_active' => true,
+            ]
+        );
+
+        $kcAviari = Branch::updateOrCreate(
+            ['code' => 'KC-AVIARI'],
+            [
+                'name' => 'Kantor Cabang Aviari',
+                'type' => 'Cabang',
+                'city' => 'Batu Aji',
+                'address' => 'Komp. Pertokoan Aviari Pratama Blok B No. 12-14, Batu Aji, Batam',
+                'phone' => '(0778) 361100',
+                'latitude' => 1.05050000,
+                'longitude' => 103.97800000,
+                'radius_meters' => 50,
+                'is_active' => true,
+            ]
+        );
+
+        $kkBengkong = Branch::updateOrCreate(
+            ['code' => 'KK-BENGKONG'],
+            [
+                'name' => 'Kantor Kas Bengkong',
+                'type' => 'Kas',
+                'city' => 'Bengkong',
+                'address' => 'Komp. Ruko Golden City Blok A No. 5-6, Bengkong, Batam',
+                'phone' => '(0778) 4888152',
+                'latitude' => 1.16100000,
+                'longitude' => 104.03200000,
+                'radius_meters' => 50,
+                'is_active' => true,
+            ]
+        );
+
+        $kkTiban = Branch::updateOrCreate(
+            ['code' => 'KK-TIBAN'],
+            [
+                'name' => 'Kantor Kas Tiban',
+                'type' => 'Kas',
+                'city' => 'Sekupang',
+                'address' => 'Ruko Tiban Centre Blok A No. 3-4, Tiban, Sekupang, Batam',
+                'phone' => '(0778) 321550',
+                'latitude' => 1.10900000,
+                'longitude' => 103.96800000,
+                'radius_meters' => 50,
+                'is_active' => true,
+            ]
+        );
+
+        // =========================================================================
+        // 2. DIVISI DAN UNIT KERJA (DEPARTMENTS)
+        // =========================================================================
+        $deptDir = Department::updateOrCreate(
+            ['code' => 'DIR'],
+            ['name' => 'Dewan Direksi & Eksekutif', 'description' => 'Kepemimpinan Strategis & Pengambilan Keputusan Tertinggi Bank']
+        );
+
+        $deptHc = Department::updateOrCreate(
+            ['code' => 'HC'],
+            ['name' => 'Human Capital & GA', 'description' => 'Pengelolaan Sumber Daya Manusia, Remunerasi, Pelatihan & Urusan Umum']
+        );
+
+        $deptOps = Department::updateOrCreate(
+            ['code' => 'OPS'],
+            ['name' => 'Operasional & Layanan Kas', 'description' => 'Pelayanan Frontliner, Customer Service, Teller, Kas Titipan & Kliring']
+        );
+
+        $deptLend = Department::updateOrCreate(
+            ['code' => 'LEND'],
+            ['name' => 'Bisnis & Penyaluran Kredit', 'description' => 'Pembiayaan UMKM, Kredit Modal Kerja, Konsumer & Analisa Agunan']
+        );
+
+        $deptRisk = Department::updateOrCreate(
+            ['code' => 'RISK'],
+            ['name' => 'Kepatuhan & Manajemen Risiko', 'description' => 'Kepatuhan Regulasi OJK/BI, Mitigasi Risiko Kredit & Operasional']
+        );
+
+        $deptSkai = Department::updateOrCreate(
+            ['code' => 'SKAI'],
+            ['name' => 'Satuan Kerja Audit Intern (SKAI)', 'description' => 'Pengawasan & Audit Kepatuhan Internal Operasional Bank']
+        );
+
+        $deptIt = Department::updateOrCreate(
+            ['code' => 'IT'],
+            ['name' => 'Teknologi Informasi & Core Banking', 'description' => 'Infrastruktur TI, Jaringan, Keamanan Data & Core Banking System']
+        );
+
+        // =========================================================================
+        // 3. JABATAN DAN GRADING (POSITIONS & GRADES)
+        // =========================================================================
+        $posDirut = Position::updateOrCreate(
+            ['name' => 'Direktur Utama', 'department_id' => $deptDir->id],
+            ['grade_level' => 'Division Head', 'min_salary' => 30000000, 'max_salary' => 50000000]
+        );
+
+        $posDirops = Position::updateOrCreate(
+            ['name' => 'Direktur Operasional & Kepatuhan', 'department_id' => $deptDir->id],
+            ['grade_level' => 'Division Head', 'min_salary' => 25000000, 'max_salary' => 40000000]
+        );
+
+        $posPincab = Position::updateOrCreate(
+            ['name' => 'Pemimpin Cabang (Pincab)', 'department_id' => $deptOps->id],
+            ['grade_level' => 'Manager', 'min_salary' => 18000000, 'max_salary' => 28000000]
+        );
+
+        $posHcMgr = Position::updateOrCreate(
+            ['name' => 'Human Capital Manager', 'department_id' => $deptHc->id],
+            ['grade_level' => 'Manager', 'min_salary' => 16000000, 'max_salary' => 25000000]
+        );
+
+        $posLendMgr = Position::updateOrCreate(
+            ['name' => 'Head of Business & Lending', 'department_id' => $deptLend->id],
+            ['grade_level' => 'Manager', 'min_salary' => 16000000, 'max_salary' => 25000000]
+        );
+
+        $posRiskOfficer = Position::updateOrCreate(
+            ['name' => 'Risk & Compliance Officer', 'department_id' => $deptRisk->id],
+            ['grade_level' => 'Officer', 'min_salary' => 8500000, 'max_salary' => 15000000]
+        );
+
+        $posAuditOfficer = Position::updateOrCreate(
+            ['name' => 'Internal Audit Officer', 'department_id' => $deptSkai->id],
+            ['grade_level' => 'Officer', 'min_salary' => 8500000, 'max_salary' => 15000000]
+        );
+
+        $posItOfficer = Position::updateOrCreate(
+            ['name' => 'IT System & Core Banking Officer', 'department_id' => $deptIt->id],
+            ['grade_level' => 'Officer', 'min_salary' => 8000000, 'max_salary' => 14000000]
+        );
+
+        $posHcOfficer = Position::updateOrCreate(
+            ['name' => 'HC & Payroll Officer', 'department_id' => $deptHc->id],
+            ['grade_level' => 'Officer', 'min_salary' => 7500000, 'max_salary' => 12000000]
+        );
+
+        $posSeniorAo = Position::updateOrCreate(
+            ['name' => 'Senior Account Officer (AO)', 'department_id' => $deptLend->id],
+            ['grade_level' => 'Officer', 'min_salary' => 7000000, 'max_salary' => 12500000]
+        );
+
+        $posSupervisorKas = Position::updateOrCreate(
+            ['name' => 'Supervisor Layanan Kas', 'department_id' => $deptOps->id],
+            ['grade_level' => 'Supervisor', 'min_salary' => 7000000, 'max_salary' => 11000000]
+        );
+
+        $posAoMikro = Position::updateOrCreate(
+            ['name' => 'Account Officer (AO) Mikro', 'department_id' => $deptLend->id],
+            ['grade_level' => 'Staff', 'min_salary' => 5500000, 'max_salary' => 9000000]
+        );
+
+        $posCs = Position::updateOrCreate(
+            ['name' => 'Customer Service (CS)', 'department_id' => $deptOps->id],
+            ['grade_level' => 'Staff', 'min_salary' => 5200000, 'max_salary' => 8500000]
+        );
+
+        $posTeller = Position::updateOrCreate(
+            ['name' => 'Teller Kas & Kliring', 'department_id' => $deptOps->id],
+            ['grade_level' => 'Staff', 'min_salary' => 5200000, 'max_salary' => 8500000]
+        );
+
+        $posAdminKredit = Position::updateOrCreate(
+            ['name' => 'Staf Administrasi Kredit & Jaminan', 'department_id' => $deptLend->id],
+            ['grade_level' => 'Staff', 'min_salary' => 5200000, 'max_salary' => 8500000]
+        );
+
+        // =========================================================================
+        // 4. HAK CUTI POKOK (LEAVE TYPES)
+        // =========================================================================
+        $leaveAnnual = LeaveType::updateOrCreate(
+            ['code' => 'ANNUAL'],
+            ['name' => 'Cuti Tahunan', 'default_days' => 12, 'is_block_leave' => false, 'max_consecutive_days' => 5, 'description' => 'Hak cuti tahunan reguler bagi karyawan aktif BPR Banda Raya.']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'SICK'],
+            ['name' => 'Cuti Sakit', 'default_days' => 14, 'is_block_leave' => false, 'description' => 'Izin sakit resmi dengan melampirkan surat keterangan dokter.']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'MATERNITY'],
+            ['name' => 'Cuti Melahirkan', 'default_days' => 90, 'is_block_leave' => false, 'max_consecutive_days' => 90, 'gender_restriction' => 'female', 'description' => 'Cuti melahirkan bagi staf wanita selama 3 bulan.']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'PATERNITY'],
+            ['name' => 'Cuti Mendampingi Istri Melahirkan', 'default_days' => 2, 'is_block_leave' => false, 'max_consecutive_days' => 2, 'gender_restriction' => 'male', 'description' => 'Hak cuti mendampingi persalinan bagi staf pria.']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'BEREAVEMENT'],
+            ['name' => 'Cuti Duka', 'default_days' => 3, 'is_block_leave' => false, 'max_consecutive_days' => 3, 'description' => 'Cuti kedukaan anggota keluarga inti.']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'LONG_LEAVE'],
+            ['name' => 'Cuti Besar', 'default_days' => 6, 'is_block_leave' => false, 'max_consecutive_days' => 6, 'description' => 'Cuti besar loyalitas bagi karyawan yang telah bekerja minimal 5 tahun (durasi 6 hari kerja).']
+        );
+
+        LeaveType::updateOrCreate(
+            ['code' => 'BLOCK_LEAVE'],
+            ['name' => 'Block Leave (Wajib OJK)', 'default_days' => 5, 'is_block_leave' => true, 'min_consecutive_days' => 5, 'max_consecutive_days' => 5, 'description' => 'Kepatuhan regulasi perbankan OJK: Cuti berturut-turut minimal 5 hari kerja tanpa interupsi akses sistem.']
+        );
+
+        // =========================================================================
+        // 5. MANAJEMEN AKUN (USERS) & DATA MASTER PEGAWAI (EMPLOYEES)
+        // =========================================================================
+
+        // Pastikan Akun Administrator IT Utama tetap ada & terhubung
+        $userAdmin = User::firstOrCreate(
+            ['email' => 'admin@bprbandaraya.com'],
+            [
+                'name' => 'Administrator IT BPR',
+                'password' => $defaultPassword,
+                'role' => 'super_admin',
+                'branch_id' => $ho->id,
+            ]
+        );
+
+        $employeesData = [
+            // 1. Direktur Utama (Pusat, Grade 10)
+            [
+                'nip' => 'BPR-DIR-0001',
+                'nik' => '2171011504720001',
+                'name' => 'Hendra Gunawan',
+                'email' => 'direktur.utama@bprbandaraya.com',
+                'role' => 'direksi',
+                'branch' => $ho,
+                'department' => $deptDir,
+                'position' => $posDirut,
+                'grade' => 10,
+                'gender' => 'Male',
+                'birth_date' => '1972-04-15',
+                'birth_place' => 'Padang',
+                'address' => 'Villa Bukit Indah Blok A No. 12, Sukajadi, Batam',
+                'phone' => '081177001001',
+                'employment_status' => 'Permanent',
+                'join_date' => '2015-02-01',
+                'education_level' => 'S-2',
+                'education_major' => 'Magister Manajemen Perbankan',
+                'education_institution' => 'Universitas Andalas',
+                'ipk' => 3.85,
+                'npwp' => '71.234.567.8-215.000',
+                'ptkp' => 'K/2',
+                'emergency_name' => 'Hj. Ratna Juwita',
+                'emergency_phone' => '081177001002',
+                'emergency_rel' => 'Istri',
+            ],
+            // 2. Direktur Operasional & Kepatuhan (Pusat, Grade 9)
+            [
+                'nip' => 'BPR-DIR-0002',
+                'nik' => '2171025008770002',
+                'name' => 'Rina Marlina',
+                'email' => 'direksi@bprbandaraya.com',
+                'role' => 'direksi',
+                'branch' => $ho,
+                'department' => $deptDir,
+                'position' => $posDirops,
+                'grade' => 9,
                 'gender' => 'Female',
-                'salary' => 6000000,
-                'allowance' => 1500000,
-                'deduction' => 300000,
+                'birth_date' => '1977-08-20',
+                'birth_place' => 'Medan',
+                'address' => 'Komp. Beverly Park Blok C No. 5, Batam Centre, Batam',
+                'phone' => '081270002002',
+                'employment_status' => 'Permanent',
+                'join_date' => '2017-06-15',
+                'education_level' => 'S-2',
+                'education_major' => 'Magister Akuntansi & Keuangan',
+                'education_institution' => 'Universitas Sumatera Utara',
+                'ipk' => 3.78,
+                'npwp' => '72.345.678.9-215.000',
+                'ptkp' => 'K/1',
+                'emergency_name' => 'Dr. Bambang Irawan',
+                'emergency_phone' => '081270002003',
+                'emergency_rel' => 'Suami',
             ],
+            // 3. Human Capital Manager (Pusat, Grade 8)
             [
-                'name' => 'Rian Pratama',
-                'email' => 'cs.botania@bprbandaraya.com',
-                'nip' => 'BPR-BOT-0011',
-                'branch' => $kcBotania,
-                'dept' => $deptOps,
-                'pos' => $posCs,
+                'nip' => 'BPR-HC-0001',
+                'nik' => '2171011203830003',
+                'name' => 'Budi Santoso',
+                'email' => 'hrd@bprbandaraya.com',
+                'role' => 'hr_admin',
+                'branch' => $ho,
+                'department' => $deptHc,
+                'position' => $posHcMgr,
+                'grade' => 8,
                 'gender' => 'Male',
-                'salary' => 6500000,
-                'allowance' => 1000000,
-                'deduction' => 320000,
+                'birth_date' => '1983-03-12',
+                'birth_place' => 'Yogyakarta',
+                'address' => 'Komp. Orchid Park Blok D No. 8, Batam Centre, Batam',
+                'phone' => '081364003003',
+                'employment_status' => 'Permanent',
+                'join_date' => '2019-01-10',
+                'education_level' => 'S-1',
+                'education_major' => 'Psikologi Industri & Organisasi',
+                'education_institution' => 'Universitas Gadjah Mada',
+                'ipk' => 3.65,
+                'npwp' => '73.456.789.0-215.000',
+                'ptkp' => 'K/2',
+                'emergency_name' => 'Sri Rahayu',
+                'emergency_phone' => '081364003004',
+                'emergency_rel' => 'Istri',
             ],
+            // 4. Pemimpin Cabang Botania (Cabang, Grade 8)
             [
-                'name' => 'Dimas Anggara',
-                'email' => 'ao.botania@bprbandaraya.com',
-                'nip' => 'BPR-BOT-0012',
+                'nip' => 'BPR-CAB-0001',
+                'nik' => '2171021406850004',
+                'name' => 'Ahmad Fauzi',
+                'email' => 'pincab.botania@bprbandaraya.com',
+                'role' => 'branch_manager',
                 'branch' => $kcBotania,
-                'dept' => $deptLend,
-                'pos' => $posAo,
+                'department' => $deptOps,
+                'position' => $posPincab,
+                'grade' => 8,
                 'gender' => 'Male',
-                'salary' => 8500000,
-                'allowance' => 2000000,
-                'deduction' => 450000,
+                'birth_date' => '1985-06-14',
+                'birth_place' => 'Batam',
+                'address' => 'Komp. Botania Garden Blok C No. 10, Batam Centre, Batam',
+                'phone' => '081277114004',
+                'employment_status' => 'Permanent',
+                'join_date' => '2018-03-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Manajemen Keuangan Perbankan',
+                'education_institution' => 'Universitas Riau',
+                'ipk' => 3.52,
+                'npwp' => '74.567.890.1-215.000',
+                'ptkp' => 'K/1',
+                'emergency_name' => 'Nur Aini',
+                'emergency_phone' => '081277114005',
+                'emergency_rel' => 'Istri',
             ],
-            // Staff KC Aviari
+            // 5. Pemimpin Cabang Aviari (Cabang, Grade 8)
             [
-                'name' => 'Nabila Putri',
-                'email' => 'teller.aviari@bprbandaraya.com',
-                'nip' => 'BPR-AVI-0010',
+                'nip' => 'BPR-CAB-0002',
+                'nik' => '2171032209840005',
+                'name' => 'Surya Darmawan',
+                'email' => 'pincab.aviari@bprbandaraya.com',
+                'role' => 'branch_manager',
                 'branch' => $kcAviari,
-                'dept' => $deptOps,
-                'pos' => $posTeller,
-                'gender' => 'Female',
-                'salary' => 5800000,
-                'allowance' => 1500000,
-                'deduction' => 290000,
+                'department' => $deptOps,
+                'position' => $posPincab,
+                'grade' => 8,
+                'gender' => 'Male',
+                'birth_date' => '1984-09-22',
+                'birth_place' => 'Tanjung Pinang',
+                'address' => 'Griya Batu Aji Asri Blok E No. 15, Batu Aji, Batam',
+                'phone' => '081372555005',
+                'employment_status' => 'Permanent',
+                'join_date' => '2018-08-15',
+                'education_level' => 'S-1',
+                'education_major' => 'Ekonomi Pembangunan',
+                'education_institution' => 'Universitas Maritim Raja Ali Haji',
+                'ipk' => 3.48,
+                'npwp' => '75.678.901.2-215.000',
+                'ptkp' => 'K/2',
+                'emergency_name' => 'Maya Sari',
+                'emergency_phone' => '081372555006',
+                'emergency_rel' => 'Istri',
             ],
+            // 6. HC & Payroll Officer (Pusat, Grade 6)
             [
-                'name' => 'Fajar Nugraha',
-                'email' => 'ao.aviari@bprbandaraya.com',
-                'nip' => 'BPR-AVI-0011',
+                'nip' => 'BPR-HC-0002',
+                'nik' => '2171016505960006',
+                'name' => 'Dewi Anggraini',
+                'email' => 'dewi.anggraini@bprbandaraya.com',
+                'role' => 'hr_admin',
+                'branch' => $ho,
+                'department' => $deptHc,
+                'position' => $posHcOfficer,
+                'grade' => 6,
+                'gender' => 'Female',
+                'birth_date' => '1996-05-25',
+                'birth_place' => 'Batam',
+                'address' => 'Perum Plamo Garden Blok B No. 22, Batam Centre, Batam',
+                'phone' => '081299887711',
+                'employment_status' => 'Permanent',
+                'join_date' => '2022-01-10',
+                'education_level' => 'S-1',
+                'education_major' => 'Manajemen SDM',
+                'education_institution' => 'Universitas Internasional Batam',
+                'ipk' => 3.75,
+                'npwp' => '76.789.012.3-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Drs. H. Suwandi',
+                'emergency_phone' => '081299887712',
+                'emergency_rel' => 'Ayah',
+            ],
+            // 7. IT Core Banking Officer (Pusat, Grade 6)
+            [
+                'nip' => 'BPR-IT-0002',
+                'nik' => '2171021811950007',
+                'name' => 'Doni Kurniawan',
+                'email' => 'doni.it@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $ho,
+                'department' => $deptIt,
+                'position' => $posItOfficer,
+                'grade' => 6,
+                'gender' => 'Male',
+                'birth_date' => '1995-11-18',
+                'birth_place' => 'Padang',
+                'address' => 'Komp. Grand BSI Blok D No. 7, Batam Centre, Batam',
+                'phone' => '081266334455',
+                'employment_status' => 'Permanent',
+                'join_date' => '2021-04-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Sistem Informasi',
+                'education_institution' => 'Universitas Putra Indonesia YPTK',
+                'ipk' => 3.68,
+                'npwp' => '77.890.123.4-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Eka Saputri',
+                'emergency_phone' => '081266334456',
+                'emergency_rel' => 'Istri',
+            ],
+            // 8. Risk & Compliance Officer (Pusat, Grade 6)
+            [
+                'nip' => 'BPR-RSK-0001',
+                'nik' => '2171012307940008',
+                'name' => 'Hendra Pratama',
+                'email' => 'hendra.risk@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $ho,
+                'department' => $deptRisk,
+                'position' => $posRiskOfficer,
+                'grade' => 6,
+                'gender' => 'Male',
+                'birth_date' => '1994-07-23',
+                'birth_place' => 'Pekanbaru',
+                'address' => 'Komp. Palm Spring Blok E No. 9, Batam Centre, Batam',
+                'phone' => '081377881122',
+                'employment_status' => 'Permanent',
+                'join_date' => '2021-07-15',
+                'education_level' => 'S-1',
+                'education_major' => 'Ilmu Hukum Perdata & Bisnis',
+                'education_institution' => 'Universitas Riau',
+                'ipk' => 3.55,
+                'npwp' => '78.901.234.5-215.000',
+                'ptkp' => 'K/1',
+                'emergency_name' => 'Dini Oktaviani',
+                'emergency_phone' => '081377881123',
+                'emergency_rel' => 'Istri',
+            ],
+            // 9. Senior Account Officer (Botania, Grade 5)
+            [
+                'nip' => 'BPR-LND-0001',
+                'nik' => '2171021004930009',
+                'name' => 'Rizky Pratama',
+                'email' => 'rizky.ao@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $kcBotania,
+                'department' => $deptLend,
+                'position' => $posSeniorAo,
+                'grade' => 5,
+                'gender' => 'Male',
+                'birth_date' => '1993-04-10',
+                'birth_place' => 'Batam',
+                'address' => 'Perum KDA Blok D No. 14, Batam Centre, Batam',
+                'phone' => '081270554433',
+                'employment_status' => 'Permanent',
+                'join_date' => '2021-02-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Manajemen Keuangan',
+                'education_institution' => 'Universitas Internasional Batam',
+                'ipk' => 3.42,
+                'npwp' => '79.012.345.6-215.000',
+                'ptkp' => 'K/1',
+                'emergency_name' => 'Anisa Rahmawati',
+                'emergency_phone' => '081270554434',
+                'emergency_rel' => 'Istri',
+            ],
+            // 10. Customer Service (Pusat, Grade 4)
+            [
+                'nip' => 'BPR-OPS-0001',
+                'nik' => '2171015509980010',
+                'name' => 'Mega Utami',
+                'email' => 'mega.cs@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $ho,
+                'department' => $deptOps,
+                'position' => $posCs,
+                'grade' => 4,
+                'gender' => 'Female',
+                'birth_date' => '1998-09-15',
+                'birth_place' => 'Batam',
+                'address' => 'Komp. Baloi Kusuma Indah Blok B No. 3, Nagoya, Batam',
+                'phone' => '081366112233',
+                'employment_status' => 'Permanent',
+                'join_date' => '2023-01-05',
+                'education_level' => 'D-3',
+                'education_major' => 'Manajemen Bisnis Terapan',
+                'education_institution' => 'Politeknik Negeri Batam',
+                'ipk' => 3.62,
+                'npwp' => '80.123.456.7-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Hj. Syarifah',
+                'emergency_phone' => '081366112234',
+                'emergency_rel' => 'Ibu',
+            ],
+            // 11. Teller Kas & Kliring (Pusat, Grade 4)
+            [
+                'nip' => 'BPR-OPS-0002',
+                'nik' => '2171022002970011',
+                'name' => 'Bagas Saputra',
+                'email' => 'bagas.teller@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $ho,
+                'department' => $deptOps,
+                'position' => $posTeller,
+                'grade' => 4,
+                'gender' => 'Male',
+                'birth_date' => '1997-02-20',
+                'birth_place' => 'Tanjung Balai Karimun',
+                'address' => 'Perumahan Tiban Indah Blok R No. 11, Sekupang, Batam',
+                'phone' => '081277889900',
+                'employment_status' => 'Permanent',
+                'join_date' => '2023-03-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Akuntansi Keuangan',
+                'education_institution' => 'Universitas Riau Kepulauan',
+                'ipk' => 3.38,
+                'npwp' => '81.234.567.8-215.001',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Rahmat Saputra',
+                'emergency_phone' => '081277889901',
+                'emergency_rel' => 'Ayah',
+            ],
+            // 12. Teller Kas (Botania, Grade 4)
+            [
+                'nip' => 'BPR-OPS-0003',
+                'nik' => '2171025508980012',
+                'name' => 'Siti Rahmadani',
+                'email' => 'siti.teller@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $kcBotania,
+                'department' => $deptOps,
+                'position' => $posTeller,
+                'grade' => 4,
+                'gender' => 'Female',
+                'birth_date' => '1998-08-15',
+                'birth_place' => 'Padang',
+                'address' => 'Komp. Botania Garden Blok B No. 5, Batam Centre, Batam',
+                'phone' => '081377889922',
+                'employment_status' => 'Contract',
+                'join_date' => '2024-06-01',
+                'education_level' => 'D-3',
+                'education_major' => 'Perbankan & Keuangan',
+                'education_institution' => 'Politeknik Negeri Padang',
+                'ipk' => 3.60,
+                'npwp' => '82.345.678.9-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Hj. Maryam',
+                'emergency_phone' => '081366551122',
+                'emergency_rel' => 'Ibu',
+            ],
+            // 13. Account Officer Mikro (Aviari, Grade 4)
+            [
+                'nip' => 'BPR-LND-0002',
+                'nik' => '2171031401990013',
+                'name' => 'Fajar Hidayat',
+                'email' => 'fajar.ao@bprbandaraya.com',
+                'role' => 'employee',
                 'branch' => $kcAviari,
-                'dept' => $deptLend,
-                'pos' => $posAo,
+                'department' => $deptLend,
+                'position' => $posAoMikro,
+                'grade' => 4,
                 'gender' => 'Male',
-                'salary' => 8500000,
-                'allowance' => 1800000,
-                'deduction' => 420000,
+                'birth_date' => '1999-01-14',
+                'birth_place' => 'Batam',
+                'address' => 'Komp. Aviari Pratama Blok G No. 8, Batu Aji, Batam',
+                'phone' => '081270998877',
+                'employment_status' => 'Contract',
+                'join_date' => '2024-03-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Manajemen Bisnis',
+                'education_institution' => 'Politeknik Negeri Batam',
+                'ipk' => 3.45,
+                'npwp' => '83.456.789.0-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'H. Hidayatullah',
+                'emergency_phone' => '081270998878',
+                'emergency_rel' => 'Ayah',
             ],
-            // Staff KC Bengkong
+            // 14. Customer Service (Kas Bengkong, Grade 4)
             [
-                'name' => 'Jessica Tanuwijaya',
-                'email' => 'teller.bengkong@bprbandaraya.com',
-                'nip' => 'BPR-BNG-0005',
-                'branch' => $kcBengkong,
-                'dept' => $deptOps,
-                'pos' => $posTeller,
+                'nip' => 'BPR-OPS-0004',
+                'nik' => '2171016007000014',
+                'name' => 'Nurul Hasanah',
+                'email' => 'nurul.cs@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $kkBengkong,
+                'department' => $deptOps,
+                'position' => $posCs,
+                'grade' => 4,
                 'gender' => 'Female',
-                'salary' => 6000000,
-                'allowance' => 1500000,
-                'deduction' => 300000,
+                'birth_date' => '2000-07-20',
+                'birth_place' => 'Tanjung Pinang',
+                'address' => 'Komp. Bengkong Harapan Blok F No. 2, Bengkong, Batam',
+                'phone' => '081372661144',
+                'employment_status' => 'Contract',
+                'join_date' => '2024-07-15',
+                'education_level' => 'S-1',
+                'education_major' => 'Akuntansi',
+                'education_institution' => 'Universitas Internasional Batam',
+                'ipk' => 3.70,
+                'npwp' => '84.567.890.1-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Hasan Basri',
+                'emergency_phone' => '081372661145',
+                'emergency_rel' => 'Ayah',
             ],
+            // 15. Customer Service (Kas Tiban, Grade 4)
             [
-                'name' => 'Rizky Ramadhan',
-                'email' => 'ao.bengkong@bprbandaraya.com',
-                'nip' => 'BPR-BNG-0006',
-                'branch' => $kcBengkong,
-                'dept' => $deptLend,
-                'pos' => $posAo,
-                'gender' => 'Male',
-                'salary' => 8000000,
-                'allowance' => 1800000,
-                'deduction' => 380000,
+                'nip' => 'BPR-OPS-0005',
+                'nik' => '2171014502010015',
+                'name' => 'Lestari Wulandari',
+                'email' => 'lestari.cs@bprbandaraya.com',
+                'role' => 'employee',
+                'branch' => $kkTiban,
+                'department' => $deptOps,
+                'position' => $posCs,
+                'grade' => 4,
+                'gender' => 'Female',
+                'birth_date' => '2001-02-05',
+                'birth_place' => 'Batam',
+                'address' => 'Ruko Tiban Mas Asri Blok C No. 6, Tiban, Sekupang, Batam',
+                'phone' => '081277443322',
+                'employment_status' => 'Contract',
+                'join_date' => '2024-09-01',
+                'education_level' => 'S-1',
+                'education_major' => 'Manajemen Perbankan',
+                'education_institution' => 'Universitas Riau Kepulauan',
+                'ipk' => 3.58,
+                'npwp' => '85.678.901.2-215.000',
+                'ptkp' => 'TK/0',
+                'emergency_name' => 'Wulandari Putri',
+                'emergency_phone' => '081277443323',
+                'emergency_rel' => 'Ibu',
             ],
         ];
 
-        $allEmployees = collect([$empDireksi, $empAdmin, $empHr, $empPincabBotania, $empPincabAviari, $empPincabBengkong]);
+        $createdEmployees = [];
 
-        foreach ($staffData as $item) {
-            $user = User::create([
-                'name' => $item['name'],
-                'email' => $item['email'],
-                'password' => $password,
-                'role' => 'employee',
-                'branch_id' => $item['branch']->id,
-            ]);
-
-            $emp = Employee::create([
-                'user_id' => $user->id,
-                'nip' => $item['nip'],
-                'nik' => '2171' . rand(100000000000, 999999999999),
-                'full_name' => $item['name'],
-                'email' => $item['email'],
-                'phone' => '081' . rand(100000000, 999999999),
-                'gender' => $item['gender'],
-                'birth_date' => '1995-05-10',
-                'address' => 'Komp. Ruko ' . $item['branch']->name . ' No. ' . rand(1, 50) . ', Batam',
-                'branch_id' => $item['branch']->id,
-                'department_id' => $item['dept']->id,
-                'position_id' => $item['pos']->id,
-                'employment_status' => 'Permanent',
-                'join_date' => '2022-01-10',
-                'status' => 'Active',
-                'bank_account_number' => '120' . rand(1000000000, 9999999999),
-                'bank_account_holder' => $item['name'],
-                'npwp' => '80.' . rand(100, 999) . '.' . rand(100, 999) . '.0-011.000',
-            ]);
-
-            $allEmployees->push($emp);
-
-            // Seed sample attendances for past 3 days
-            for ($d = 2; $d >= 0; $d--) {
-                $attDate = Carbon::today()->subDays($d);
-                if (! $attDate->isWeekend()) {
-                    Attendance::create([
-                        'employee_id' => $emp->id,
-                        'date' => $attDate->toDateString(),
-                        'clock_in' => '07:55:00',
-                        'clock_out' => '17:05:00',
-                        'status' => 'Present',
-                        'lat_in' => $item['branch']->latitude,
-                        'long_in' => $item['branch']->longitude,
-                        'lat_out' => $item['branch']->latitude,
-                        'long_out' => $item['branch']->longitude,
-                        'distance_in_meters' => rand(5, 25),
-                        'notes' => 'Presensi tepat waktu kantor ' . $item['branch']->name,
-                    ]);
-                }
-            }
-        }
-
-        // Pastikan seluruh pegawai memiliki saldo cuti tahunan dan block leave 2026
-        foreach (Employee::all() as $empItem) {
-            EmployeeLeaveBalance::firstOrCreate(
+        foreach ($employeesData as $idx => $d) {
+            // Buat akun User
+            $user = User::updateOrCreate(
+                ['email' => $d['email']],
                 [
-                    'employee_id' => $empItem->id,
+                    'name' => $d['name'],
+                    'password' => $defaultPassword,
+                    'role' => $d['role'],
+                    'branch_id' => $d['branch']->id,
+                ]
+            );
+
+            // Buat profil Master Pegawai
+            $emp = Employee::updateOrCreate(
+                ['nip' => $d['nip']],
+                [
+                    'user_id' => $user->id,
+                    'nik' => $d['nik'],
+                    'full_name' => $d['name'],
+                    'email' => $d['email'],
+                    'personal_email' => 'personal.' . strtolower(explode(' ', $d['name'])[0]) . '@gmail.com',
+                    'phone' => $d['phone'],
+                    'gender' => $d['gender'],
+                    'birth_date' => $d['birth_date'],
+                    'birth_place' => $d['birth_place'],
+                    'address' => $d['address'],
+                    'branch_id' => $d['branch']->id,
+                    'department_id' => $d['department']->id,
+                    'position_id' => $d['position']->id,
+                    'job_effective_date' => $d['join_date'],
+                    'grade' => $d['grade'],
+                    'grade_effective_date' => $d['join_date'],
+                    'employment_status' => $d['employment_status'],
+                    'join_date' => $d['join_date'],
+                    'permanent_date' => $d['employment_status'] === 'Permanent' ? $d['join_date'] : null,
+                    'contract_end_date' => $d['employment_status'] === 'Contract' ? Carbon::parse($d['join_date'])->addYears(2)->toDateString() : null,
+                    'status' => 'Active',
+                    'education_level' => $d['education_level'],
+                    'education_major' => $d['education_major'],
+                    'education_institution' => $d['education_institution'],
+                    'ipk' => $d['ipk'],
+                    'bank_bpr_account' => '01.10.' . sprintf('%05d', ($idx + 1) * 317 + 100),
+                    'bank_external_name' => ['Bank Mandiri', 'BCA', 'BNI'][$idx % 3],
+                    'bank_external_account' => '109-00-' . rand(1000000, 9999999),
+                    'bank_account_number' => '01.10.' . sprintf('%05d', ($idx + 1) * 317 + 100),
+                    'bank_account_holder' => $d['name'],
+                    'npwp' => $d['npwp'],
+                    'bpjs_tk_number' => '080' . rand(10000000, 99999999),
+                    'bpjs_kes_number' => '0001' . rand(10000000, 99999999),
+                    'ptkp_status' => $d['ptkp'],
+                    'emergency_contact_name' => $d['emergency_name'],
+                    'emergency_contact_phone' => $d['emergency_phone'],
+                    'emergency_contact_relation' => $d['emergency_rel'],
+                ]
+            );
+
+            // Inisialisasi saldo cuti tahunan
+            EmployeeLeaveBalance::updateOrCreate(
+                [
+                    'employee_id' => $emp->id,
                     'leave_type_id' => $leaveAnnual->id,
-                    'year' => 2026,
+                    'year' => (int) date('Y'),
                 ],
                 [
                     'initial_quota' => 12,
-                    'used_quota' => 2,
-                    'remaining_quota' => 10,
-                ]
-            );
-
-            EmployeeLeaveBalance::firstOrCreate(
-                [
-                    'employee_id' => $empItem->id,
-                    'leave_type_id' => $leaveBlock->id,
-                    'year' => 2026,
-                ],
-                [
-                    'initial_quota' => 5,
                     'used_quota' => 0,
-                    'remaining_quota' => 5,
+                    'remaining_quota' => 12,
                 ]
             );
+
+            $createdEmployees[] = $emp;
         }
 
-        // Seed Sample Leave Requests
-        $tellerBotaniaEmp = Employee::where('email', 'teller.botania@bprbandaraya.com')->first();
-        if ($tellerBotaniaEmp) {
-            LeaveRequest::create([
-                'employee_id' => $tellerBotaniaEmp->id,
-                'leave_type_id' => $leaveAnnual->id,
-                'start_date' => Carbon::today()->addDays(5)->toDateString(),
-                'end_date' => Carbon::today()->addDays(6)->toDateString(),
-                'total_days' => 2,
-                'reason' => 'Keperluan keluarga di luar kota',
-                'status' => 'Pending',
-            ]);
+        // =========================================================================
+        // 6. DATA FIKTIF ABSEN (ATTENDANCE LOGS - BULAN OKTOBER 2026)
+        // =========================================================================
+        // Bersihkan data presensi lama agar tidak duplikat
+        Attendance::truncate();
 
-            // Sample Block Leave Request (5 days consecutive)
-            LeaveRequest::create([
-                'employee_id' => $tellerBotaniaEmp->id,
-                'leave_type_id' => $leaveBlock->id,
-                'start_date' => Carbon::today()->addDays(15)->toDateString(),
-                'end_date' => Carbon::today()->addDays(19)->toDateString(),
-                'total_days' => 5,
-                'reason' => 'Pengambilan Mandatori Block Leave OJK 2026',
-                'status' => 'Approved_HR',
-                'approved_by' => $uHr->id,
-            ]);
-        }
+        $year = 2026;
+        $month = 10;
+        $todayDay = 15; // Hingga tanggal 15 Oktober 2026 (hari ini)
 
-        // 6. Seed Announcements
-        Announcement::create([
-            'title' => 'Surat Edaran Direksi: Kewajiban Pengambilan Mandatori Block Leave OJK 2026',
-            'category' => 'direksi_memo',
-            'priority' => 'urgent',
-            'content' => 'Diberitahukan kepada seluruh pegawai pemegang posisi berisiko (Teller, Customer Service, Account Officer, dan Pejabat Operasional Cabang) wajib menjadwalkan cuti Block Leave minimal 5 hari kerja berturut-turut sesuai POJK Kepatuhan Tata Kelola Perbankan.',
-            'author_id' => $uAdmin->id,
-            'is_active' => true,
-            'published_at' => Carbon::today()->subDays(2)->toDateString(),
-        ]);
+        foreach ($createdEmployees as $empIndex => $emp) {
+            for ($d = 1; $d <= $todayDay; $d++) {
+                $dateObj = Carbon::create($year, $month, $d);
 
-        Announcement::create([
-            'title' => 'Pemberlakuan Presensi Biometrik Mesin Sidik Jari Cabang BPR Banda Raya',
-            'category' => 'ojk_compliance',
-            'priority' => 'important',
-            'content' => 'Presensi masuk dan pulang seluruh staf perbankan wajib dilakukan melalui mesin sidik jari biometrik (Solution X105) di kantor cabang masing-masing. Data kehadiran tersinkronisasi otomatis ke portal HRIS.',
-            'author_id' => $uAdmin->id,
-            'is_active' => true,
-            'published_at' => Carbon::today()->subDays(5)->toDateString(),
-        ]);
+                // Hari Minggu libur operasional bank (tidak ada presensi)
+                if ($dateObj->isSunday()) {
+                    continue;
+                }
 
-        Announcement::create([
-            'title' => 'Jadwal Libur Nasional & Penyesuaian Jam Operasional Kas Layanan BPR Banda Raya',
-            'category' => 'holiday',
-            'priority' => 'normal',
-            'content' => 'Informasi operasional kliring dan kas layanan kantor cabang selama libur nasional. Seluruh staf operasional diharapkan memperhatikan jadwal piket keamanan dan layanan kas.',
-            'author_id' => $uAdmin->id,
-            'is_active' => true,
-            'published_at' => Carbon::today()->subDays(1)->toDateString(),
-        ]);
+                $dateStr = $dateObj->toDateString();
 
-        // 7. Seed Solution X105 Fingerprint Machines
-        \App\Models\FingerprintDevice::create([
-            'name' => 'Solution X105 - Kantor Pusat Nagoya',
-            'model' => 'Solution X105',
-            'serial_number' => 'SOL-X105-HO01',
-            'branch_id' => $ho->id,
-            'ip_address' => '192.168.1.201',
-            'port' => 4370,
-            'comm_key' => '0',
-            'status' => 'Online',
-            'last_sync_at' => Carbon::now()->subMinutes(15),
-            'total_logs_count' => 142,
-            'is_active' => true,
-        ]);
+                // Variasi Skenario Kehadiran Realistis:
+                // Skenario 1: Cuti Resmi (misal: Siti Rahmadani pada 8 & 9 Oktober)
+                if ($emp->nip === 'BPR-OPS-0003' && in_array($d, [8, 9])) {
+                    Attendance::create([
+                        'employee_id' => $emp->id,
+                        'date' => $dateStr,
+                        'clock_in' => null,
+                        'clock_out' => null,
+                        'status' => 'Excused',
+                        'late_minutes' => 0,
+                        'penalty_amount' => 0,
+                        'notes' => 'Cuti Resmi Tahunan (Disetujui HRD & Pincab)',
+                    ]);
+                    continue;
+                }
 
-        \App\Models\FingerprintDevice::create([
-            'name' => 'Solution X105 - KC Botania Garden',
-            'model' => 'Solution X105',
-            'serial_number' => 'SOL-X105-BOT01',
-            'branch_id' => $kcBotania->id,
-            'ip_address' => '192.168.2.201',
-            'port' => 4370,
-            'comm_key' => '0',
-            'status' => 'Online',
-            'last_sync_at' => Carbon::now()->subMinutes(30),
-            'total_logs_count' => 86,
-            'is_active' => true,
-        ]);
+                // Skenario 2: Izin Tugas Luar / Rapat Koordinasi OJK (misal: Pincab Botania pada 12 Oktober)
+                if ($emp->nip === 'BPR-CAB-0001' && $d === 12) {
+                    Attendance::create([
+                        'employee_id' => $emp->id,
+                        'date' => $dateStr,
+                        'clock_in' => null,
+                        'clock_out' => null,
+                        'status' => 'Excused',
+                        'late_minutes' => 0,
+                        'penalty_amount' => 0,
+                        'notes' => 'Dispensasi Rapat Koordinasi Perbarindo & OJK Kepri',
+                    ]);
+                    continue;
+                }
 
-        \App\Models\FingerprintDevice::create([
-            'name' => 'Solution X105 - KC Aviari Pratama',
-            'model' => 'Solution X105',
-            'serial_number' => 'SOL-X105-AVI01',
-            'branch_id' => $kcAviari->id,
-            'ip_address' => '192.168.3.201',
-            'port' => 4370,
-            'comm_key' => '0',
-            'status' => 'Online',
-            'last_sync_at' => Carbon::now()->subHours(1),
-            'total_logs_count' => 64,
-            'is_active' => true,
-        ]);
+                // Skenario 3: Dispensasi Telat Masuk Sah (misal: CS Mega Utami pada 13 Oktober - hadir tapi izin telat)
+                if ($emp->nip === 'BPR-OPS-0001' && $d === 13) {
+                    Attendance::create([
+                        'employee_id' => $emp->id,
+                        'date' => $dateStr,
+                        'clock_in' => "{$dateStr} 08:35:00",
+                        'clock_out' => "{$dateStr} 17:15:00",
+                        'status' => 'Present',
+                        'late_minutes' => 0,
+                        'penalty_amount' => 0,
+                        'notes' => 'Hadir (Dispensasi Telat Masuk HRD - Kendala Cuaca Hujan Deras)',
+                    ]);
+                    continue;
+                }
 
-        \App\Models\FingerprintDevice::create([
-            'name' => 'Solution X105 - KC Bengkong Golden City',
-            'model' => 'Solution X105',
-            'serial_number' => 'SOL-X105-BNG01',
-            'branch_id' => $kcBengkong->id,
-            'ip_address' => '192.168.4.201',
-            'port' => 4370,
-            'comm_key' => '0',
-            'status' => 'Online',
-            'last_sync_at' => Carbon::now()->subHours(2),
-            'total_logs_count' => 52,
-            'is_active' => true,
-        ]);
+                // Skenario 4: Keterlambatan Riil (Terlambat & Denda Rp 50.000)
+                // Teller Bagas Saputra telat di tanggal 6 Oktober (masuk 08:18)
+                if ($emp->nip === 'BPR-OPS-0002' && $d === 6) {
+                    Attendance::create([
+                        'employee_id' => $emp->id,
+                        'date' => $dateStr,
+                        'clock_in' => "{$dateStr} 08:18:00",
+                        'clock_out' => "{$dateStr} 17:12:00",
+                        'status' => 'Late',
+                        'late_minutes' => 18,
+                        'penalty_amount' => 50000,
+                        'notes' => 'Keterlambatan 18 menit (Pencatatan Otomatis Mesin)',
+                    ]);
+                    continue;
+                }
 
-        // 8. Update Contract Dates for Sample Alert Testing
-        $empTellerBot = Employee::where('email', 'teller.botania@bprbandaraya.com')->first();
-        if ($empTellerBot) {
-            $empTellerBot->update([
-                'employment_status' => 'Contract',
-                'contract_end_date' => Carbon::today()->addDays(24), // Alert in 24 days!
-            ]);
-        }
+                // AO Rizky Pratama telat di tanggal 9 Oktober (masuk 08:24)
+                if ($emp->nip === 'BPR-LND-0001' && $d === 9) {
+                    Attendance::create([
+                        'employee_id' => $emp->id,
+                        'date' => $dateStr,
+                        'clock_in' => "{$dateStr} 08:24:00",
+                        'clock_out' => "{$dateStr} 17:30:00",
+                        'status' => 'Late',
+                        'late_minutes' => 24,
+                        'penalty_amount' => 50000,
+                        'notes' => 'Keterlambatan 24 menit (Pencatatan Otomatis Mesin)',
+                    ]);
+                    continue;
+                }
 
-        $empAoAviari = Employee::where('email', 'ao.aviari@bprbandaraya.com')->first();
-        if ($empAoAviari) {
-            $empAoAviari->update([
-                'employment_status' => 'Probation',
-                'probation_end_date' => Carbon::today()->addDays(40), // Alert in 40 days!
-            ]);
-        }
+                // Skenario 5: Kehadiran Tepat Waktu (Present - 95% Hari Kerja)
+                // Jam masuk bervariasi antara 07:42 s.d 07:58
+                $inMinute = str_pad(rand(42, 58), 2, '0', STR_PAD_LEFT);
+                $inSecond = str_pad(rand(10, 55), 2, '0', STR_PAD_LEFT);
+                $clockInTime = "07:{$inMinute}:{$inSecond}";
 
-        // 9. Seed Sample Overtimes (SPK Lembur)
-        if ($empTellerBot) {
-            \App\Models\Overtime::create([
-                'employee_id' => $empTellerBot->id,
-                'date' => Carbon::today()->subDays(1)->toDateString(),
-                'start_time' => '17:30:00',
-                'end_time' => '20:30:00',
-                'duration_hours' => 3.00,
-                'reason' => 'Tutup Buku Akhir Bulan (EOM Closing) & Rekonsiliasi Kas Teller',
-                'status' => 'Approved_Pincab',
-                'approved_by' => $uPincabBotania->id,
-            ]);
+                // Jam pulang bervariasi antara 17:05 s.d 17:35
+                $outMinute = str_pad(rand(5, 35), 2, '0', STR_PAD_LEFT);
+                $outSecond = str_pad(rand(10, 55), 2, '0', STR_PAD_LEFT);
+                $clockOutTime = "17:{$outMinute}:{$outSecond}";
 
-            \App\Models\Overtime::create([
-                'employee_id' => $empTellerBot->id,
-                'date' => Carbon::today()->toDateString(),
-                'start_time' => '17:30:00',
-                'end_time' => '19:30:00',
-                'duration_hours' => 2.00,
-                'reason' => 'Pemberkasan Arsip Dokumen Pembukaan Rekening Nasabah Baru',
-                'status' => 'Pending',
-            ]);
-        }
-
-        // 10. Seed Sample Reimbursements
-        if ($empAoAviari) {
-            \App\Models\Reimbursement::create([
-                'employee_id' => $empAoAviari->id,
-                'title' => 'Bensin Kunjungan Calon Debitur UMKM Aviari',
-                'category' => 'Bensin & Transport AO',
-                'date' => Carbon::today()->subDays(2)->toDateString(),
-                'amount' => 125000,
-                'description' => 'Survei agunan ruko debitur PT Berkah Mandiri di Batu Aji',
-                'status' => 'Approved_Pincab',
-                'approved_by' => $uPincabAviari->id,
-            ]);
-
-            \App\Models\Reimbursement::create([
-                'employee_id' => $empAoAviari->id,
-                'title' => 'Klaim Tunjangan Kacamata Kerja',
-                'category' => 'Kesehatan / Kacamata',
-                'date' => Carbon::today()->subDays(5)->toDateString(),
-                'amount' => 500000,
-                'description' => 'Penggantian lensa kacamata resep dokter Optik Melawai Batam',
-                'status' => 'Paid',
-                'payment_date' => Carbon::today()->subDays(1)->toDateString(),
-                'approved_by' => $uAdmin->id,
-            ]);
-        }
-
-        // 11. Seed Sample Career Movements (Mutasi / Promosi)
-        if ($empTellerBot) {
-            \App\Models\CareerMovement::create([
-                'employee_id' => $empTellerBot->id,
-                'type' => 'Mutasi Cabang',
-                'from_branch_id' => $kcBengkong->id,
-                'to_branch_id' => $kcBotania->id,
-                'from_position_id' => $posTeller->id,
-                'to_position_id' => $posTeller->id,
-                'effective_date' => '2026-01-01',
-                'sk_number' => 'SK.DIR/BPR-BR/2026/01/015',
-                'notes' => 'Rotasi penyegaran staf operasional kas ke KC Botania',
-            ]);
-        }
-
-        // 12. Seed Sample Warning Letters (SP)
-        $empTellerBengkong = Employee::where('email', 'teller.bengkong@bprbandaraya.com')->first();
-        if ($empTellerBengkong) {
-            \App\Models\WarningLetter::create([
-                'employee_id' => $empTellerBengkong->id,
-                'level' => 'Surat Peringatan 1 (SP 1)',
-                'letter_number' => 'SP.01/SDM/BPR-BR/2026/007',
-                'reason' => 'Keterlambatan presensi lebih dari 3 kali berturut-turut dalam 1 bulan tanpa surat izin resmi',
-                'issued_date' => Carbon::today()->subMonths(1)->toDateString(),
-                'expiry_date' => Carbon::today()->addMonths(5)->toDateString(),
-                'status' => 'Aktif',
-                'issued_by' => $uAdmin->id,
-                'notes' => 'Telah dilakukan konseling pembinaan bersama Pincab Bengkong',
-            ]);
-        }
-
-        // 13. Seed Comprehensive Profile, Families, Trainings, and Performance Appraisals
-        foreach (Employee::all() as $index => $employee) {
-            $employee->update([
-                'birth_place' => ['Batam', 'Tanjung Pinang', 'Padang', 'Kerinci', 'Yogyakarta', 'Medan'][$index % 6],
-                'grade' => [4, 5, 6, 7, 5, 4, 6][$index % 7],
-                'job_effective_date' => Carbon::parse($employee->join_date)->addMonths(6)->toDateString(),
-                'grade_effective_date' => Carbon::parse($employee->join_date)->addYears(2)->toDateString(),
-                'permanent_date' => Carbon::parse($employee->join_date)->addMonths(3)->toDateString(),
-                'education_level' => ['S-1', 'D-3', 'S-1', 'S-2', 'S-1'][$index % 5],
-                'education_major' => ['Manajemen Perbankan', 'Teknik Elektronika', 'Akuntansi Keuangan', 'Ilmu Hukum', 'Sistem Informasi'][$index % 5],
-                'education_institution' => ['Universitas Internasional Batam', 'Univ. Negeri Yogyakarta', 'Universitas Riau', 'Universitas Andalas'][$index % 4],
-                'ipk' => [3.45, 2.89, 3.72, 3.60, 3.85][$index % 5],
-                'personal_email' => 'personal.' . strtolower(explode(' ', $employee->full_name)[0]) . '@gmail.com',
-                'bpjs_tk_number' => '080' . rand(10000000, 99999999),
-                'bpjs_kes_number' => '0001' . rand(10000000, 99999999),
-                'bank_bpr_account' => '01.10.' . sprintf('%05d', $employee->id * 142 + 500),
-                'bank_external_name' => ['Bank Mandiri', 'BCA', 'BNI'][$index % 3],
-                'bank_external_account' => '109-00-' . rand(1000000, 9999999),
-                'ptkp_status' => ['TK/0', 'K/1', 'K/2', 'K/3', 'TK/1'][$index % 5],
-                'emergency_contact_name' => 'Keluarga ' . explode(' ', $employee->full_name)[0],
-                'emergency_contact_phone' => '0812' . rand(10000000, 99999999),
-                'emergency_contact_relation' => ['Istri', 'Suami', 'Orang Tua', 'Saudara Kandung'][$index % 4],
-            ]);
-
-            // Seed Families
-            \App\Models\EmployeeFamily::create([
-                'employee_id' => $employee->id,
-                'name' => $employee->emergency_contact_name,
-                'nik' => '2171' . rand(100000000000, 999999999999),
-                'relationship' => $employee->emergency_contact_relation,
-                'birth_place' => $employee->birth_place,
-                'birth_date' => Carbon::parse($employee->birth_date)->addYears(rand(-2, 2))->toDateString(),
-                'gender' => in_array($employee->emergency_contact_relation, ['Istri', 'Ibu']) ? 'Perempuan' : 'Laki-laki',
-                'occupation' => 'Ibu Rumah Tangga / Karyawan Swasta',
-            ]);
-
-            \App\Models\EmployeeFamily::create([
-                'employee_id' => $employee->id,
-                'name' => 'Anak ' . explode(' ', $employee->full_name)[0] . ' Pratama',
-                'nik' => '2171' . rand(100000000000, 999999999999),
-                'relationship' => 'Anak',
-                'birth_place' => 'Batam',
-                'birth_date' => Carbon::today()->subYears(rand(3, 10))->toDateString(),
-                'gender' => rand(0, 1) ? 'Laki-laki' : 'Perempuan',
-                'occupation' => 'Pelajar',
-            ]);
-
-            // Seed Trainings
-            $sampleTrainings = [
-                ['Smart Service Excellence Perbankan', '15-Mei-2023', 'BPR Banda Raya', 'Bp. Andreas Ariefianto', 'Batam'],
-                ['Penilaian Agunan Kredit & Properti BPR', '17-Jul-2023', 'Jakarta Financial Institute', 'Bp. Kardi P, SH, M.Ba', 'Jakarta'],
-                ['Pencegahan Fraud & Audit Operasional BPR', '05-Des-2024', 'DPD Perbarindo Kepri', 'Bp. Eko Atmojo', 'Batam View Beach Resort'],
-                ['Penerapan Manajemen Risiko Karyawan BPR', '26-Jan-2025', 'BPR Banda Raya', 'Direksi', 'Bandung'],
-            ];
-
-            foreach ($sampleTrainings as $t) {
-                \App\Models\EmployeeTraining::create([
-                    'employee_id' => $employee->id,
-                    'training_name' => $t[0],
-                    'schedule' => $t[1],
-                    'organizer' => $t[2],
-                    'trainer' => $t[3],
-                    'location' => $t[4],
+                Attendance::create([
+                    'employee_id' => $emp->id,
+                    'date' => $dateStr,
+                    'clock_in' => "{$dateStr} {$clockInTime}",
+                    'clock_out' => "{$dateStr} {$clockOutTime}",
+                    'status' => 'Present',
+                    'late_minutes' => 0,
+                    'penalty_amount' => 0,
+                    'notes' => 'Tarik Log Mesin Fingerprint Biometrik Solution',
                 ]);
             }
-
-            // Seed Performance Appraisals (PA)
-            \App\Models\EmployeePerformanceAppraisal::create([
-                'employee_id' => $employee->id,
-                'period_year' => 2023,
-                'letter_grade' => 'B',
-                'score' => 3.75,
-                'notes' => 'Pencapaian KPI cabang dan kepatuhan operasional sangat memuaskan.',
-            ]);
-
-            \App\Models\EmployeePerformanceAppraisal::create([
-                'employee_id' => $employee->id,
-                'period_year' => 2024,
-                'letter_grade' => 'B',
-                'score' => 3.82,
-                'notes' => 'Peningkatan produktivitas layanan nasabah dan inisiatif kerja.',
-            ]);
-
-            \App\Models\EmployeePerformanceAppraisal::create([
-                'employee_id' => $employee->id,
-                'period_year' => 2025,
-                'letter_grade' => 'A',
-                'score' => 3.92,
-                'notes' => 'Kinerja istimewa, integritas tinggi, dan berkontribusi signifikan pada pencapaian target kantor.',
-            ]);
         }
     }
 }

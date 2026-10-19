@@ -78,11 +78,12 @@ class SecurityTest extends TestCase
 
     public function test_successful_login_clears_rate_limiter_and_authenticates(): void
     {
-        $teller = User::where('email', 'teller.botania@bprbandaraya.com')->first();
+        $teller = User::where('email', 'siti.teller@bprbandaraya.com')->first()
+            ?? User::where('role', 'employee')->first();
         $this->assertNotNull($teller);
 
         $response = $this->post('/login', [
-            'email' => 'teller.botania@bprbandaraya.com',
+            'email' => $teller->email,
             'password' => 'password',
         ]);
 

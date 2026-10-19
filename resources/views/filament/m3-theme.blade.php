@@ -1,44 +1,84 @@
-<!-- Google Fonts: Plus Jakarta Sans for Material 3 Expressive -->
+<!-- Apple VisionOS / macOS Liquid Glass System with High-Precision Light & Dark Ergonomics -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
 <style>
 /* =============================================================================
    PT BPR BANDA RAYA - CORE HRIS
-   MATERIAL 3 EXPRESSIVE DESIGN SYSTEM (LIGHT & DARK MODES)
-   High Reader Ergonomics, Zero Eye Strain, Tactile Tonal Containers
-   Unified Font: Plus Jakarta Sans
+   APPLE LIQUID GLASS DESIGN SYSTEM (HIGH-CONTRAST LIGHT & DARK EDITIONS)
+   - Solves Light-Mode Washed-Out Edge Blending (Razor-sharp perimeter definition)
+   - Preserves Dark-Mode VisionOS Luminous Obsidian Styling
+   - Complete --m3-* and --glass-* token harmonization
+   - Specular Top-Rim Light Bevel (Inset 1px 0)
+   - Ergonomics First: Uncompromised WCAG AAA Readability
    ============================================================================= */
 
 :root {
-    --m3-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
+    /* Fonts */
+    --m3-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", system-ui, sans-serif;
+    --m3-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+    --glass-font-sans: var(--m3-font-sans);
+    --glass-font-display: var(--m3-font-display);
 
-    /* Light Mode: Calming Warm Sage-Mint Ergonomics (Zero eye glare, high functional contrast) */
-    --m3-bg: #E8EFEA;
-    --m3-surface: #FFFFFF;
-    --m3-surface-dim: #E1EAE3;
+    /* =========================================================================
+       LIGHT MODE: TACTILE APPLE FROSTED GLASS (CRISP EDGES, ZERO WASHOUT)
+       ========================================================================= */
+    --glass-bg-mesh: 
+        radial-gradient(at 0% 0%, rgba(14, 104, 56, 0.16) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(243, 122, 32, 0.12) 0px, transparent 45%),
+        radial-gradient(at 50% 100%, rgba(253, 184, 19, 0.09) 0px, transparent 55%),
+        radial-gradient(at 100% 100%, rgba(14, 104, 56, 0.14) 0px, transparent 50%),
+        linear-gradient(145deg, #DFEAE3 0%, #D5E3DA 50%, #DCE8E0 100%);
+
+    --m3-bg: #DCE8E0;
+
+    /* Light Mode Glass Surfaces */
+    --glass-surface: rgba(255, 255, 255, 0.88);
+    --glass-surface-solid: #FFFFFF;
+    --glass-surface-subtle: rgba(235, 244, 238, 0.92);
+    --glass-surface-hover: #FFFFFF;
+    --glass-surface-active: rgba(220, 237, 226, 0.95);
+
+    /* M3 compatibility tokens */
+    --m3-surface: var(--glass-surface);
+    --m3-surface-dim: rgba(215, 228, 220, 0.85);
     --m3-surface-bright: #FFFFFF;
-    --m3-surface-container-lowest: #F4F8F5;
-    --m3-surface-container-low: #DFEAE2;
-    --m3-surface-container: #D6E3D9;
-    --m3-surface-container-high: #CBDCD0;
-    --m3-surface-container-highest: #BFD3C5;
+    --m3-surface-container-lowest: rgba(255, 255, 255, 0.75);
+    --m3-surface-container-low: rgba(238, 245, 240, 0.88);
+    --m3-surface-container: rgba(228, 239, 232, 0.92);
+    --m3-surface-container-high: rgba(218, 232, 224, 0.94);
+    --m3-surface-container-highest: rgba(206, 224, 213, 0.96);
 
-    /* Text & Legibility */
-    --m3-on-surface: #0F1E14;
-    --m3-on-surface-variant: #33473B;
-    --m3-outline: #5E7365;
-    --m3-outline-variant: #B6CAC0;
+    /* Razor-Sharp Light Mode Borders (Fixes Invisible Borders) */
+    --glass-border: rgba(14, 104, 56, 0.18);
+    --glass-border-subtle: rgba(14, 104, 56, 0.10);
+    --glass-border-strong: rgba(14, 104, 56, 0.35);
+
+    /* Text & Legibility: Deep Obsidian & Charcoal (Zero Eye-Strain, AAA Contrast) */
+    --glass-text-main: #0B1910;
+    --glass-text-secondary: #1F3326;
+    --glass-text-muted: #4B6354;
+    --m3-on-surface: var(--glass-text-main);
+    --m3-on-surface-variant: var(--glass-text-secondary);
+    --m3-outline: rgba(14, 104, 56, 0.35);
+    --m3-outline-variant: rgba(14, 104, 56, 0.18);
 
     /* Corporate Accents (PT BPR Banda Raya Deep Emerald) */
-    --m3-primary: #0E6838;
-    --m3-on-primary: #FFFFFF;
+    --glass-primary: #0E6838;
+    --glass-primary-glow: rgba(14, 104, 56, 0.25);
+    --glass-primary-container: rgba(14, 104, 56, 0.14);
+    --glass-on-primary: #FFFFFF;
+    --glass-on-primary-container: #03361B;
+    --m3-primary: var(--glass-primary);
+    --m3-on-primary: var(--glass-on-primary);
     --m3-primary-container: #CCE8D7;
-    --m3-on-primary-container: #03361B;
+    --m3-on-primary-container: var(--glass-on-primary-container);
 
-    --m3-secondary: #EA580C;
+    --glass-warning: #EA580C;
+    --glass-warning-glow: rgba(234, 88, 12, 0.22);
+    --glass-amber: #CA8A04;
+    --m3-secondary: var(--glass-warning);
     --m3-on-secondary: #FFFFFF;
     --m3-secondary-container: #FFEDD5;
     --m3-on-secondary-container: #7C2D12;
@@ -48,37 +88,78 @@
     --m3-tertiary-container: #FEF08A;
     --m3-on-tertiary-container: #713F12;
 
-    /* Elevation */
-    --m3-elevation-1: 0 1px 3px rgba(14, 104, 56, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --m3-elevation-2: 0 4px 14px 0 rgba(14, 104, 56, 0.09), 0 2px 4px 0 rgba(0, 0, 0, 0.03);
-    --m3-elevation-3: 0 8px 24px -4px rgba(14, 104, 56, 0.14), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+    /* Apple Ambient Depth Shadows with Specular Top Bevel */
+    --glass-shadow-sm: 0 2px 8px -1px rgba(14, 104, 56, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+    --glass-shadow-md: 0 10px 28px -4px rgba(14, 104, 56, 0.10), 0 4px 12px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+    --glass-shadow-lg: 0 20px 48px -8px rgba(14, 104, 56, 0.15), 0 8px 24px -4px rgba(0, 0, 0, 0.08), inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+    --glass-shadow-modal: 0 32px 72px -12px rgba(0, 0, 0, 0.25), 0 16px 32px -4px rgba(14, 104, 56, 0.15), inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
+
+    --m3-elevation-1: var(--glass-shadow-sm);
+    --m3-elevation-2: var(--glass-shadow-md);
+    --m3-elevation-3: var(--glass-shadow-lg);
+
+    /* Blur & Refraction */
+    --glass-blur-sm: blur(12px) saturate(180%);
+    --glass-blur-md: blur(24px) saturate(190%);
+    --glass-blur-lg: blur(36px) saturate(200%);
 }
 
+/* =============================================================================
+   DARK MODE: VISIONOS LUMINOUS OBSIDIAN FROSTED GLASS
+   ============================================================================= */
 .dark {
-    /* Dark Mode: Deep Soothing Slate-Emerald (No eye-fatiguing #000000) */
+    --glass-bg-mesh: 
+        radial-gradient(at 10% 12%, rgba(14, 104, 56, 0.24) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(243, 122, 32, 0.14) 0px, transparent 45%),
+        radial-gradient(at 50% 90%, rgba(74, 222, 128, 0.12) 0px, transparent 55%),
+        radial-gradient(at 85% 75%, rgba(14, 104, 56, 0.18) 0px, transparent 50%),
+        linear-gradient(145deg, #070D09 0%, #0B130E 50%, #060B08 100%);
+
     --m3-bg: #0D1410;
-    --m3-surface: #111A14;
-    --m3-surface-dim: #0B110D;
-    --m3-surface-bright: #1A261F;
-    --m3-surface-container-lowest: #0F1612;
-    --m3-surface-container-low: #141E18;
-    --m3-surface-container: #19261E;
-    --m3-surface-container-high: #203026;
-    --m3-surface-container-highest: #283B30;
+    --glass-surface: rgba(18, 28, 22, 0.76);
+    --glass-surface-solid: #121C16;
+    --glass-surface-subtle: rgba(14, 22, 17, 0.7);
+    --glass-surface-hover: rgba(28, 42, 34, 0.88);
+    --glass-surface-active: rgba(11, 79, 39, 0.55);
+
+    --m3-surface: var(--glass-surface);
+    --m3-surface-dim: rgba(11, 17, 13, 0.7);
+    --m3-surface-bright: rgba(26, 38, 31, 0.85);
+    --m3-surface-container-lowest: rgba(15, 22, 18, 0.65);
+    --m3-surface-container-low: rgba(20, 30, 24, 0.72);
+    --m3-surface-container: rgba(25, 38, 30, 0.78);
+    --m3-surface-container-high: rgba(32, 48, 38, 0.84);
+    --m3-surface-container-highest: rgba(40, 59, 48, 0.9);
+
+    /* Apple Specular Dark Edge Rim */
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-border-subtle: rgba(255, 255, 255, 0.08);
+    --glass-border-strong: rgba(74, 222, 128, 0.35);
 
     /* Text & Legibility */
-    --m3-on-surface: #E2E8E4;
-    --m3-on-surface-variant: #9EABA3;
-    --m3-outline: #7A8980;
-    --m3-outline-variant: #304036;
+    --glass-text-main: #F4F7F5;
+    --glass-text-secondary: #CBD8D0;
+    --glass-text-muted: #8E9F94;
+    --m3-on-surface: var(--glass-text-main);
+    --m3-on-surface-variant: var(--glass-text-secondary);
+    --m3-outline: rgba(255, 255, 255, 0.2);
+    --m3-outline-variant: rgba(255, 255, 255, 0.1);
 
-    /* Corporate Accents (Vibrant & Ergonomic for Dark Surface) */
-    --m3-primary: #4ADE80;
-    --m3-on-primary: #003A19;
+    /* Corporate Accents */
+    --glass-primary: #34D399;
+    --glass-primary-glow: rgba(52, 211, 153, 0.32);
+    --glass-primary-container: rgba(14, 104, 56, 0.45);
+    --glass-on-primary: #022C15;
+    --glass-on-primary-container: #A7F3D0;
+    --m3-primary: var(--glass-primary);
+    --m3-on-primary: var(--glass-on-primary);
     --m3-primary-container: #0B4F27;
-    --m3-on-primary-container: #BBF7D0;
+    --m3-on-primary-container: var(--glass-on-primary-container);
 
-    --m3-secondary: #FB923C;
+    --glass-warning: #FB923C;
+    --glass-warning-glow: rgba(251, 146, 60, 0.28);
+    --glass-amber: #FBBF24;
+    --m3-secondary: var(--glass-warning);
     --m3-on-secondary: #541C00;
     --m3-secondary-container: #7C2D12;
     --m3-on-secondary-container: #FED7AA;
@@ -89,68 +170,149 @@
     --m3-on-tertiary-container: #FEF08A;
 
     /* Elevation */
-    --m3-elevation-1: 0 2px 6px rgba(0, 0, 0, 0.35);
-    --m3-elevation-2: 0 6px 18px rgba(0, 0, 0, 0.45);
-    --m3-elevation-3: 0 12px 32px rgba(0, 0, 0, 0.55);
-}
+    --glass-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --glass-shadow-md: 0 12px 36px -4px rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+    --glass-shadow-lg: 0 24px 60px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
+    --glass-shadow-modal: 0 36px 84px -10px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 2px 0 rgba(255, 255, 255, 0.2);
 
-/* Base Document Typography */
-html, body {
-    font-family: var(--m3-font-sans) !important;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+    --m3-elevation-1: var(--glass-shadow-sm);
+    --m3-elevation-2: var(--glass-shadow-md);
+    --m3-elevation-3: var(--glass-shadow-lg);
 
-/* Background Application */
-body.fi-body {
-    background-color: var(--m3-bg) !important;
-    color: var(--m3-on-surface) !important;
+    --glass-blur-sm: blur(14px) saturate(190%);
+    --glass-blur-md: blur(28px) saturate(200%);
+    --glass-blur-lg: blur(40px) saturate(210%);
 }
 
 /* =============================================================================
-   1. FILAMENT SIDEBAR (M3 Navigation Drawer with Ergonomic Pills)
+   1. GLOBAL CANVAS & RESET TAILWIND CLASHING RINGS
+   ============================================================================= */
+html, body {
+    font-family: var(--glass-font-sans) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body.fi-body {
+    background: var(--glass-bg-mesh) !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    color: var(--glass-text-main) !important;
+    min-height: 100vh;
+}
+
+/* Neutralize Tailwind Ring Clashes (prevents double outlines) */
+.fi-section,
+.fi-card,
+.fi-ta-ctn,
+.fi-modal-window,
+.fi-dropdown-panel,
+.fi-wi-stats-overview-stat {
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+/* =============================================================================
+   2. APPLE FROSTED GLASS SIDEBAR & ACTIVE NAVIGATION
    ============================================================================= */
 .fi-sidebar {
-    background-color: var(--m3-surface-container-low) !important;
-    border-right: 1px solid var(--m3-outline-variant) !important;
-    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+    background: var(--glass-surface-subtle) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    border-right: 1px solid var(--glass-border) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .fi-sidebar-header {
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface-container-low) !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--glass-border) !important;
     padding-top: 1.25rem !important;
     padding-bottom: 1.25rem !important;
 }
 
-/* Nav Item Styling */
+/* Sidebar Nav Item: Apple Floating Capsule */
 .fi-sidebar-item-btn {
-    border-radius: 9999px !important; /* M3 Expressive Pill */
-    padding: 0.65rem 1rem !important;
-    margin: 0.15rem 0.6rem !important;
+    border-radius: 14px !important;
+    padding: 0.65rem 0.95rem !important;
+    margin: 0.2rem 0.65rem !important;
     font-weight: 600 !important;
-    font-size: 0.86rem !important;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-    color: var(--m3-on-surface-variant) !important;
+    font-size: 0.875rem !important;
+    letter-spacing: -0.01em !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: var(--glass-text-secondary) !important;
+    border: 1px solid transparent !important;
 }
 
 .fi-sidebar-item-btn:hover {
-    background-color: var(--m3-surface-container-high) !important;
-    color: var(--m3-on-surface) !important;
-    transform: translateX(2px);
+    background: var(--glass-surface-hover) !important;
+    color: var(--glass-text-main) !important;
+    border-color: var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-sm) !important;
+    transform: translateX(3px);
 }
 
-/* Active Nav Item: Expressive Primary Tonal Container */
-.fi-sidebar-item-active .fi-sidebar-item-btn,
+/* Active Nav Item: Explicit Pure White Text & Icon on Emerald Glass Capsule */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn,
 .fi-sidebar-item-btn[aria-current="page"] {
-    background-color: var(--m3-primary-container) !important;
-    color: var(--m3-on-primary-container) !important;
-    font-weight: 700 !important;
-    box-shadow: var(--m3-elevation-1) !important;
+    background: linear-gradient(135deg, #0E6838 0%, #084D28 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 4px 14px -1px rgba(14, 104, 56, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }
 
-.fi-sidebar-item-active .fi-sidebar-item-icon {
-    color: var(--m3-on-primary-container) !important;
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > span,
+.fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label,
+.fi-sidebar-item-btn[aria-current="page"] > span,
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn span,
+.fi-sidebar-item-btn[aria-current="page"] span {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > svg,
+.fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item-btn[aria-current="page"] > svg,
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn svg,
+.fi-sidebar-item-btn[aria-current="page"] svg {
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+    fill: none !important;
+}
+
+/* Dark Mode Active Nav */
+:is(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.28), rgba(14, 104, 56, 0.45)) !important;
+    border: 1px solid rgba(52, 211, 153, 0.45) !important;
+    box-shadow: 0 6px 20px -2px rgba(52, 211, 153, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+}
+
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+:is(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > span,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] > span,
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn span,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] span {
+    color: #A7F3D0 !important;
+    -webkit-text-fill-color: #A7F3D0 !important;
+    font-weight: 700 !important;
+}
+
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+:is(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > svg,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-icon,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] > svg,
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn svg,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] svg {
+    color: #34D399 !important;
+    stroke: #34D399 !important;
 }
 
 .fi-sidebar-group-label {
@@ -158,86 +320,95 @@ body.fi-body {
     letter-spacing: 0.8px !important;
     text-transform: uppercase !important;
     font-weight: 800 !important;
-    color: var(--m3-outline) !important;
-    padding-left: 1.2rem !important;
+    color: var(--glass-text-muted) !important;
+    padding-left: 1.25rem !important;
+    margin-top: 0.5rem !important;
 }
 
 /* =============================================================================
-   2. FILAMENT TOPBAR & TOP NAVIGATION
+   3. APPLE FROSTED GLASS TOPBAR
    ============================================================================= */
 .fi-topbar-ctn {
     overflow-x: visible !important;
 }
 
 .fi-topbar {
-    background-color: var(--m3-surface-container-lowest) !important;
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: 0 1px 3px rgba(14, 104, 56, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
     overflow: visible !important;
     padding-right: 1.5rem !important;
     box-sizing: border-box !important;
 }
 
 :is(.dark) .fi-topbar {
-    background-color: var(--m3-surface-container-low) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+    background: var(--glass-surface-subtle) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45) !important;
 }
 
 .fi-topbar nav {
-    background-color: transparent !important;
-    overflow: visible !important;
-    padding-right: 0.5rem !important;
-}
-
-.fi-topbar-nav-groups {
-    flex-shrink: 1 !important;
-    min-width: 0 !important;
-    overflow-x: auto !important;
-    scrollbar-width: none !important;
-}
-
-.fi-topbar-nav-groups::-webkit-scrollbar {
-    display: none !important;
+    background: transparent !important;
 }
 
 .fi-topbar-end {
     margin-left: auto !important;
-    flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 0.75rem !important;
-    padding-right: 0.5rem !important;
-}
-
-.fi-user-menu {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.fi-user-menu-trigger {
-    flex-shrink: 0 !important;
-    min-width: 2.25rem !important;
-    min-height: 2.25rem !important;
+    gap: 0.85rem !important;
 }
 
 .fi-topbar-item-btn {
     border-radius: 9999px !important;
     font-weight: 600 !important;
+    font-size: 0.875rem !important;
     transition: all 0.2s ease !important;
 }
 
-.fi-topbar-item-active .fi-topbar-item-btn {
-    background-color: var(--m3-primary-container) !important;
-    color: var(--m3-on-primary-container) !important;
+.fi-topbar-item.fi-active .fi-topbar-item-btn,
+.fi-topbar-item-btn[aria-current="page"] {
+    background: linear-gradient(135deg, #0E6838 0%, #084D28 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 4px 12px rgba(14, 104, 56, 0.35) !important;
+}
+
+.fi-topbar-item.fi-active .fi-topbar-item-label,
+.fi-topbar-item-btn[aria-current="page"] .fi-topbar-item-label,
+.fi-topbar-item.fi-active .fi-topbar-item-btn span,
+.fi-topbar-item-btn[aria-current="page"] span {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
     font-weight: 700 !important;
 }
 
+.fi-topbar-item.fi-active .fi-topbar-item-icon,
+.fi-topbar-item-btn[aria-current="page"] .fi-topbar-item-icon,
+.fi-topbar-item.fi-active .fi-topbar-item-btn svg,
+.fi-topbar-item-btn[aria-current="page"] svg {
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+}
+
+:is(.dark) .fi-topbar-item.fi-active .fi-topbar-item-btn,
+:is(.dark) .fi-topbar-item-btn[aria-current="page"] {
+    background: rgba(52, 211, 153, 0.25) !important;
+    color: #A7F3D0 !important;
+}
+
+:is(.dark) .fi-topbar-item.fi-active .fi-topbar-item-label,
+:is(.dark) .fi-topbar-item-btn[aria-current="page"] .fi-topbar-item-label,
+:is(.dark) .fi-topbar-item.fi-active .fi-topbar-item-btn span,
+:is(.dark) .fi-topbar-item-btn[aria-current="page"] span {
+    color: #A7F3D0 !important;
+    -webkit-text-fill-color: #A7F3D0 !important;
+}
+
 /* =============================================================================
-   3. SECTIONS, CARDS & CONTAINERS (M3 Expressive Squircle 24px)
+   4. SECTIONS, CARDS & CONTAINERS (CRISP APPLE SQUIRCLES)
    ============================================================================= */
-/* Filament Stats Overview Widget wrapper: transparent so each stat card renders standalone without outer nested box */
 .fi-wi-stats-overview,
 .fi-wi-stats-overview > .fi-section,
 .fi-wi-stats-overview .fi-section-content-ctn,
@@ -249,146 +420,182 @@ body.fi-body {
     padding: 0 !important;
 }
 
-/* Genuine Section Cards (Forms, InfoLists, contained Sections) */
 .fi-section:not(.fi-section-not-contained),
 .fi-card {
-    border-radius: 24px !important; /* M3 Expressive Card Radius */
-    background-color: var(--m3-surface) !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: var(--m3-elevation-1) !important;
-    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease !important;
+    border-radius: 24px !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-md) !important;
+    transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
 }
 
 .fi-section:not(.fi-section-not-contained):hover,
 .fi-card:hover {
-    box-shadow: var(--m3-elevation-2) !important;
+    border-color: var(--glass-border-strong) !important;
+    box-shadow: var(--glass-shadow-lg) !important;
 }
 
-/* Standalone Stat Cards: Direct, Clean M3 Expressive Cards */
+/* Stat Cards */
 .fi-wi-stats-overview-stat {
-    border-radius: 20px !important;
-    background-color: var(--m3-surface) !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: var(--m3-elevation-1) !important;
-    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease !important;
+    border-radius: 22px !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-md) !important;
+    padding: 1.35rem 1.6rem !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .fi-wi-stats-overview-stat:hover {
-    box-shadow: var(--m3-elevation-2) !important;
-    transform: translateY(-2px);
-}
-
-.fi-section-header {
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    padding: 1.25rem 1.5rem !important;
-    background-color: var(--m3-surface-container-lowest) !important;
-}
-
-:is(.dark) .fi-section-header {
-    background-color: transparent !important;
-}
-
-.fi-section-header-title {
-    font-family: var(--m3-font-display) !important;
-    font-weight: 700 !important;
-    font-size: 1.15rem !important;
-    color: var(--m3-on-surface) !important;
-}
-
-.fi-section-header-description {
-    color: var(--m3-on-surface-variant) !important;
-    font-size: 0.85rem !important;
-}
-
-/* Stat Overview Cards */
-.fi-wi-stats-overview-stat {
-    padding: 1.25rem 1.5rem !important;
+    box-shadow: var(--glass-shadow-lg) !important;
+    transform: translateY(-3px) scale(1.01);
+    border-color: var(--glass-border-strong) !important;
 }
 
 .fi-wi-stats-overview-stat-label {
     font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    color: var(--m3-on-surface-variant) !important;
+    font-weight: 700 !important;
+    color: var(--glass-text-muted) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
+    letter-spacing: 0.6px !important;
 }
 
 .fi-wi-stats-overview-stat-value {
-    font-family: var(--m3-font-display) !important;
+    font-family: var(--glass-font-display) !important;
     font-weight: 800 !important;
-    font-size: 1.85rem !important;
-    color: var(--m3-on-surface) !important;
-    margin-top: 0.35rem !important;
+    font-size: 1.95rem !important;
+    letter-spacing: -0.025em !important;
+    color: var(--glass-text-main) !important;
+    margin-top: 0.4rem !important;
+}
+
+.fi-section-header {
+    border-bottom: 1px solid var(--glass-border-subtle) !important;
+    padding: 1.25rem 1.65rem !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+:is(.dark) .fi-section-header {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-bottom-color: var(--glass-border-subtle) !important;
+}
+
+.fi-section-header-title {
+    font-family: var(--glass-font-display) !important;
+    font-weight: 800 !important;
+    font-size: 1.2rem !important;
+    letter-spacing: -0.02em !important;
+    color: var(--glass-text-main) !important;
+}
+
+.fi-section-header-description {
+    color: var(--glass-text-muted) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
 }
 
 /* =============================================================================
-   4. DATA TABLES (Clean, Ergonomic Rows & Tonal Headers)
+   5. DATA TABLES: RAZOR-SHARP ERGONOMICS (NO WASHED-OUT CELLS)
    ============================================================================= */
 .fi-ta-ctn {
     border-radius: 24px !important;
-    overflow: hidden !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface) !important;
-    box-shadow: var(--m3-elevation-1) !important;
+    overflow: visible !important;
+    border: 1px solid var(--glass-border) !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    box-shadow: var(--glass-shadow-md) !important;
+}
+
+.fi-ta-content {
+    border-radius: 0 0 24px 24px !important;
+    overflow-x: auto !important;
+}
+
+.fi-ta-content,
+.fi-ta-table,
+.fi-ta-table > thead,
+.fi-ta-table > tbody {
+    background: transparent !important;
 }
 
 .fi-ta-header-cell {
-    background-color: var(--m3-surface-container) !important;
-    color: var(--m3-on-surface) !important;
-    font-weight: 700 !important;
+    background: rgba(228, 239, 232, 0.95) !important;
+    color: var(--glass-text-main) !important;
+    font-weight: 800 !important;
     font-size: 0.78rem !important;
-    letter-spacing: 0.5px !important;
+    letter-spacing: 0.6px !important;
     text-transform: uppercase !important;
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    padding: 0.95rem 1rem !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    padding: 1rem 1.15rem !important;
 }
 
 :is(.dark) .fi-ta-header-cell {
-    background-color: var(--m3-surface-container-low) !important;
-    color: var(--m3-on-surface-variant) !important;
+    background: rgba(14, 22, 17, 0.85) !important;
+    color: var(--glass-text-secondary) !important;
+    border-bottom-color: var(--glass-border-subtle) !important;
 }
 
 .fi-ta-row {
-    transition: background-color 0.15s ease !important;
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
+    background: transparent !important;
+    transition: background 0.18s ease !important;
+    border-bottom: 1px solid var(--glass-border-subtle) !important;
 }
 
-.fi-ta-row:hover {
-    background-color: var(--m3-surface-container-low) !important;
+.fi-ta-row:hover,
+.fi-ta-row.fi-striped:hover {
+    background: rgba(14, 104, 56, 0.06) !important;
+}
+
+:is(.dark) .fi-ta-row:hover,
+:is(.dark) .fi-ta-row.fi-striped:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.fi-ta-row.fi-striped {
+    background: rgba(235, 244, 238, 0.45) !important;
+}
+
+:is(.dark) .fi-ta-row.fi-striped {
+    background: rgba(255, 255, 255, 0.02) !important;
 }
 
 .fi-ta-cell {
-    padding: 0.95rem 1rem !important;
+    padding: 1rem 1.15rem !important;
     font-size: 0.875rem !important;
-    color: var(--m3-on-surface) !important;
+    color: var(--glass-text-main) !important;
 }
 
-/* Table Search Input */
 .fi-ta-search-field .fi-input-wrp {
-    border-radius: 9999px !important; /* M3 Pill Search */
+    border-radius: 9999px !important;
 }
 
-/* Table Pagination Buttons */
 .fi-pagination-item-btn {
     border-radius: 9999px !important;
     font-weight: 600 !important;
+    transition: all 0.2s ease !important;
 }
 
 .fi-pagination-item-active .fi-pagination-item-btn {
-    background-color: var(--m3-primary) !important;
-    color: var(--m3-on-primary) !important;
+    background: var(--glass-primary) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px var(--glass-primary-glow) !important;
 }
 
 /* =============================================================================
-   5. BUTTONS & CHIPS (M3 Full Pill Shapes)
+   6. APPLE SPECULAR BUTTONS & CAPSULES
    ============================================================================= */
 .fi-btn {
-    border-radius: 9999px !important; /* M3 Pill Button */
+    border-radius: 9999px !important;
     font-weight: 700 !important;
-    font-size: 0.86rem !important;
-    padding: 0.6rem 1.35rem !important;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-    letter-spacing: 0.2px !important;
+    font-size: 0.875rem !important;
+    letter-spacing: -0.01em !important;
+    padding: 0.6rem 1.45rem !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
 }
 
 .fi-btn-size-sm {
@@ -397,150 +604,255 @@ body.fi-body {
 }
 
 .fi-btn-size-lg {
-    padding: 0.8rem 1.85rem !important;
+    padding: 0.8rem 2rem !important;
     font-size: 0.95rem !important;
 }
 
-/* Primary Button Styling */
+/* Primary Button */
 .fi-btn-color-primary {
-    background-color: var(--m3-primary) !important;
-    color: var(--m3-on-primary) !important;
-    box-shadow: 0 2px 8px rgba(14, 104, 56, 0.25) !important;
+    background: linear-gradient(135deg, #0E6838 0%, #09502A 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 14px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+}
+
+:is(.dark) .fi-btn-color-primary {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: #022C15 !important;
+    font-weight: 800 !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
 }
 
 .fi-btn-color-primary:hover {
-    filter: brightness(1.1) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 14px rgba(14, 104, 56, 0.35) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 24px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+    filter: brightness(1.08) !important;
 }
 
 .fi-btn-color-primary:active {
-    transform: translateY(0) !important;
+    transform: translateY(0) scale(0.99) !important;
 }
 
-/* Outlined / Gray Buttons */
+/* Secondary / Gray Button */
 .fi-btn-color-gray {
-    border-color: var(--m3-outline-variant) !important;
-    color: var(--m3-on-surface) !important;
+    background: var(--glass-surface-hover) !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--glass-text-main) !important;
+    box-shadow: var(--glass-shadow-sm) !important;
 }
 
 .fi-btn-color-gray:hover {
-    background-color: var(--m3-surface-container-high) !important;
+    background: #FFFFFF !important;
+    border-color: var(--glass-border-strong) !important;
+    transform: translateY(-1px) !important;
 }
 
 /* =============================================================================
-   6. FORM INPUTS & CONTROLS (Squircle 14px with Gentle Optical Focus)
+   7. FORM INPUTS: SOLID WHITE IN LIGHT MODE (CRISP CONTRAST)
    ============================================================================= */
 .fi-input-wrp {
-    border-radius: 14px !important; /* M3 Squircle Input */
-    background-color: #FFFFFF !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    border-radius: 14px !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(14, 104, 56, 0.22) !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 :is(.dark) .fi-input-wrp {
-    background-color: var(--m3-surface-container-lowest) !important;
-    border-color: var(--m3-outline-variant) !important;
-    box-shadow: none !important;
+    background: rgba(14, 22, 17, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 .fi-input-wrp:focus-within {
-    border-color: var(--m3-primary) !important;
-    box-shadow: 0 0 0 3px rgba(14, 104, 56, 0.16) !important;
+    border-color: #0E6838 !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 0 0 3.5px rgba(14, 104, 56, 0.2), 0 2px 8px rgba(14, 104, 56, 0.1) !important;
+}
+
+:is(.dark) .fi-input-wrp:focus-within {
+    background: rgba(20, 32, 24, 0.95) !important;
+    border-color: #34D399 !important;
+    box-shadow: 0 0 0 3.5px rgba(52, 211, 153, 0.28) !important;
 }
 
 .fi-input {
     font-size: 0.9rem !important;
-    color: var(--m3-on-surface) !important;
-    padding: 0.65rem 0.85rem !important;
+    color: var(--glass-text-main) !important;
+    padding: 0.7rem 0.95rem !important;
 }
 
 .fi-fo-field-wrp-label {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 0.85rem !important;
-    color: var(--m3-on-surface) !important;
-    margin-bottom: 0.35rem !important;
+    letter-spacing: -0.01em !important;
+    color: var(--glass-text-secondary) !important;
+    margin-bottom: 0.4rem !important;
+}
+
+/* Fix native select options dropdown */
+select option {
+    background-color: #FFFFFF !important;
+    color: #0B1910 !important;
+}
+
+:is(.dark) select option {
+    background-color: #121C16 !important;
+    color: #F4F7F5 !important;
 }
 
 /* =============================================================================
-   7. BADGES & CHIPS (Full Pill with Soft Tonal Accents)
+   8. APPLE BADGES & STATUS CHIPS
    ============================================================================= */
 .fi-badge {
     border-radius: 9999px !important;
-    font-size: 0.75rem !important;
+    font-size: 0.76rem !important;
     font-weight: 700 !important;
-    padding: 0.3rem 0.75rem !important;
-    letter-spacing: 0.3px !important;
+    padding: 0.32rem 0.85rem !important;
+    letter-spacing: 0.2px !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+:is(.dark) .fi-badge {
+    border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* =============================================================================
-   8. MODALS & DIALOGS (M3 Expressive Squircle 28px)
+   9. VISIONOS FROSTED MODALS & DIALOGS
    ============================================================================= */
+.fi-modal-close-overlay {
+    background: rgba(7, 13, 9, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 .fi-modal-window {
     border-radius: 28px !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface) !important;
-    box-shadow: var(--m3-elevation-3) !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-lg) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-modal) !important;
     overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+:is(.dark) .fi-modal-window {
+    background: rgba(18, 28, 22, 0.88) !important;
 }
 
 .fi-modal-header {
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    padding: 1.5rem !important;
+    padding: 1.6rem 1.85rem 1.25rem !important;
+    border-bottom: 1px solid var(--glass-border-subtle) !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+}
+
+:is(.dark) .fi-modal-header {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.fi-modal-heading {
+    font-family: var(--glass-font-display) !important;
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--glass-text-main) !important;
+}
+
+.fi-modal-description {
+    font-size: 0.875rem !important;
+    color: var(--glass-text-muted) !important;
+    line-height: 1.5 !important;
+    margin-top: 0.35rem !important;
+}
+
+.fi-modal-close-btn {
+    border-radius: 9999px !important;
+    padding: 0.5rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-modal-close-btn:hover {
+    background: var(--glass-surface-hover) !important;
+    transform: rotate(90deg);
+}
+
+.fi-modal-content {
+    padding: 1.6rem 1.85rem !important;
+    color: var(--glass-text-main) !important;
 }
 
 .fi-modal-footer {
-    border-top: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface-container-low) !important;
-    padding: 1.25rem 1.5rem !important;
+    padding: 1.25rem 1.85rem !important;
+    border-top: 1px solid var(--glass-border-subtle) !important;
+    background: rgba(244, 248, 245, 0.7) !important;
+}
+
+:is(.dark) .fi-modal-footer {
+    background: rgba(14, 22, 17, 0.75) !important;
 }
 
 /* =============================================================================
-   9. TABS (M3 Pill Indicator)
-   ============================================================================= */
-.fi-tabs {
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-}
-
-.fi-tabs-item-btn {
-    border-radius: 9999px !important;
-    font-weight: 600 !important;
-    padding: 0.5rem 1.25rem !important;
-    transition: all 0.2s ease !important;
-    color: var(--m3-on-surface-variant) !important;
-}
-
-.fi-tabs-item-active .fi-tabs-item-btn {
-    background-color: var(--m3-primary-container) !important;
-    color: var(--m3-on-primary-container) !important;
-    font-weight: 700 !important;
-}
-
-/* =============================================================================
-   10. DROPDOWNS & USER MENU (M3 Surface Container & Full Name Display)
+   10. DROPDOWNS & USER MENU
    ============================================================================= */
 .fi-dropdown-panel {
     min-width: 20rem !important;
     max-width: 28rem !important;
     width: max-content !important;
     border-radius: 20px !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
-    background-color: var(--m3-surface) !important;
-    padding: 0.5rem !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-lg) !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-lg) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
+    padding: 0.6rem !important;
+    z-index: 100 !important;
 }
 
-:is(.dark) .fi-dropdown-panel {
-    background-color: var(--m3-surface-container-low) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5) !important;
+/* Table Filters Dropdown Panel: ensure proper padding, height, and no button cutoff */
+.fi-ta-filters-dropdown .fi-dropdown-panel {
+    min-width: 22rem !important;
+    max-width: 32rem !important;
+    width: auto !important;
+    padding: 1.25rem 1.35rem 1.5rem !important;
+    max-height: min(85vh, 600px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.fi-ta-filters {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.15rem !important;
+}
+
+.fi-ta-filters-actions-ctn {
+    margin-top: 1rem !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.25rem !important;
+    border-top: 1px solid var(--glass-border-subtle) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+.fi-ta-filters-actions-ctn .fi-btn {
+    border-radius: 12px !important;
+    width: 100% !important;
+    justify-content: center !important;
 }
 
 .fi-dropdown-header {
     padding: 0.75rem 1rem !important;
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    margin-bottom: 0.35rem !important;
+    border-bottom: 1px solid var(--glass-border-subtle) !important;
+    margin-bottom: 0.4rem !important;
 }
 
 .fi-dropdown-header span,
@@ -555,30 +867,31 @@ body.fi-body {
     word-break: break-word !important;
     font-weight: 700 !important;
     font-size: 0.9rem !important;
-    color: var(--m3-on-surface) !important;
+    color: var(--glass-text-main) !important;
     line-height: 1.35 !important;
 }
 
 .fi-dropdown-list-item-btn,
 .fi-dropdown-list-item-link {
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     padding: 0.65rem 1rem !important;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-    color: var(--m3-on-surface) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: var(--glass-text-main) !important;
 }
 
 .fi-dropdown-list-item-btn:hover,
 .fi-dropdown-list-item-link:hover {
-    background-color: var(--m3-surface-container-high) !important;
+    background: var(--glass-surface-hover) !important;
     transform: translateX(2px);
 }
 
 .fi-theme-switcher {
     border-radius: 14px !important;
-    background-color: var(--m3-surface-container) !important;
+    background: var(--glass-surface-subtle) !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
     padding: 0.25rem !important;
-    margin: 0.35rem 0.5rem !important;
-    border: 1px solid var(--m3-outline-variant) !important;
+    margin: 0.4rem 0.5rem !important;
+    border: 1px solid var(--glass-border-subtle) !important;
 }
 
 .fi-theme-switcher-btn {
@@ -587,188 +900,53 @@ body.fi-body {
 }
 
 /* =============================================================================
-   11. MATERIAL 3 EXPRESSIVE MODALS & DIALOG POPUPS
-   Tactile 28px Containers, Frosted Scrim, M3 Action Pills & Elevated Toasts
+   11. APPLE FLOATING TOASTS & NOTIFICATIONS
    ============================================================================= */
-
-/* Modal Scrim / Backdrop */
-.fi-modal-close-overlay {
-    background-color: rgba(13, 20, 16, 0.68) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1) !important;
-}
-
-/* Modal Window Container */
-.fi-modal-window {
-    border-radius: 28px !important;
-    background-color: var(--m3-surface) !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(14, 104, 56, 0.08) !important;
-    overflow: hidden !important;
-    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1) !important;
-}
-
-:is(.dark) .fi-modal-window {
-    background-color: var(--m3-surface-container-high) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 28px 72px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Slide-over Modals (Panel Slide from Edge) */
-.fi-modal-window.fi-modal-slide-over {
-    border-top-left-radius: 28px !important;
-    border-bottom-left-radius: 28px !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-}
-
-/* Modal Header */
-.fi-modal-header {
-    padding: 1.5rem 1.75rem 1.15rem !important;
-    border-bottom: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface-container-lowest) !important;
-}
-
-:is(.dark) .fi-modal-header {
-    background-color: var(--m3-surface-container-high) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.fi-modal-heading {
-    font-family: var(--m3-font-display) !important;
-    font-size: 1.25rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.015em !important;
-    color: var(--m3-on-surface) !important;
-}
-
-.fi-modal-description {
-    font-size: 0.875rem !important;
-    color: var(--m3-on-surface-variant) !important;
-    line-height: 1.5 !important;
-    margin-top: 0.35rem !important;
-}
-
-/* Modal Close Button */
-.fi-modal-close-btn {
-    border-radius: 9999px !important;
-    padding: 0.5rem !important;
-    color: var(--m3-on-surface-variant) !important;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-}
-
-.fi-modal-close-btn:hover {
-    background-color: var(--m3-surface-container-highest) !important;
-    color: var(--m3-on-surface) !important;
-    transform: rotate(90deg);
-}
-
-/* Modal Content / Body */
-.fi-modal-content {
-    padding: 1.5rem 1.75rem !important;
-    color: var(--m3-on-surface) !important;
-}
-
-/* Modal Footer & Action Buttons */
-.fi-modal-footer {
-    padding: 1.15rem 1.75rem !important;
-    border-top: 1px solid var(--m3-outline-variant) !important;
-    background-color: var(--m3-surface-container-low) !important;
-}
-
-:is(.dark) .fi-modal-footer {
-    background-color: var(--m3-surface-container) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.fi-modal-footer .fi-btn {
-    border-radius: 9999px !important; /* M3 Action Pill */
-    font-weight: 700 !important;
-    font-size: 0.875rem !important;
-    padding: 0.55rem 1.35rem !important;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-    letter-spacing: 0.1px !important;
-}
-
-.fi-modal-footer .fi-btn:hover {
-    transform: translateY(-1px) !important;
-}
-
-/* Danger Modal Action (Confirm Delete) */
-.fi-modal-footer .fi-btn-color-danger {
-    background-color: #DC2626 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
-}
-
-.fi-modal-footer .fi-btn-color-danger:hover {
-    background-color: #B91C1C !important;
-    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45) !important;
-}
-
-/* Secondary/Cancel Modal Action */
-.fi-modal-footer .fi-btn-color-gray {
-    background-color: transparent !important;
-    border: 1px solid var(--m3-outline) !important;
-    color: var(--m3-on-surface) !important;
-}
-
-.fi-modal-footer .fi-btn-color-gray:hover {
-    background-color: var(--m3-surface-container-high) !important;
-}
-
-/* Confirmation Dialog Icon Badge */
-.fi-modal-icon-bg {
-    border-radius: 18px !important;
-    padding: 0.75rem !important;
-}
-
-/* Notifications & Toast Popups */
 .fi-no-notification {
     border-radius: 20px !important;
-    background-color: var(--m3-surface) !important;
-    border: 1px solid var(--m3-outline-variant) !important;
-    box-shadow: var(--m3-elevation-3) !important;
-    padding: 1rem 1.25rem !important;
-}
-
-:is(.dark) .fi-no-notification {
-    background-color: var(--m3-surface-container-high) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5) !important;
+    background: var(--glass-surface) !important;
+    backdrop-filter: var(--glass-blur-lg) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-lg) !important;
+    padding: 1.1rem 1.35rem !important;
 }
 
 .fi-no-notification-title {
-    font-family: var(--m3-font-sans) !important;
+    font-family: var(--glass-font-sans) !important;
     font-weight: 800 !important;
-    font-size: 0.925rem !important;
-    color: var(--m3-on-surface) !important;
+    font-size: 0.95rem !important;
+    letter-spacing: -0.01em !important;
+    color: var(--glass-text-main) !important;
 }
 
 .fi-no-notification-date,
 .fi-no-notification-body {
-    font-size: 0.825rem !important;
-    color: var(--m3-on-surface-variant) !important;
+    font-size: 0.85rem !important;
+    color: var(--glass-text-muted) !important;
     line-height: 1.45 !important;
 }
 
-/* Custom Scrollbar for Smooth Ergonomics */
+/* =============================================================================
+   12. ULTRA-SMOOTH APPLE SCROLLBAR
+   ============================================================================= */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--m3-bg);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--m3-outline-variant);
+    background: var(--glass-border-strong);
     border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--m3-outline);
+    background: var(--glass-primary);
 }
 </style>

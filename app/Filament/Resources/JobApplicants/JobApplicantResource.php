@@ -26,7 +26,7 @@ class JobApplicantResource extends Resource
 
     protected static ?string $modelLabel = 'Pelamar Kerja';
 
-    protected static ?string $pluralModelLabel = 'Pelamar Kerja (cPanel IMAP)';
+    protected static ?string $pluralModelLabel = 'Pelamar Kerja';
 
     protected static ?int $navigationSort = 2;
 

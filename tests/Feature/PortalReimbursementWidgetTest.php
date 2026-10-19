@@ -17,7 +17,8 @@ class PortalReimbursementWidgetTest extends TestCase
 
     public function test_portal_dashboard_renders_reimbursement_widgets(): void
     {
-        $user = User::where('email', 'teller.botania@bprbandaraya.com')->first();
+        $user = User::where('email', 'siti.teller@bprbandaraya.com')->first()
+            ?? User::where('role', 'employee')->first();
         $this->actingAs($user);
 
         $employee = $user->employee;
@@ -57,7 +58,8 @@ class PortalReimbursementWidgetTest extends TestCase
 
     public function test_navigation_badge_shows_active_reimbursements(): void
     {
-        $user = User::where('email', 'teller.botania@bprbandaraya.com')->first();
+        $user = User::where('email', 'siti.teller@bprbandaraya.com')->first()
+            ?? User::where('role', 'employee')->first();
         $this->actingAs($user);
 
         $employee = $user->employee;
