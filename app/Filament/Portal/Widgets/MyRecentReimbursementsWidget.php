@@ -13,7 +13,7 @@ class MyRecentReimbursementsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 5;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -74,12 +74,27 @@ class MyRecentReimbursementsWidget extends BaseWidget
 
                 ImageColumn::make('receipt_photo')
                     ->label('Bukti Struk')
-                    ->circular(),
+                    ->circular()
+                    ->action('view_details'),
 
                 TextColumn::make('payment_date')
                     ->label('Tgl Dicairkan')
                     ->date('d M Y')
                     ->placeholder('-'),
+            ])
+            ->recordAction('view_details')
+            ->recordActions([
+                Action::make('view_details')
+                    ->label('Lihat Struk')
+                    ->icon('heroicon-o-receipt-percent')
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->modalWidth('5xl')
+                    ->modalHeading(fn (Reimbursement $record) => "Bukti Struk: {$record->title}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalContent(fn (Reimbursement $record) => view('filament.modals.reimbursement-detail', ['record' => $record])),
             ])
             ->paginated([5, 10]);
     }

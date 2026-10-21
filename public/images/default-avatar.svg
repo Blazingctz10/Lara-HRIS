@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E6838" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+    <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGrad)" />
+
+  <!-- Subtle Inner Ring -->
+  <circle cx="64" cy="64" r="61" fill="none" stroke="#FDB813" stroke-width="2" stroke-opacity="0.4" />
+
+  <!-- Avatar Group -->
+  <g filter="url(#shadow)">
+    <!-- Head -->
+    <circle cx="64" cy="46" r="22" fill="url(#avatarGrad)" />
+    
+    <!-- Torso / Shoulders -->
+    <path d="M 28 106 C 28 82, 44 76, 64 76 C 84 76, 100 82, 100 106 Z" fill="url(#suitGrad)" />
+    
+    <!-- Collar / Tie Accent -->
+    <path d="M 58 76 L 64 88 L 70 76 Z" fill="#0E6838" />
+    <path d="M 64 88 L 61 106 L 67 106 Z" fill="#FDB813" />
+  </g>
+</svg>

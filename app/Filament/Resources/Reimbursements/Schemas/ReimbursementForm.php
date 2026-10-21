@@ -79,6 +79,7 @@ class ReimbursementForm
 
                         FileUpload::make('receipt_photo')
                             ->label('Foto Bukti / Struk / Kwitansi Pembayaran')
+                            ->disk('public')
                             ->directory('reimbursements/receipts')
                             ->image()
                             ->imageEditor()

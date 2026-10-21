@@ -85,6 +85,14 @@ class LeaveRequestsTable
                         default => $state,
                     }),
 
+                TextColumn::make('attachment_url')
+                    ->label('Bukti')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($state) => $state ? '📄 Berkas' : 'N/A')
+                    ->alignCenter()
+                    ->action('view_details'),
+
                 TextColumn::make('approver.name')
                     ->label('Disetujui Oleh')
                     ->placeholder('-'),
@@ -105,7 +113,20 @@ class LeaveRequestsTable
                     ->relationship('leaveType', 'name')
                     ->label('Jenis Cuti'),
             ])
+            ->recordAction('view_details')
             ->recordActions([
+                Action::make('view_details')
+                    ->label('Lihat Bukti')
+                    ->icon('heroicon-o-paper-clip')
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->modalWidth('5xl')
+                    ->modalHeading(fn (LeaveRequest $record) => "Lampiran Berkas Cuti: {$record->employee->user->name}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalContent(fn (LeaveRequest $record) => view('filament.modals.leave-request-detail', ['record' => $record])),
+
                 // 1. Verifikasi HR untuk Karyawan Regular
                 Action::make('approve_hr')
                     ->label('Verifikasi HR')

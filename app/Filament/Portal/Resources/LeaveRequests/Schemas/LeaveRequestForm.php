@@ -182,6 +182,7 @@ class LeaveRequestForm
 
                         FileUpload::make('attachment_url')
                             ->label('Lampiran Dokumen Pendukung (Surat Dokter / Undangan / dll)')
+                            ->disk('public')
                             ->directory('leaves/attachments')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
                             ->maxSize(5120),

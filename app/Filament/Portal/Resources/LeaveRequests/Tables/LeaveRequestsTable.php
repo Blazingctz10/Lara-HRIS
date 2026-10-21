@@ -35,10 +35,18 @@ class LeaveRequestsTable
                     ->date('d M Y'),
 
                 TextColumn::make('total_days')
-                    ->label('Durasi')
-                    ->suffix(' Hari')
+                    ->label('Hari Dipotong')
+                    ->formatStateUsing(fn ($state) => "-{$state} Hari")
+                    ->color('danger')
                     ->alignCenter()
                     ->weight('bold'),
+
+                TextColumn::make('reason')
+                    ->label('Alasan / Keperluan Cuti')
+                    ->limit(40)
+                    ->tooltip(fn ($record) => $record->reason)
+                    ->searchable()
+                    ->placeholder('-'),
 
                 TextColumn::make('status')
                     ->label('Status Approval')
@@ -74,7 +82,20 @@ class LeaveRequestsTable
             ->filters([
                 //
             ])
+            ->recordAction('view_details')
             ->recordActions([
+                Action::make('view_details')
+                    ->label('Lihat Bukti')
+                    ->icon('heroicon-o-paper-clip')
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->modalWidth('5xl')
+                    ->modalHeading(fn (\App\Models\LeaveRequest $record) => "Lampiran Berkas Cuti: {$record->leaveType?->name}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalContent(fn (\App\Models\LeaveRequest $record) => view('filament.modals.leave-request-detail', ['record' => $record])),
+
                 Action::make('print_form')
                     ->label('Cetak Formulir')
                     ->icon('heroicon-o-printer')

@@ -54,7 +54,8 @@ class ReimbursementsTable
 
                 ImageColumn::make('receipt_photo')
                     ->label('Struk')
-                    ->circular(),
+                    ->circular()
+                    ->action('view_details'),
 
                 TextColumn::make('status')
                     ->label('Status')
@@ -67,7 +68,20 @@ class ReimbursementsTable
                         default => 'gray',
                     }),
             ])
+            ->recordAction('view_details')
             ->recordActions([
+                Action::make('view_details')
+                    ->label('Lihat Struk')
+                    ->icon('heroicon-o-receipt-percent')
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->modalWidth('5xl')
+                    ->modalHeading(fn (Reimbursement $record) => "Bukti Struk: {$record->title} ({$record->employee->full_name})")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalContent(fn (Reimbursement $record) => view('filament.modals.reimbursement-detail', ['record' => $record])),
+
                 Action::make('approve_pincab')
                     ->label('Acc Pincab')
                     ->icon('heroicon-m-check')

@@ -11,6 +11,36 @@ use Illuminate\Support\Facades\Log;
 class LeaveRequestObserver
 {
     /**
+     * Handle the LeaveRequest "created" event.
+     */
+    public function created(LeaveRequest $leaveRequest): void
+    {
+        try {
+            $employeeName = $leaveRequest->employee?->full_name ?? $leaveRequest->employee?->user?->name ?? 'Pegawai';
+            $leaveTypeName = $leaveRequest->leaveType?->name ?? 'Cuti';
+            
+            // Penerima notifikasi: seluruh HR Admin & Super Admin
+            $recipients = \App\Models\User::whereIn('role', ['hr_admin', 'super_admin'])->get();
+
+            if ($recipients->isNotEmpty()) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Pengajuan Cuti Baru')
+                    ->body("{$employeeName} mengajukan {$leaveTypeName} ({$leaveRequest->total_days} hari kerja). Menunggu verifikasi berkas.")
+                    ->icon('heroicon-o-document-text')
+                    ->iconColor('warning')
+                    ->actions([
+                        \Filament\Notifications\Actions\Action::make('view')
+                            ->label('Buka Daftar Cuti')
+                            ->url('/admin/leave-requests'),
+                    ])
+                    ->sendToDatabase($recipients);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Gagal kirim notifikasi pengajuan cuti baru: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Handle the LeaveRequest "updated" event.
      */
     public function updated(LeaveRequest $leaveRequest): void
@@ -23,6 +53,47 @@ class LeaveRequestObserver
             $finalStatuses = ['Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris', 'Approved_HR'];
             $isFinalApproved = in_array($newStatus, $finalStatuses);
             $wasFinalApproved = in_array($originalStatus, $finalStatuses);
+
+            // Notifikasi ke Direksi ketika status berubah menjadi Approved_HR (siap otorisasi final)
+            if ($newStatus === 'Approved_HR') {
+                try {
+                    $direksiUsers = \App\Models\User::where('role', 'direksi')->get();
+                    if ($direksiUsers->isNotEmpty()) {
+                        $empName = $leaveRequest->employee?->full_name ?? $leaveRequest->employee?->user?->name ?? 'Pegawai';
+                        \Filament\Notifications\Notification::make()
+                            ->title('Otorisasi Final Cuti Direksi')
+                            ->body("Pengajuan cuti {$empName} telah diverifikasi HRD dan menunggu persetujuan akhir Direksi.")
+                            ->icon('heroicon-o-check-badge')
+                            ->iconColor('primary')
+                            ->actions([
+                                \Filament\Notifications\Actions\Action::make('view')
+                                    ->label('Otorisasi Sekarang')
+                                    ->url('/admin/leave-requests'),
+                            ])
+                            ->sendToDatabase($direksiUsers);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Gagal kirim notifikasi cuti ke direksi: ' . $e->getMessage());
+                }
+            }
+
+            // Notifikasi balik ke Pegawai yang mengajukan jika status disetujui atau ditolak
+            if ($leaveRequest->employee?->user && in_array($newStatus, ['Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris', 'Rejected'])) {
+                try {
+                    $isApproved = $newStatus !== 'Rejected';
+                    $statusText = $isApproved ? 'Telah Disetujui Resmi' : 'Ditolak: ' . ($leaveRequest->rejection_reason ?? 'Tidak memenuhi syarat');
+                    $ltName = $leaveRequest->leaveType?->name ?? 'Cuti';
+
+                    \Filament\Notifications\Notification::make()
+                        ->title("Permohonan Cuti {$statusText}")
+                        ->body("Permohonan {$ltName} Anda telah diputuskan.")
+                        ->icon($isApproved ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                        ->iconColor($isApproved ? 'success' : 'danger')
+                        ->sendToDatabase($leaveRequest->employee->user);
+                } catch (\Throwable $e) {
+                    Log::warning('Gagal kirim notifikasi status cuti ke pegawai: ' . $e->getMessage());
+                }
+            }
 
             // Ketika disetujui final oleh Direksi, HRD, atau Komisaris, potong saldo cuti resmi & sinkronkan presensi
             if ($isFinalApproved && ! $wasFinalApproved) {

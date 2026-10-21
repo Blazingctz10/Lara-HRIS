@@ -2,9 +2,11 @@
     @php
         $employee = auth()->user()?->employee;
         $branch = $employee?->branch;
-        $attendance = $this->getTodayAttendance();
         $schedule = $this->getTodaySchedule();
         $statusInfo = $this->getTodayStatusInfo();
+        $leaveSummary = $this->getLeaveSummary();
+        $tenure = $this->getTenureInfo();
+        $statusLabel = $this->getEmploymentStatusLabel();
     @endphp
 
     <style>
@@ -68,25 +70,35 @@
             color: #bbf7d0;
         }
 
-        .m3-badge-device {
-            display: inline-flex;
+        .m3-att-profile-box {
+            display: flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.3rem 0.85rem;
-            border-radius: 9999px;
-            background: rgba(253, 184, 19, 0.2);
-            border: 1px solid rgba(253, 184, 19, 0.4);
-            font-size: 0.725rem;
-            font-weight: 700;
-            color: #fef08a;
-            margin-top: 0.5rem;
+            gap: 1.15rem;
+            margin-top: 0.75rem;
+        }
+
+        .m3-att-avatar-img {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(255, 255, 255, 0.45);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.15);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .m3-att-avatar-img:hover {
+            transform: scale(1.05);
+            border-color: #FDB813;
         }
 
         .m3-att-greeting {
             font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             font-size: 1.55rem;
             font-weight: 800;
-            margin-top: 0.65rem;
             color: #ffffff;
             line-height: 1.2;
             letter-spacing: -0.01em;
@@ -95,14 +107,33 @@
         .m3-att-sub {
             font-size: 0.875rem;
             color: #d1fae5;
-            margin-top: 0.25rem;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+
+        .m3-att-meta-chips {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.45rem;
+            margin-top: 0.45rem;
+            font-size: 0.75rem;
+        }
+
+        .m3-att-chip {
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.18rem 0.65rem;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 600;
         }
 
         .m3-stat-group {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 1rem;
+            gap: 0.85rem;
         }
 
         .m3-stat-card {
@@ -113,13 +144,13 @@
             border: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 18px;
             padding: 0.85rem 1.25rem;
-            min-width: 155px;
+            min-width: 160px;
             transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
         .m3-stat-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-2px);
         }
 
         .m3-stat-icon-box {
@@ -147,11 +178,18 @@
         }
 
         .m3-stat-num {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #ffffff;
-            font-family: monospace;
-            letter-spacing: 0.5px;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            letter-spacing: -0.01em;
+            margin-top: 0.1rem;
+        }
+
+        .m3-stat-sub {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 500;
             margin-top: 0.1rem;
         }
 
@@ -162,9 +200,9 @@
             background: rgba(255, 255, 255, 0.2);
             color: #ffffff;
             font-weight: 700;
-            font-size: 0.875rem;
-            padding: 0.85rem 1.4rem;
-            border-radius: 9999px; /* M3 Full Pill */
+            font-size: 0.85rem;
+            padding: 0.85rem 1.35rem;
+            border-radius: 9999px;
             text-decoration: none;
             border: 1px solid rgba(255, 255, 255, 0.35);
             transition: all 0.2s ease;
@@ -178,6 +216,29 @@
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
         }
 
+        .m3-btn-action-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(253, 184, 19, 0.22);
+            color: #fef08a;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.85rem 1.35rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            border: 1px solid rgba(253, 184, 19, 0.45);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .m3-btn-action-pill:hover {
+            background: #FDB813;
+            color: #1e3a24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(253, 184, 19, 0.3);
+        }
+
         .m3-btn-icon {
             width: 18px;
             height: 18px;
@@ -186,12 +247,15 @@
 
     <div class="m3-att-banner">
         <div class="m3-att-content">
+            {{-- Kolom Kiri: Metadata Tanggal & Profil Pegawai --}}
             <div>
+                {{-- Baris Pil Tanggal & Lokasi Cabang --}}
                 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem;">
                     <span class="m3-badge-pill">
                         <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #FDB813;"></span>
-                        PRESENSI &bull; {{ now()->translatedFormat('l, d F Y') }}
+                        {{ now()->translatedFormat('l, d F Y') }}
                     </span>
+
                     @if($branch)
                         <span class="m3-badge-branch">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 13px; height: 13px;">
@@ -200,68 +264,78 @@
                             <span>{{ $branch->name }}</span>
                         </span>
                     @endif
-
-                    <span class="m3-badge-branch" style="background: rgba(255, 255, 255, 0.18); color: #fef08a; font-weight: 700;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 13px; height: 13px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <span>Jam Kerja: {{ $schedule['badge'] }}</span>
-                    </span>
-
-                    <span class="m3-badge-branch" style="background: {{ $statusInfo['type'] === 'leave' ? 'rgba(59, 130, 246, 0.28)' : ($statusInfo['type'] === 'dispensation' ? 'rgba(234, 88, 12, 0.28)' : 'rgba(16, 185, 129, 0.22)') }}; color: {{ $statusInfo['type'] === 'leave' ? '#93c5fd' : ($statusInfo['type'] === 'dispensation' ? '#fed7aa' : '#a7f3d0') }}; font-weight: 700;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 13px; height: 13px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <span>{{ $statusInfo['badge'] }}</span>
-                    </span>
                 </div>
 
-                <div class="m3-att-greeting">
-                    Halo, {{ $employee?->full_name ?? auth()->user()->name }}
-                </div>
-                <div class="m3-att-sub">
-                    {{ $employee?->position?->name ?? 'Staf' }} &bull; {{ $employee?->department?->name ?? 'Operasional' }} &bull; NIP: {{ $employee?->nip ?? '-' }}
-                </div>
-                @if(! empty($statusInfo['notes']))
-                    <div style="font-size: 0.8rem; opacity: 0.95; margin-top: 0.35rem; color: #fef08a; font-weight: 600;">
-                        Catatan: {{ $statusInfo['notes'] }}
+                {{-- Profil & Sapaan Pegawai --}}
+                <div class="m3-att-profile-box">
+                    <a href="{{ url('/portal/my-profile') }}" title="Lihat & Perbarui Profil Pegawai" style="display: inline-block; text-decoration: none; flex-shrink: 0;">
+                        <img
+                            src="{{ $employee?->photo_url ? \Illuminate\Support\Facades\Storage::url($employee->photo_url) : asset('images/default-avatar.svg') }}"
+                            alt="{{ $employee?->full_name ?? auth()->user()->name }}"
+                            class="m3-att-avatar-img"
+                        />
+                    </a>
+
+                    <div>
+                        <div class="m3-att-greeting">
+                            Halo, {{ $employee?->full_name ?? auth()->user()->name }}
+                        </div>
+                        <div class="m3-att-sub">
+                            {{ $employee?->position?->name ?? 'Staf' }} &bull; {{ $employee?->department?->name ?? 'Operasional & Layanan Kas' }}
+                        </div>
+                        <div class="m3-att-meta-chips">
+                            <span class="m3-att-chip" style="background: rgba(253, 184, 19, 0.2); border-color: rgba(253, 184, 19, 0.4); color: #fef08a;">
+                                NIP: {{ $employee?->nip ?? '-' }}
+                            </span>
+                            <span class="m3-att-chip">
+                                {{ $statusLabel }}
+                            </span>
+                            @if($tenure)
+                                <span class="m3-att-chip" style="background: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.35);">
+                                    Masa Kerja: {{ $tenure }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
-                @endif
+                </div>
             </div>
 
+            {{-- Kolom Kanan: Ringkasan Hak Cuti & Tombol Akses Riwayat --}}
             <div class="m3-stat-group">
-                <!-- Box Jam Masuk -->
-                <div class="m3-stat-card">
-                    <div class="m3-stat-icon-box" style="background: rgba(16, 185, 129, 0.3);">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="#6ee7b7" class="m3-stat-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                <!-- Card Sisa Cuti Tahunan (Clickable Shortcut) -->
+                <a href="{{ url('/portal/leave-requests') }}" class="m3-stat-card" style="text-decoration: none;" title="Klik untuk melihat riwayat dan pemotongan cuti Anda">
+                    <div class="m3-stat-icon-box" style="background: rgba(16, 185, 129, 0.25);">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#6ee7b7" class="m3-stat-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v7.5" />
                         </svg>
                     </div>
                     <div>
-                        <div class="m3-stat-lbl">Masuk (In)</div>
+                        <div class="m3-stat-lbl">Sisa Cuti {{ now()->year }}</div>
                         <div class="m3-stat-num">
-                            {{ $attendance?->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '--:--' }}
+                            {{ $leaveSummary['annual_remaining'] }} Hari
                         </div>
+                        <div class="m3-stat-sub">Hak Cuti Tahunan &bull; Detail &rarr;</div>
                     </div>
-                </div>
+                </a>
 
-                <!-- Box Jam Pulang -->
-                <div class="m3-stat-card">
-                    <div class="m3-stat-icon-box" style="background: rgba(243, 122, 32, 0.3);">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="#FDB813" class="m3-stat-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                <!-- Card Block Leave OJK (Clickable Shortcut) -->
+                <a href="{{ url('/portal/leave-requests/create') }}" class="m3-stat-card" style="text-decoration: none;" title="Klik untuk mengajukan permohonan Cuti Mandatori Block Leave OJK">
+                    <div class="m3-stat-icon-box" style="background: rgba(243, 122, 32, 0.25);">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#FDB813" class="m3-stat-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
                         </svg>
                     </div>
                     <div>
-                        <div class="m3-stat-lbl">Pulang (Out)</div>
+                        <div class="m3-stat-lbl">Block Leave OJK</div>
                         <div class="m3-stat-num">
-                            {{ $attendance?->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '--:--' }}
+                            {{ $leaveSummary['block_remaining'] }} Hari
                         </div>
+                        <div class="m3-stat-sub">Mandatori Bank &bull; Ajukan &rarr;</div>
                     </div>
-                </div>
+                </a>
 
-                <!-- Action Button -->
-                <a href="{{ url('/portal/attendances') }}" class="m3-btn-history-pill">
+                <!-- Action Button Riwayat Presensi -->
+                <a href="{{ url('/portal/attendances') }}" class="m3-btn-history-pill" title="Lihat Rekap dan Riwayat Presensi Bulanan">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="m3-btn-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>

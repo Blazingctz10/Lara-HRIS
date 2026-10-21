@@ -4,6 +4,7 @@ namespace App\Filament\Portal\Pages;
 
 use App\Filament\Portal\Widgets\AnnouncementsWidget;
 use App\Filament\Portal\Widgets\MyLeaveBalanceWidget;
+use App\Filament\Portal\Widgets\MyLeaveHistoryWidget;
 use App\Filament\Portal\Widgets\MyRecentReimbursementsWidget;
 use App\Filament\Portal\Widgets\MyReimbursementStatsWidget;
 use App\Filament\Portal\Widgets\PortalShortcutWidget;
@@ -22,6 +23,7 @@ class Dashboard extends BaseDashboard
             PortalShortcutWidget::class,
             TodayAttendanceWidget::class,
             MyLeaveBalanceWidget::class,
+            MyLeaveHistoryWidget::class,
             MyReimbursementStatsWidget::class,
             MyRecentReimbursementsWidget::class,
             AnnouncementsWidget::class,

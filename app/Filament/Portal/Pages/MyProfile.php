@@ -3,6 +3,7 @@
 namespace App\Filament\Portal\Pages;
 
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -62,6 +63,7 @@ class MyProfile extends Page implements HasForms
             'emergency_contact' => ($employee?->emergency_contact_name ?? '-') . ' (' . ($employee?->emergency_contact_relation ?? '-') . ') - ' . ($employee?->emergency_contact_phone ?? '-'),
 
             // Data Pribadi & Kontak (Dapat Diperbarui Mandiri)
+            'photo_url' => $employee?->photo_url,
             'phone' => $employee?->phone ?? '',
             'address' => $employee?->address ?? '',
             'bank_account_number' => $employee?->bank_account_number ?? '',
@@ -161,34 +163,57 @@ class MyProfile extends Page implements HasForms
                     ->collapsible(),
 
                 Section::make('Biodata Kontak Pribadi & Rekening Bank')
-                    ->description('Pastikan nomor telepon/WhatsApp, alamat tempat tinggal, dan nomor rekening bank Anda selalu akurat dan valid.')
+                    ->description('Pastikan foto profil, nomor telepon/WhatsApp, alamat domisili, dan nomor rekening bank Anda selalu akurat dan valid.')
                     ->icon('heroicon-m-identification')
                     ->schema([
+                        FileUpload::make('photo_url')
+                            ->label('Foto Profil Pegawai')
+                            ->image()
+                            ->avatar()
+                            ->disk('public')
+                            ->directory('employee-photos')
+                            ->imageCropAspectRatio('1:1')
+                            ->maxSize(2048)
+                            ->nullable()
+                            ->helperText('Unggah foto resmi pegawai (Format JPG/PNG/WEBP, Maks. 2MB).')
+                            ->columnSpanFull(),
                         Grid::make(2)->schema([
                             TextInput::make('phone')
                                 ->label('Nomor HP / WhatsApp Aktif')
                                 ->tel()
                                 ->required()
                                 ->maxLength(20)
-                                ->placeholder('Contoh: 081234567890'),
+                                ->placeholder('Contoh: 081234567890')
+                                ->validationMessages([
+                                    'required' => 'Nomor HP / WhatsApp wajib diisi.',
+                                    'max' => 'Nomor HP maksimal 20 digit.',
+                                    'max_digits' => 'Nomor HP maksimal 20 digit.',
+                                ]),
                             TextInput::make('npwp')
                                 ->label('Nomor Pokok Wajib Pajak (NPWP)')
+                                ->nullable()
                                 ->maxLength(30)
                                 ->placeholder('Contoh: 72.333.444.5-021.000'),
                         ]),
                         Grid::make(2)->schema([
                             TextInput::make('bank_account_number')
                                 ->label('Nomor Rekening Bank')
-                                ->numeric()
-                                ->maxLength(30)
-                                ->placeholder('Contoh: 1200056789012'),
+                                ->nullable()
+                                ->maxLength(35)
+                                ->placeholder('Contoh: 1200056789012')
+                                ->helperText('Nomor rekening bank untuk keperluan transfer gaji / payroll')
+                                ->validationMessages([
+                                    'max' => 'Nomor rekening bank maksimal 35 karakter.',
+                                ]),
                             TextInput::make('bank_account_holder')
                                 ->label('Nama Pemilik Rekening')
+                                ->nullable()
                                 ->maxLength(100)
                                 ->placeholder('Sesuai buku rekening bank'),
                         ]),
                         Textarea::make('address')
                             ->label('Alamat Domisili Tempat Tinggal')
+                            ->nullable()
                             ->rows(3)
                             ->maxLength(255)
                             ->placeholder('Alamat domisili tempat tinggal saat ini di Batam / Kepri'),
@@ -203,13 +228,22 @@ class MyProfile extends Page implements HasForms
                                 ->label('Kata Sandi Baru')
                                 ->password()
                                 ->revealable()
-                                ->rule(Password::default()),
+                                ->nullable()
+                                ->rule(Password::default())
+                                ->validationMessages([
+                                    'min' => 'Kata sandi baru minimal 8 karakter.',
+                                ]),
                             TextInput::make('new_password_confirmation')
                                 ->label('Konfirmasi Kata Sandi Baru')
                                 ->password()
                                 ->revealable()
+                                ->nullable()
                                 ->same('new_password')
-                                ->requiredWith('new_password'),
+                                ->requiredWith('new_password')
+                                ->validationMessages([
+                                    'same' => 'Konfirmasi kata sandi baru tidak cocok.',
+                                    'required_with' => 'Harap konfirmasi kata sandi baru Anda.',
+                                ]),
                         ]),
                     ])
                     ->collapsed(),
@@ -224,11 +258,6 @@ class MyProfile extends Page implements HasForms
             ->icon('heroicon-m-check')
             ->color('primary')
             ->size('lg')
-            ->requiresConfirmation()
-            ->modalHeading('Konfirmasi Simpan Perubahan Profil')
-            ->modalDescription('Apakah Anda yakin data nomor kontak, rekening bank, alamat tempat tinggal, atau kata sandi baru yang Anda masukkan sudah benar dan valid?')
-            ->modalSubmitActionLabel('Ya, Simpan Perubahan')
-            ->modalCancelActionLabel('Batal')
             ->action(fn () => $this->save());
     }
 
@@ -241,12 +270,38 @@ class MyProfile extends Page implements HasForms
 
     public function save(): void
     {
-        $data = $this->form->getState();
+        try {
+            $data = $this->form->getState();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorItems = collect($e->validator->errors()->all())
+                ->map(fn ($msg) => '• ' . $msg)
+                ->implode("<br>");
+
+            Notification::make()
+                ->title('Gagal Menyimpan: Mohon Periksa Input Data')
+                ->body('Terdapat isian formulir yang belum sesuai ketentuan:<br>' . $errorItems)
+                ->danger()
+                ->duration(10000)
+                ->send();
+
+            throw $e;
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Terjadi Kesalahan Sistem')
+                ->body('Gagal menyimpan profil: ' . $e->getMessage())
+                ->danger()
+                ->duration(8000)
+                ->send();
+
+            return;
+        }
+
         $user = auth()->user();
         $employee = $user?->employee;
 
         if ($employee) {
             $employee->update([
+                'photo_url' => $data['photo_url'] ?? $employee->photo_url,
                 'phone' => $data['phone'] ?? $employee->phone,
                 'address' => $data['address'] ?? $employee->address,
                 'bank_account_number' => $data['bank_account_number'] ?? $employee->bank_account_number,
@@ -265,6 +320,7 @@ class MyProfile extends Page implements HasForms
             ->title('Profil Berhasil Diperbarui')
             ->body('Data kontak dan informasi akun Anda telah berhasil disimpan dengan akurat.')
             ->success()
+            ->duration(5000)
             ->send();
     }
 }

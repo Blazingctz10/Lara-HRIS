@@ -98,17 +98,83 @@ class TodayAttendanceWidget extends Widget
         // 3. Cek Absensi yang terunggah
         $att = $this->getTodayAttendance();
         if ($att && $att->clock_in) {
+            $timeFormatted = \Carbon\Carbon::parse($att->clock_in)->format('H:i');
+            $outFormatted = $att->clock_out ? ' - Pulang ' . \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '';
             return [
                 'type' => 'present',
-                'badge' => 'Status: ' . ($att->status === 'Late' ? 'Terlambat (' . ($att->late_minutes ?? 0) . ' Mnt)' : 'Hadir Tepat Waktu'),
-                'notes' => $att->notes ?: 'Tersinkronisasi dari berkas presensi cabang',
+                'badge' => 'Status: ' . ($att->status === 'Late' ? "Terlambat ({$att->late_minutes} Mnt)" : 'Hadir') . " ({$timeFormatted} WIB{$outFormatted})",
+                'notes' => $att->notes ?: 'Tersinkronisasi dari mesin biometrik cabang',
             ];
         }
 
         return [
             'type' => 'normal',
-            'badge' => 'Data Terpadu (Mesin, Cuti & Logbook)',
+            'badge' => 'Presensi Biometrik (Fingerprint Cabang)',
             'notes' => '',
         ];
+    }
+
+    public function getLeaveSummary(): array
+    {
+        $employee = auth()->user()?->employee;
+        if (! $employee) {
+            return [
+                'annual_remaining' => 0,
+                'block_remaining' => 0,
+                'pending_count' => 0,
+            ];
+        }
+
+        $balances = \App\Models\EmployeeLeaveBalance::with('leaveType')
+            ->where('employee_id', $employee->id)
+            ->where('year', now()->year)
+            ->get();
+
+        $annual = $balances->firstWhere('leaveType.code', 'ANNUAL');
+        $block = $balances->firstWhere('leaveType.code', 'BLOCK_LEAVE');
+
+        $pendingCount = \App\Models\LeaveRequest::where('employee_id', $employee->id)
+            ->where('status', 'Pending')
+            ->count();
+
+        return [
+            'annual_remaining' => $annual->remaining_quota ?? 12,
+            'block_remaining' => $block->remaining_quota ?? 5,
+            'pending_count' => $pendingCount,
+        ];
+    }
+
+    public function getTenureInfo(): ?string
+    {
+        $employee = auth()->user()?->employee;
+        if (! $employee || ! $employee->join_date) {
+            return null;
+        }
+
+        $diff = $employee->join_date->diff(now());
+        $years = $diff->y;
+        $months = $diff->m;
+
+        if ($years > 0 && $months > 0) {
+            return "{$years} Tahun {$months} Bulan";
+        } elseif ($years > 0) {
+            return "{$years} Tahun";
+        } elseif ($months > 0) {
+            return "{$months} Bulan";
+        }
+
+        return 'Baru Bergabung';
+    }
+
+    public function getEmploymentStatusLabel(): string
+    {
+        $employee = auth()->user()?->employee;
+        return match ($employee?->employment_status) {
+            'Permanent' => 'Karyawan Tetap (PKWTT)',
+            'Contract' => 'Karyawan Kontrak (PKWT)',
+            'Probation' => 'Masa Percobaan',
+            'Internship' => 'Magang',
+            default => 'Karyawan Aktif',
+        };
     }
 }

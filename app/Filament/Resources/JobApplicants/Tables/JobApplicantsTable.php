@@ -57,7 +57,8 @@ class JobApplicantsTable
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->formatStateUsing(fn ($state) => $state ? '📄 Ada CV' : 'Tidak Ada')
-                    ->tooltip(fn (JobApplicant $record): ?string => $record->cv_filename),
+                    ->tooltip(fn (JobApplicant $record): ?string => $record->cv_filename)
+                    ->action('view_details'),
 
                 TextColumn::make('email_date')
                     ->label('Waktu Masuk')
@@ -88,16 +89,19 @@ class JobApplicantsTable
                         'Staff HR & GA' => 'Staff HR & GA',
                     ]),
             ])
+            ->recordAction('view_details')
             ->actions([
-                Action::make('download_cv')
-                    ->label('Unduh CV')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('success')
+                Action::make('view_details')
+                    ->label('Lihat CV')
+                    ->icon('heroicon-o-document-text')
+                    ->color('info')
                     ->button()
                     ->outlined()
-                    ->visible(fn (JobApplicant $record): bool => ! empty($record->cv_path))
-                    ->url(fn (JobApplicant $record): string => asset('storage/' . $record->cv_path))
-                    ->openUrlInNewTab(),
+                    ->modalWidth('5xl')
+                    ->modalHeading(fn (JobApplicant $record) => "Berkas CV Pelamar: {$record->name}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalContent(fn (JobApplicant $record) => view('filament.modals.job-applicant-detail', ['record' => $record])),
 
                 Action::make('hire_as_employee')
                     ->label('Terima Jadi Pegawai')

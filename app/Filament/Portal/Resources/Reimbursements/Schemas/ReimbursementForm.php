@@ -67,6 +67,7 @@ class ReimbursementForm
 
                         FileUpload::make('receipt_photo')
                             ->label('Upload Foto Kwitansi / Struk SPBU / Nota Pembayaran')
+                            ->disk('public')
                             ->directory('reimbursements/receipts')
                             ->image()
                             ->imageEditor()

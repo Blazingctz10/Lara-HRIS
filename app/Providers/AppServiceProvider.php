@@ -45,6 +45,15 @@ class AppServiceProvider extends ServiceProvider
                 }
                 @chmod($dir, 0777);
                 @chmod($dbPath, 0666);
+
+                try {
+                    \Illuminate\Support\Facades\DB::statement('PRAGMA journal_mode = WAL;');
+                    \Illuminate\Support\Facades\DB::statement('PRAGMA synchronous = NORMAL;');
+                    \Illuminate\Support\Facades\DB::statement('PRAGMA cache_size = -20000;');
+                    \Illuminate\Support\Facades\DB::statement('PRAGMA temp_store = MEMORY;');
+                } catch (\Throwable $e) {
+                    // Ignore during early boot/migration
+                }
             }
         }
 

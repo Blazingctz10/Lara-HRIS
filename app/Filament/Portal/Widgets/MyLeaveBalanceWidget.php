@@ -38,19 +38,22 @@ class MyLeaveBalanceWidget extends BaseWidget
 
         $stats = [
             Stat::make('Sisa Cuti Tahunan', ($annualBalance->remaining_quota ?? 12) . ' Hari')
-                ->description('Kuota Tahun ' . now()->year)
+                ->description('Kuota Tahun ' . now()->year . ' • Klik untuk lihat riwayat')
                 ->descriptionIcon('heroicon-m-calendar')
-                ->color('success'),
+                ->color('success')
+                ->url('/portal/leave-requests'),
 
             Stat::make('Status Block Leave OJK', ($blockBalance ? $blockBalance->remaining_quota . ' Hari Tersedia' : '5 Hari Tersedia'))
-                ->description('Mandatori Bank (Min. 5 Hari Beruntun)')
+                ->description('Mandatori Bank • Klik untuk ajukan cuti')
                 ->descriptionIcon('heroicon-m-shield-check')
-                ->color('primary'),
+                ->color('primary')
+                ->url('/portal/leave-requests/create'),
 
             Stat::make('Pengajuan Berjalan', $pendingCount . ' Pengajuan')
-                ->description('Status menunggu approval')
+                ->description('Status approval • Klik untuk cek status')
                 ->descriptionIcon('heroicon-m-arrow-path')
-                ->color($pendingCount > 0 ? 'warning' : 'gray'),
+                ->color($pendingCount > 0 ? 'warning' : 'gray')
+                ->url('/portal/leave-requests'),
         ];
 
         return $stats;

@@ -31,6 +31,28 @@ class LeaveRequestResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return null;
+        }
+
+        $query = static::getEloquentQuery();
+        if ($user->role === 'direksi') {
+            $count = $query->where('status', 'Approved_HR')->count();
+        } else {
+            $count = $query->where('status', 'Pending')->count();
+        }
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->accessibleBy();

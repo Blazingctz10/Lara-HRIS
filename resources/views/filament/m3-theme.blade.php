@@ -1,7 +1,9 @@
 <!-- Apple VisionOS / macOS Liquid Glass System with High-Precision Light & Dark Ergonomics -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"></noscript>
 
 <style>
 /* =============================================================================
@@ -949,4 +951,38 @@ select option {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--glass-primary);
 }
+
+/* =============================================================================
+   13. MODAL SVG & CONTENT SAFEGUARDS (PREVENTS GIGANTIC UNSTYLED SVGS)
+   ============================================================================= */
+.fi-modal-content svg,
+.fi-modal-window svg {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.fi-modal-content svg.w-4, .fi-modal-window svg.w-4 { width: 1rem !important; height: 1rem !important; min-width: 1rem !important; max-width: 1rem !important; }
+.fi-modal-content svg.w-5, .fi-modal-window svg.w-5 { width: 1.25rem !important; height: 1.25rem !important; min-width: 1.25rem !important; max-width: 1.25rem !important; }
+.fi-modal-content svg.w-6, .fi-modal-window svg.w-6 { width: 1.5rem !important; height: 1.5rem !important; min-width: 1.5rem !important; max-width: 1.5rem !important; }
+.fi-modal-content svg.w-8, .fi-modal-window svg.w-8 { width: 2rem !important; height: 2rem !important; min-width: 2rem !important; max-width: 2rem !important; }
+.fi-modal-content svg:not([class*="w-"]):not([width]) {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    max-width: 1.25rem !important;
+    max-height: 1.25rem !important;
+}
+
+/* Ensure flex/grid/spacing inside custom modals works reliably */
+.fi-modal-content .flex { display: flex !important; }
+.fi-modal-content .grid { display: grid !important; }
+.fi-modal-content .items-center { align-items: center !important; }
+.fi-modal-content .items-start { align-items: flex-start !important; }
+.fi-modal-content .justify-between { justify-content: space-between !important; }
+.fi-modal-content .justify-center { justify-content: center !important; }
+.fi-modal-content .gap-2 { gap: 0.5rem !important; }
+.fi-modal-content .gap-3 { gap: 0.75rem !important; }
+.fi-modal-content .gap-4 { gap: 1rem !important; }
+.fi-modal-content .space-y-3 > * + * { margin-top: 0.75rem !important; }
+.fi-modal-content .space-y-4 > * + * { margin-top: 1rem !important; }
+.fi-modal-content .space-y-6 > * + * { margin-top: 1.5rem !important; }
 </style>

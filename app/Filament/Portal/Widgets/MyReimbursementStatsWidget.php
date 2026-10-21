@@ -10,7 +10,7 @@ class MyReimbursementStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     protected function getStats(): array
     {
@@ -47,7 +47,8 @@ class MyReimbursementStatsWidget extends BaseWidget
             )
                 ->description($approvedCount > 0 ? "{$approvedCount} klaim disetujui Pincab (siap cair kasir)" : "Tidak ada dana siap tarik")
                 ->descriptionIcon('heroicon-m-banknotes')
-                ->color($approvedCount > 0 ? 'warning' : 'gray'),
+                ->color($approvedCount > 0 ? 'warning' : 'gray')
+                ->url('/portal/reimbursements'),
 
             Stat::make(
                 'Klaim Menunggu Review',
@@ -55,7 +56,8 @@ class MyReimbursementStatsWidget extends BaseWidget
             )
                 ->description($pendingCount > 0 ? "{$pendingCount} berkas menunggu persetujuan Pincab" : "Semua pengajuan telah diproses")
                 ->descriptionIcon('heroicon-m-clock')
-                ->color($pendingCount > 0 ? 'info' : 'gray'),
+                ->color($pendingCount > 0 ? 'info' : 'gray')
+                ->url('/portal/reimbursements'),
 
             Stat::make(
                 'Sudah Cair Bulan Ini',
@@ -63,7 +65,8 @@ class MyReimbursementStatsWidget extends BaseWidget
             )
                 ->description("{$paidCount} klaim telah lunas ditransfer")
                 ->descriptionIcon('heroicon-m-check-badge')
-                ->color('success'),
+                ->color('success')
+                ->url('/portal/reimbursements'),
         ];
     }
 }
