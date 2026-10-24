@@ -81,6 +81,7 @@ class EmployeeForm
                                             FileUpload::make('photo_url')
                                                 ->label('Pas Foto Pegawai')
                                                 ->image()
+                                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
                                                 ->avatar()
                                                 ->imageEditor()
                                                 ->directory('employees/photos')

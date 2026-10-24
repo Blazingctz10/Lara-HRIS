@@ -82,6 +82,7 @@ class ReimbursementForm
                             ->disk('public')
                             ->directory('reimbursements/receipts')
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
                             ->imageEditor()
                             ->maxSize(5120),
                     ]),

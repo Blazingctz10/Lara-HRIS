@@ -31,12 +31,12 @@ class LeaveRequestResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return $record->status === 'Pending';
+        return $record->status === 'Pending' && $record->employee_id === auth()->user()?->employee?->id;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return $record->status === 'Pending';
+        return $record->status === 'Pending' && $record->employee_id === auth()->user()?->employee?->id;
     }
 
     public static function getEloquentQuery(): Builder

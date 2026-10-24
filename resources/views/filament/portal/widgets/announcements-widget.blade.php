@@ -348,7 +348,7 @@
 
                         <!-- Content -->
                         <div class="m3-item-body">
-                            {!! $item->content !!}
+                            {!! strip_tags($item->content, '<p><br><b><strong><i><em><u><ul><ol><li><a><h2><h3><h4><blockquote>') !!}
                         </div>
 
                         <!-- Attachment -->

@@ -245,9 +245,18 @@ class BackupData extends Page
     public function downloadBackup(string $filename): BinaryFileResponse
     {
         $safeName = basename($filename);
+        if ($safeName === '' || $safeName === '.' || $safeName === '..') {
+            abort(400, 'Nama berkas tidak valid.');
+        }
+
+        $extension = strtolower(pathinfo($safeName, PATHINFO_EXTENSION));
+        if (! in_array($extension, ['sqlite', 'zip', 'json', 'sql'])) {
+            abort(403, 'Format berkas cadangan tidak diizinkan.');
+        }
+
         $path = $this->getBackupDir() . DIRECTORY_SEPARATOR . $safeName;
 
-        if (! File::exists($path)) {
+        if (! File::exists($path) || ! File::isFile($path)) {
             abort(404, 'File cadangan tidak ditemukan.');
         }
 
@@ -257,9 +266,18 @@ class BackupData extends Page
     public function deleteBackup(string $filename): void
     {
         $safeName = basename($filename);
+        if ($safeName === '' || $safeName === '.' || $safeName === '..') {
+            return;
+        }
+
+        $extension = strtolower(pathinfo($safeName, PATHINFO_EXTENSION));
+        if (! in_array($extension, ['sqlite', 'zip', 'json', 'sql'])) {
+            return;
+        }
+
         $path = $this->getBackupDir() . DIRECTORY_SEPARATOR . $safeName;
 
-        if (File::exists($path)) {
+        if (File::exists($path) && File::isFile($path)) {
             File::delete($path);
 
             Notification::make()

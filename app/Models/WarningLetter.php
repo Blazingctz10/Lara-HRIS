@@ -54,14 +54,16 @@ class WarningLetter extends Model
             return $query;
         }
 
-        if ($user->isBranchManager() && $user->branch_id) {
-            return $query->whereHas('employee', fn ($q) => $q->where('branch_id', $user->branch_id));
+        if ($user->isBranchManager()) {
+            $branchId = $user->branch_id ?? $user->employee?->branch_id;
+            return $query->whereHas('employee', fn ($q) => $q->where('branch_id', $branchId ?: 0));
         }
 
         if ($user->employee) {
             return $query->where('employee_id', $user->employee->id);
         }
 
-        return $query;
+        // Fail-safe: Non-admin users without an employee profile cannot see any warning letters
+        return $query->whereRaw('1 = 0');
     }
 }

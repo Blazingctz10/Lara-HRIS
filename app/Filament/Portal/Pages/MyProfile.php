@@ -13,6 +13,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -169,6 +170,7 @@ class MyProfile extends Page implements HasForms
                         FileUpload::make('photo_url')
                             ->label('Foto Profil Pegawai')
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
                             ->avatar()
                             ->disk('public')
                             ->directory('employee-photos')
@@ -223,6 +225,17 @@ class MyProfile extends Page implements HasForms
                     ->description('Kosongkan bagian ini jika Anda tidak bermaksud mengganti kata sandi login Anda.')
                     ->icon('heroicon-m-key')
                     ->schema([
+                        TextInput::make('current_password')
+                            ->label('Kata Sandi Saat Ini')
+                            ->password()
+                            ->revealable()
+                            ->nullable()
+                            ->rule('current_password')
+                            ->requiredWith('new_password')
+                            ->validationMessages([
+                                'current_password' => 'Kata sandi saat ini yang Anda masukkan tidak sesuai.',
+                                'required_with' => 'Harap masukkan kata sandi saat ini untuk menetapkan kata sandi baru.',
+                            ]),
                         Grid::make(2)->schema([
                             TextInput::make('new_password')
                                 ->label('Kata Sandi Baru')
@@ -314,6 +327,12 @@ class MyProfile extends Page implements HasForms
             $user?->update([
                 'password' => Hash::make($data['new_password']),
             ]);
+
+            try {
+                Auth::logoutOtherDevices($data['new_password']);
+            } catch (\Throwable $e) {
+                // Ignore if session driver does not support logoutOtherDevices
+            }
         }
 
         Notification::make()

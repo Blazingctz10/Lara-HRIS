@@ -12,9 +12,14 @@ class LeavePrintController extends Controller
     {
         $user = auth()->user();
 
-        // Cek otorisasi akses
+        // Cek otorisasi akses (Cegah IDOR / Akses Ilegal)
         if (! $user->isHrAdmin() && ! $user->isDireksi() && ! $user->isSuperAdmin()) {
-            if ($user->employee && $user->employee->id !== $leaveRequest->employee_id) {
+            if ($user->isBranchManager()) {
+                $userBranchId = $user->employee?->branch_id ?? $user->branch_id;
+                if (! $userBranchId || $userBranchId !== $leaveRequest->employee?->branch_id) {
+                    abort(403, 'Anda tidak berhak mencetak formulir cuti pegawai di luar kantor cabang Anda.');
+                }
+            } elseif (! $user->employee || $user->employee->id !== $leaveRequest->employee_id) {
                 abort(403, 'Anda tidak berhak mencetak formulir cuti pegawai lain.');
             }
         }

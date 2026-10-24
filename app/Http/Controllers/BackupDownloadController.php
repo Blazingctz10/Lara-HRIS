@@ -16,10 +16,19 @@ class BackupDownloadController extends Controller
         }
 
         $safeName = basename($filename);
+        if ($safeName === '' || $safeName === '.' || $safeName === '..') {
+            abort(400, 'Nama berkas tidak valid.');
+        }
+
+        $extension = strtolower(pathinfo($safeName, PATHINFO_EXTENSION));
+        if (! in_array($extension, ['sqlite', 'zip', 'json', 'sql'])) {
+            abort(403, 'Format berkas cadangan tidak diizinkan.');
+        }
+
         $backupDir = storage_path('app/backups');
         $path = $backupDir . DIRECTORY_SEPARATOR . $safeName;
 
-        if (! File::exists($path)) {
+        if (! File::exists($path) || ! File::isFile($path)) {
             abort(404, 'Berkas cadangan tidak ditemukan.');
         }
 

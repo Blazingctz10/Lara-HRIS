@@ -36,7 +36,8 @@ class ListAttendances extends ListRecords
                 ->form([
                     FileUpload::make('csv_file')
                         ->label('Pilih Berkas Mesin Presensi (.xls atau .csv)')
-                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel', 'application/octet-stream', 'application/x-msexcel'])
+                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel', 'application/x-msexcel'])
+                        ->maxSize(10240)
                         ->disk('local')
                         ->directory('temp_imports')
                         ->required()

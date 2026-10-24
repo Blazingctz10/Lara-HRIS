@@ -7,6 +7,7 @@ use App\Models\LeaveRequest;
 use App\Observers\EmployeeObserver;
 use App\Observers\LeaveRequestObserver;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -63,5 +64,12 @@ class AppServiceProvider extends ServiceProvider
 
         Employee::observe(EmployeeObserver::class);
         LeaveRequest::observe(LeaveRequestObserver::class);
+
+        // Enterprise Password Security Policy: Minimum 8 characters with letters & numbers
+        Password::defaults(function () {
+            return Password::min(8)
+                ->letters()
+                ->numbers();
+        });
     }
 }

@@ -240,8 +240,9 @@ class Employee extends Model
         }
 
         // Branch manager only sees employees within their branch
-        if ($user->isBranchManager() && $user->branch_id) {
-            return $query->where('branch_id', $user->branch_id);
+        if ($user->isBranchManager()) {
+            $branchId = $user->branch_id ?? $user->employee?->branch_id;
+            return $query->where('branch_id', $branchId ?: 0);
         }
 
         // Regular employee only sees themselves
@@ -249,6 +250,7 @@ class Employee extends Model
             return $query->where('id', $user->employee->id);
         }
 
-        return $query;
+        // Fail-safe: Non-admin users without an employee profile cannot see any employee records
+        return $query->whereRaw('1 = 0');
     }
 }

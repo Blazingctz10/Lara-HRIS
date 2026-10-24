@@ -58,12 +58,14 @@ class UserForm
                                 ->label('Kata Sandi Masuk')
                                 ->password()
                                 ->revealable()
+                                ->minLength(6)
+                                ->maxLength(255)
                                 ->placeholder('Default: password')
                                 ->dehydrateStateUsing(fn ($state) => ! empty($state) ? Hash::make($state) : null)
                                 ->dehydrated(fn ($state) => filled($state))
                                 ->required(fn (string $operation): bool => $operation === 'create')
                                 ->helperText(fn (string $operation): string => $operation === 'create'
-                                    ? 'Kata sandi awal untuk akun baru (Default: password)'
+                                    ? 'Kata sandi awal untuk akun baru (Minimal 6 karakter, Default: password)'
                                     : 'Biarkan kosong jika tidak ingin mengubah kata sandi yang sudah ada.'
                                 ),
                         ]),
