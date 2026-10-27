@@ -17,5 +17,7 @@ Route::middleware(['auth', 'throttle:60,1'])->prefix('admin')->group(function ()
     Route::get('/download-template/attendance', [\App\Http\Controllers\TemplateDownloadController::class, 'downloadAttendance'])->name('admin.download-template.attendance');
     Route::get('/download-template/attendance-xls', [\App\Http\Controllers\TemplateDownloadController::class, 'downloadAttendanceXls'])->name('admin.download-template.attendance-xls');
     Route::get('/backup/download/{filename}', [\App\Http\Controllers\BackupDownloadController::class, 'download'])->name('admin.backup.download');
+    Route::get('/attendance/matrix-preview', [\App\Http\Controllers\AttendanceReportController::class, 'previewMatrix'])->name('admin.attendance.matrix-preview');
+    Route::get('/attendance/export-matrix', [\App\Http\Controllers\AttendanceReportController::class, 'exportMatrix'])->name('admin.attendance.export-matrix');
 });
 

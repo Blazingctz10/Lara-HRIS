@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Attendances\Pages;
 use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
 use App\Models\AttendanceDispensation;
+use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Services\DataMigrationService;
@@ -88,8 +89,8 @@ class ListAttendances extends ListRecords
                     ];
 
                     $callback = function () use ($attendances) {
-                        $out = fopen('php://output', 'w');
-                        fputs($out, "\xEF\xBB\xBF");
+                        $streamHandle = fopen('php://output', 'w');
+                        fputs($streamHandle, "\xEF\xBB\xBF");
 
                         $html = '<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -160,7 +161,7 @@ class ListAttendances extends ListRecords
   </thead>
   <tbody>';
 
-                        fputs($out, $html);
+                        fputs($streamHandle, $html);
 
                         $no = 1;
                         foreach ($attendances as $row) {
@@ -210,26 +211,28 @@ class ListAttendances extends ListRecords
                             $tr .= '<td class="td-cell" style="font-size: 9px; color: #475569;">' . htmlspecialchars($notes) . '</td>';
                             $tr .= '</tr>';
 
-                            fputs($out, $tr);
+                            fputs($streamHandle, $tr);
                         }
 
                         $footerHtml = '</tbody>
 </table>
 </body>
 </html>';
-                        fputs($out, $footerHtml);
-                        fclose($out);
+                        fputs($streamHandle, $footerHtml);
+                        fclose($streamHandle);
                     };
 
-                    return response()->stream($callback, 200, $headers);
+                    return response()->streamDownload($callback, $filename, [
+                        'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+                    ]);
                 }),
 
             Action::make('export_monthly_matrix')
-                ->label('Unduh Matriks Rekap Bulanan (Buku Rekap HR)')
-                ->icon('heroicon-o-table-cells')
+                ->label('Matriks Rekap Bulanan (Preview, Cetak & Unduh)')
+                ->icon('heroicon-o-printer')
                 ->color('primary')
-                ->modalHeading('Cetak & Unduh Matriks Rekap Presensi Bulanan')
-                ->modalDescription('Pilih periode bulan, tahun, dan format keluaran rekapitulasi presensi terpadu (mesin biometrik, cuti resmi, dan logbook dispensasi).')
+                ->modalHeading('Cetak & Pratinjau Matriks Presensi Bulanan')
+                ->modalDescription('Pilih periode bulan, tahun, filter kantor cabang, serta opsi tindakan: buka halaman pratinjau siap cetak (print/PDF) atau langsung unduh berkas.')
                 ->form([
                     Select::make('month')
                         ->label('Periode Bulan')
@@ -262,501 +265,52 @@ class ListAttendances extends ListRecords
                         })
                         ->default(now()->year)
                         ->required(),
-                    Select::make('format')
-                        ->label('Format Unduhan')
+                    Select::make('branch_id')
+                        ->label('Filter Kantor Unit Kerja')
+                        ->options(fn () => Branch::orderBy('name')->pluck('name', 'id')->toArray())
+                        ->placeholder('Semua Unit Kerja BPR Banda Raya')
+                        ->nullable(),
+                    Select::make('action_type')
+                        ->label('Aksi Laporan')
                         ->options([
-                            'excel' => 'Microsoft Excel (.xls) - Rekap Resmi & Berwarna (Executive HR Report)',
-                            'csv' => 'File CSV Mentah (.csv) - Data Teks Sederhana',
+                            'preview' => '👁️ Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
+                            'excel' => '📥 Langsung Unduh Berkas Excel Resmi (.xls)',
+                            'csv' => '📄 Langsung Unduh Berkas Teks (.csv)',
                         ])
-                        ->default('excel')
+                        ->default('preview')
                         ->required(),
                 ])
-                ->modalSubmitActionLabel('Unduh Laporan')
-                ->action(function (array $data): StreamedResponse {
+                ->modalSubmitActionLabel('Lanjutkan')
+                ->action(function (array $data) {
                     $year = (int) ($data['year'] ?? now()->year);
                     $month = (int) ($data['month'] ?? now()->month);
-                    $format = $data['format'] ?? 'excel';
-                    $daysInMonth = Carbon::create($year, $month)->daysInMonth;
-                    $periodName = Carbon::create($year, $month, 1)->translatedFormat('F Y');
+                    $branchId = ! empty($data['branch_id']) ? (int) $data['branch_id'] : null;
+                    $actionType = $data['action_type'] ?? 'preview';
 
-                    $employees = Employee::accessibleBy()
-                        ->with(['branch', 'department'])
-                        ->where('status', 'Active')
-                        ->orderBy('branch_id')
-                        ->orderBy('nip')
-                        ->get();
-
-                    if ($format === 'excel') {
-                        $filename = 'Matriks_Rekap_Presensi_BPR_' . sprintf('%04d_%02d', $year, $month) . '.xls';
-                        $headers = [
-                            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-                            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                            'Pragma' => 'no-cache',
-                            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                            'Expires' => '0',
-                        ];
-
-                        $callback = function () use ($employees, $year, $month, $daysInMonth, $periodName) {
-                            $out = fopen('php://output', 'w');
-                            fputs($out, "\xEF\xBB\xBF");
-
-                            // Day names helper
-                            $dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-
-                            $htmlHeader = '<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:x="urn:schemas-microsoft-com:office:excel"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!--[if gte mso 9]>
-<xml>
- <x:ExcelWorkbook>
-  <x:ExcelWorksheets>
-   <x:ExcelWorksheet>
-    <x:Name>Rekap Presensi ' . htmlspecialchars($periodName) . '</x:Name>
-    <x:WorksheetOptions>
-     <x:DisplayGridlines/>
-     <x:FreezePanes/>
-     <x:FrozenNoSplit/>
-     <x:SplitHorizontal>7</x:SplitHorizontal>
-     <x:TopRowBottomPane>7</x:TopRowBottomPane>
-     <x:SplitVertical>4</x:SplitVertical>
-     <x:LeftColumnRightPane>4</x:LeftColumnRightPane>
-     <x:ActivePane>0</x:ActivePane>
-    </x:WorksheetOptions>
-   </x:ExcelWorksheet>
-  </x:ExcelWorksheets>
- </x:ExcelWorkbook>
-</xml>
-<![endif]-->
-<style>
-  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 11px; margin: 0; padding: 10px; }
-  table { border-collapse: collapse; width: 100%; }
-  .title-main { font-size: 16px; font-weight: bold; color: #0E6838; text-transform: uppercase; }
-  .subtitle { font-size: 12px; font-weight: bold; color: #27272a; margin-top: 4px; }
-  .meta-info { font-size: 11px; color: #52525b; margin-top: 2px; }
-  
-  .th-base { border: 1px solid #14532d; font-family: Calibri, sans-serif; }
-  .th-main { background-color: #0E6838; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 8px 4px; font-size: 11px; }
-  .th-sun { background-color: #b91c1c; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 8px 4px; font-size: 11px; }
-  .th-sub { background-color: #15803d; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 4px 2px; font-size: 10px; }
-  .th-sub-sun { background-color: #dc2626; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 4px 2px; font-size: 10px; }
-  .th-summary { background-color: #1e293b; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 8px 6px; font-size: 11px; }
-  .th-summary-sub { background-color: #334155; color: #ffffff; font-weight: bold; text-align: center; vertical-align: middle; padding: 4px; font-size: 10px; }
-
-  .td-cell { border: 1px solid #cbd5e1; padding: 4px 5px; font-size: 10px; text-align: center; vertical-align: middle; mso-number-format: "\@"; }
-  .td-left { text-align: left; }
-  .td-right { text-align: right; }
-  .td-nip { font-family: "Courier New", monospace; text-align: center; }
-  .td-cuti { background-color: #dbeafe; color: #1e40af; font-weight: bold; }
-  .td-izin { background-color: #fef3c7; color: #92400e; font-weight: bold; }
-  .td-menunggu { background-color: #f3e8ff; color: #6b21a8; font-style: italic; }
-  .td-libur { background-color: #f1f5f9; color: #94a3b8; font-weight: bold; }
-  .td-late { color: #dc2626; font-weight: bold; background-color: #fee2e2; }
-  .td-present { color: #047857; font-weight: 500; }
-  .td-alpa { background-color: #ffe4e6; color: #be123c; font-weight: bold; }
-
-  .sum-col { font-weight: bold; font-size: 11px; }
-  .sum-hadir { color: #047857; }
-  .sum-cuti { color: #1d4ed8; }
-  .sum-izin { color: #b45309; }
-  .sum-telat { color: #b91c1c; }
-  .sum-denda { color: #b91c1c; text-align: right; }
-  .sum-alpa { color: #be123c; }
-
-  .tr-even { background-color: #ffffff; }
-  .tr-odd { background-color: #f8fafc; }
-
-  .tfoot-total { background-color: #e2e8f0; font-weight: bold; font-size: 11px; border-top: 2px solid #0E6838; border-bottom: 2px solid #0E6838; }
-  .sign-box { border: 1px solid #cbd5e1; padding: 12px; text-align: center; vertical-align: top; }
-</style>
-</head>
-<body>
-<table>
-  <tr>
-    <td colspan="' . (4 + ($daysInMonth * 2) + 7) . '" class="title-main">PT BPR BANDA RAYA</td>
-  </tr>
-  <tr>
-    <td colspan="' . (4 + ($daysInMonth * 2) + 7) . '" class="subtitle">MATRIKS REKAPITULASI PRESENSI & KEHADIRAN BULANAN (TERPADU: MESIN, CUTI & LOGBOOK)</td>
-  </tr>
-  <tr>
-    <td colspan="' . (4 + ($daysInMonth * 2) + 7) . '" class="meta-info">Periode: <b>' . htmlspecialchars($periodName) . '</b> | Dicetak Pada: ' . now()->format('d/m/Y H:i:s') . ' WIB | Status Pegawai: Aktif</td>
-  </tr>
-  <tr><td colspan="' . (4 + ($daysInMonth * 2) + 7) . '">&nbsp;</td></tr>
-  <thead>
-    <tr>
-      <th rowspan="2" class="th-main th-base" style="width: 35px;">NO</th>
-      <th rowspan="2" class="th-main th-base" style="width: 90px;">NIP / NIK</th>
-      <th rowspan="2" class="th-main th-base" style="width: 170px;">NAMA PEGAWAI</th>
-      <th rowspan="2" class="th-main th-base" style="width: 130px;">KANTOR UNIT</th>';
-
-                            // Day columns header
-                            for ($d = 1; $d <= $daysInMonth; $d++) {
-                                $dObj = Carbon::create($year, $month, $d);
-                                $isSun = $dObj->isSunday();
-                                $dayStr = sprintf('%02d', $d);
-                                $dayAbbr = $dayNames[$dObj->dayOfWeek];
-                                $cls = $isSun ? 'th-sun' : 'th-main';
-                                $htmlHeader .= '<th colspan="2" class="' . $cls . ' th-base" style="width: 68px;">Tgl ' . $dayStr . '<br><small>' . $dayAbbr . '</small></th>';
-                            }
-
-                            $htmlHeader .= '
-      <th colspan="6" class="th-summary th-base">AKUMULASI KEHADIRAN</th>
-      <th rowspan="2" class="th-summary th-base" style="width: 220px;">CATATAN TERPADU (LOGBOOK & CUTI)</th>
-    </tr>
-    <tr>';
-
-                            // Day sub-headers (In / Out)
-                            for ($d = 1; $d <= $daysInMonth; $d++) {
-                                $dObj = Carbon::create($year, $month, $d);
-                                $isSun = $dObj->isSunday();
-                                $subCls = $isSun ? 'th-sub-sun' : 'th-sub';
-                                $htmlHeader .= '<th class="' . $subCls . ' th-base">In</th><th class="' . $subCls . ' th-base">Out</th>';
-                            }
-
-                            $htmlHeader .= '
-      <th class="th-summary-sub th-base" style="width: 45px;">Hadir</th>
-      <th class="th-summary-sub th-base" style="width: 45px;">Cuti</th>
-      <th class="th-summary-sub th-base" style="width: 45px;">Izin</th>
-      <th class="th-summary-sub th-base" style="width: 45px;">Telat</th>
-      <th class="th-summary-sub th-base" style="width: 80px;">Denda (Rp)</th>
-      <th class="th-summary-sub th-base" style="width: 45px;">Alpa</th>
-    </tr>
-  </thead>
-  <tbody>';
-
-                            fputs($out, $htmlHeader);
-
-                            $grandHadir = 0;
-                            $grandCuti = 0;
-                            $grandIzin = 0;
-                            $grandTelat = 0;
-                            $grandDenda = 0;
-                            $grandAlpa = 0;
-                            $no = 1;
-
-                            foreach ($employees as $emp) {
-                                $attendances = Attendance::where('employee_id', $emp->id)
-                                    ->whereYear('date', $year)
-                                    ->whereMonth('date', $month)
-                                    ->get()
-                                    ->keyBy(fn ($a) => Carbon::parse($a->date)->format('j'));
-
-                                $rowCls = ($no % 2 === 0) ? 'tr-even' : 'tr-odd';
-                                $rowHtml = '<tr class="' . $rowCls . '">';
-                                $rowHtml .= '<td class="td-cell">' . $no++ . '</td>';
-                                $rowHtml .= '<td class="td-cell td-nip">' . htmlspecialchars($emp->nip) . '</td>';
-                                $rowHtml .= '<td class="td-cell td-left" style="font-weight: 600;">' . htmlspecialchars($emp->full_name) . '</td>';
-                                $rowHtml .= '<td class="td-cell td-left">' . htmlspecialchars($emp->branch?->name ?? 'Kantor Pusat') . '</td>';
-
-                                $totalHadir = 0;
-                                $totalCuti = 0;
-                                $totalIzin = 0;
-                                $totalTerlambat = 0;
-                                $totalDenda = 0;
-                                $totalTidakAbsen = 0;
-                                $notesList = [];
-
-                                for ($d = 1; $d <= $daysInMonth; $d++) {
-                                    $dateObj = Carbon::create($year, $month, $d);
-                                    $isSunday = $dateObj->isSunday();
-                                    $att = $attendances->get($d);
-
-                                    if ($att) {
-                                        $in = $att->clock_in ? Carbon::parse($att->clock_in)->format('H:i') : '-';
-                                        $out = $att->clock_out ? Carbon::parse($att->clock_out)->format('H:i') : '-';
-                                        $isLateDisp = str_contains($att->notes ?? '', 'Dispensasi Telat');
-                                        $isLate = ($att->status === 'Late' || ($att->late_minutes ?? 0) > 0);
-
-                                        if (str_contains($att->notes ?? '', 'Cuti Resmi') || ($att->status === 'Excused' && str_contains($att->notes ?? '', 'Cuti'))) {
-                                            $rowHtml .= '<td colspan="2" class="td-cell td-cuti">CUTI</td>';
-                                            $totalCuti++;
-                                            $notesList[] = "Tgl {$d}: Cuti";
-                                        } elseif ($att->status === 'Excused' && ! $isLateDisp) {
-                                            $rowHtml .= '<td colspan="2" class="td-cell td-izin">IZIN</td>';
-                                            $totalIzin++;
-                                            $notesList[] = "Tgl {$d}: Izin";
-                                        } elseif ($att->status === 'Present' || $isLateDisp) {
-                                            $rowHtml .= '<td class="td-cell td-present">' . $in . '</td>';
-                                            $rowHtml .= '<td class="td-cell td-present">' . $out . '</td>';
-                                            $totalHadir++;
-                                            if ($isLateDisp) {
-                                                $notesList[] = "Tgl {$d}: Disp. Telat";
-                                            }
-                                        } elseif ($isLate) {
-                                            $rowHtml .= '<td class="td-cell td-late">' . $in . '</td>';
-                                            $rowHtml .= '<td class="td-cell">' . $out . '</td>';
-                                            $totalHadir++;
-                                            $totalTerlambat++;
-                                            $totalDenda += ($att->penalty_amount ?: 50000);
-                                            $notesList[] = "Tgl {$d}: Telat " . ($att->late_minutes ?? 0) . "m";
-                                        } else {
-                                            $rowHtml .= '<td class="td-cell">' . $in . '</td>';
-                                            $rowHtml .= '<td class="td-cell">' . $out . '</td>';
-                                        }
-
-                                        if (! empty($att->notes) && ! in_array("Tgl {$d}: {$att->notes}", $notesList)) {
-                                            $notesList[] = "Tgl {$d}: {$att->notes}";
-                                        }
-                                    } else {
-                                        // Cek pengajuan cuti & dispensasi tidak tersinkron
-                                        $unSyncedLeave = LeaveRequest::where('employee_id', $emp->id)
-                                            ->whereIn('status', ['Approved', 'approved', 'Approved_HR'])
-                                            ->whereDate('start_date', '<=', $dateObj->toDateString())
-                                            ->whereDate('end_date', '>=', $dateObj->toDateString())
-                                            ->first();
-
-                                        $unSyncedDisp = AttendanceDispensation::where('employee_id', $emp->id)
-                                            ->whereDate('date', $dateObj->toDateString())
-                                            ->first();
-
-                                        if ($unSyncedLeave) {
-                                            $rowHtml .= '<td colspan="2" class="td-cell td-cuti">CUTI</td>';
-                                            $totalCuti++;
-                                            $notesList[] = "Tgl {$d}: Cuti";
-                                        } elseif ($unSyncedDisp) {
-                                            if ($unSyncedDisp->isLateArrivalDispensation()) {
-                                                $rowHtml .= '<td colspan="2" class="td-cell td-menunggu">MENUNGGU PRESENSI</td>';
-                                                $notesList[] = "Tgl {$d}: Izin Telat";
-                                            } else {
-                                                $rowHtml .= '<td colspan="2" class="td-cell td-izin">IZIN</td>';
-                                                $totalIzin++;
-                                                $notesList[] = "Tgl {$d}: Dispensasi";
-                                            }
-                                        } elseif ($isSunday) {
-                                            $rowHtml .= '<td colspan="2" class="td-cell td-libur">LIBUR</td>';
-                                        } else {
-                                            $isPastWorkday = $dateObj->lte(now());
-                                            if ($isPastWorkday) {
-                                                $rowHtml .= '<td class="td-cell td-alpa">-</td><td class="td-cell td-alpa">-</td>';
-                                                $totalTidakAbsen++;
-                                            } else {
-                                                $rowHtml .= '<td class="td-cell">-</td><td class="td-cell">-</td>';
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $grandHadir += $totalHadir;
-                                $grandCuti += $totalCuti;
-                                $grandIzin += $totalIzin;
-                                $grandTelat += $totalTerlambat;
-                                $grandDenda += $totalDenda;
-                                $grandAlpa += $totalTidakAbsen;
-
-                                $rowHtml .= '<td class="td-cell sum-col sum-hadir">' . $totalHadir . '</td>';
-                                $rowHtml .= '<td class="td-cell sum-col sum-cuti">' . $totalCuti . '</td>';
-                                $rowHtml .= '<td class="td-cell sum-col sum-izin">' . $totalIzin . '</td>';
-                                $rowHtml .= '<td class="td-cell sum-col sum-telat">' . $totalTerlambat . '</td>';
-                                $rowHtml .= '<td class="td-cell sum-col sum-denda">' . number_format($totalDenda, 0, ',', '.') . '</td>';
-                                $rowHtml .= '<td class="td-cell sum-col sum-alpa">' . $totalTidakAbsen . '</td>';
-                                $rowHtml .= '<td class="td-cell td-left" style="font-size: 9px; color: #475569;">' . htmlspecialchars(implode('; ', array_slice(array_unique($notesList), 0, 3))) . '</td>';
-                                $rowHtml .= '</tr>';
-
-                                fputs($out, $rowHtml);
-                            }
-
-                            // Footer Totals
-                            $htmlFoot = '</tbody>
-  <tfoot>
-    <tr class="tfoot-total">
-      <td colspan="4" class="td-cell" style="text-align: right; font-weight: bold; padding: 8px;">TOTAL REKAPITULASI:</td>
-      <td colspan="' . ($daysInMonth * 2) . '" class="td-cell" style="color: #64748b; font-style: italic;">(Akumulasi ' . count($employees) . ' Karyawan Aktif)</td>
-      <td class="td-cell sum-col sum-hadir">' . $grandHadir . '</td>
-      <td class="td-cell sum-col sum-cuti">' . $grandCuti . '</td>
-      <td class="td-cell sum-col sum-izin">' . $grandIzin . '</td>
-      <td class="td-cell sum-col sum-telat">' . $grandTelat . '</td>
-      <td class="td-cell sum-col sum-denda">' . number_format($grandDenda, 0, ',', '.') . '</td>
-      <td class="td-cell sum-col sum-alpa">' . $grandAlpa . '</td>
-      <td class="td-cell">&nbsp;</td>
-    </tr>
-  </tfoot>
-</table>
-
-<br><br>
-<table style="width: 100%; border: none;">
-  <tr>
-    <td style="width: 30%; text-align: center; vertical-align: top;">
-      <b>Dibuat Oleh:</b><br><br><br><br><br>
-      <u>( Staf Human Capital )</u><br>
-      <span style="font-size: 10px; color: #64748b;">Pengelola Presensi & HRIS</span>
-    </td>
-    <td style="width: 40%; text-align: center; vertical-align: top;">
-      <b>Diperiksa Oleh:</b><br><br><br><br><br>
-      <u>( HC & GA Division Head )</u><br>
-      <span style="font-size: 10px; color: #64748b;">Human Capital & General Affair</span>
-    </td>
-    <td style="width: 30%; text-align: center; vertical-align: top;">
-      <b>Disetujui Oleh:</b><br><br><br><br><br>
-      <u>( Direktur Operasional )</u><br>
-      <span style="font-size: 10px; color: #64748b;">PT BPR Banda Raya</span>
-    </td>
-  </tr>
-</table>
-</body>
-</html>';
-                            fputs($out, $htmlFoot);
-                            fclose($out);
-                        };
-
-                        return response()->stream($callback, 200, $headers);
+                    if ($actionType === 'excel') {
+                        return redirect()->route('admin.attendance.export-matrix', [
+                            'year' => $year,
+                            'month' => $month,
+                            'branch_id' => $branchId,
+                            'format' => 'excel',
+                        ]);
                     }
 
-                    // Fallback to RAW CSV
-                    $headers = [
-                        'Content-Type' => 'text/csv; charset=UTF-8',
-                        'Content-Disposition' => 'attachment; filename="matriks_rekap_presensi_' . sprintf('%04d_%02d', $year, $month) . '_bpr_banda_raya.csv"',
-                        'Pragma' => 'no-cache',
-                        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                        'Expires' => '0',
-                    ];
+                    if ($actionType === 'csv') {
+                        return redirect()->route('admin.attendance.export-matrix', [
+                            'year' => $year,
+                            'month' => $month,
+                            'branch_id' => $branchId,
+                            'format' => 'csv',
+                        ]);
+                    }
 
-                    $callback = function () use ($employees, $year, $month, $daysInMonth) {
-                        $file = fopen('php://output', 'w');
-                        fputs($file, "\xEF\xBB\xBF");
-
-                        // Row 1: Judul Laporan
-                        fputcsv($file, ['PT BPR BANDA RAYA - MATRIKS REKAPITULASI PRESENSI TERPADU (MESIN, CUTI & LOGBOOK)']);
-                        fputcsv($file, ['Periode: ' . Carbon::create($year, $month)->translatedFormat('F Y')]);
-                        fputcsv($file, []);
-
-                        // Header Columns
-                        $headerCols = ['No', 'NIK / NIP', 'Nama Pegawai', 'Kantor / Unit Kerja'];
-                        for ($d = 1; $d <= $daysInMonth; $d++) {
-                            $pad = str_pad($d, 2, '0', STR_PAD_LEFT);
-                            $headerCols[] = "{$pad} In";
-                            $headerCols[] = "{$pad} Out";
-                        }
-                        $headerCols[] = 'Total Hadir';
-                        $headerCols[] = 'Total Cuti';
-                        $headerCols[] = 'Total Izin / Dispensasi';
-                        $headerCols[] = 'Total Terlambat';
-                        $headerCols[] = 'Total Denda (Rp)';
-                        $headerCols[] = 'Tidak Absen / Alpa';
-                        $headerCols[] = 'Keterangan / Rincian Logbook & Cuti';
-                        fputcsv($file, $headerCols);
-
-                        $no = 1;
-                        foreach ($employees as $emp) {
-                            $attendances = Attendance::where('employee_id', $emp->id)
-                                ->whereYear('date', $year)
-                                ->whereMonth('date', $month)
-                                ->get()
-                                ->keyBy(fn ($a) => Carbon::parse($a->date)->format('j'));
-
-                            $row = [
-                                $no++,
-                                $emp->nip,
-                                $emp->full_name,
-                                $emp->branch?->name ?? 'Kantor Pusat',
-                            ];
-
-                            $totalHadir = 0;
-                            $totalCuti = 0;
-                            $totalIzin = 0;
-                            $totalTerlambat = 0;
-                            $totalDenda = 0;
-                            $totalTidakAbsen = 0;
-                            $notesList = [];
-
-                            for ($d = 1; $d <= $daysInMonth; $d++) {
-                                $dateObj = Carbon::create($year, $month, $d);
-                                $isSunday = $dateObj->isSunday();
-                                $att = $attendances->get($d);
-
-                                if ($att) {
-                                    $in = $att->clock_in ? Carbon::parse($att->clock_in)->format('H:i') : '-';
-                                    $out = $att->clock_out ? Carbon::parse($att->clock_out)->format('H:i') : '-';
-                                    $isLateDisp = str_contains($att->notes ?? '', 'Dispensasi Telat');
-
-                                    if (str_contains($att->notes ?? '', 'Cuti Resmi') || ($att->status === 'Excused' && str_contains($att->notes ?? '', 'Cuti'))) {
-                                        $row[] = 'CUTI';
-                                        $row[] = 'CUTI';
-                                        $totalCuti++;
-                                        $notesList[] = "Tgl {$d}: Cuti";
-                                    } elseif ($att->status === 'Excused' && ! $isLateDisp) {
-                                        $row[] = 'IZIN';
-                                        $row[] = 'IZIN';
-                                        $totalIzin++;
-                                        $notesList[] = "Tgl {$d}: Izin";
-                                    } elseif ($att->status === 'Present' || $isLateDisp) {
-                                        $row[] = $in;
-                                        $row[] = $out;
-                                        $totalHadir++;
-                                        if ($isLateDisp) {
-                                            $notesList[] = "Tgl {$d}: Disp. Telat";
-                                        }
-                                    } elseif ($att->status === 'Late' || ($att->late_minutes ?? 0) > 0) {
-                                        $row[] = $in;
-                                        $row[] = $out;
-                                        $totalHadir++;
-                                        $totalTerlambat++;
-                                        $totalDenda += ($att->penalty_amount ?: 50000);
-                                        $notesList[] = "Tgl {$d}: Telat " . ($att->late_minutes ?? 0) . "m";
-                                    } else {
-                                        $row[] = $in;
-                                        $row[] = $out;
-                                    }
-
-                                    if (! empty($att->notes) && ! in_array("Tgl {$d}: {$att->notes}", $notesList)) {
-                                        $notesList[] = "Tgl {$d}: {$att->notes}";
-                                    }
-                                } else {
-                                    $unSyncedLeave = LeaveRequest::where('employee_id', $emp->id)
-                                        ->whereIn('status', ['Approved', 'approved', 'Approved_HR'])
-                                        ->whereDate('start_date', '<=', $dateObj->toDateString())
-                                        ->whereDate('end_date', '>=', $dateObj->toDateString())
-                                        ->first();
-
-                                    $unSyncedDisp = AttendanceDispensation::where('employee_id', $emp->id)
-                                        ->whereDate('date', $dateObj->toDateString())
-                                        ->first();
-
-                                    if ($unSyncedLeave) {
-                                        $row[] = 'CUTI';
-                                        $row[] = 'CUTI';
-                                        $totalCuti++;
-                                        $notesList[] = "Tgl {$d}: Cuti";
-                                    } elseif ($unSyncedDisp) {
-                                        if ($unSyncedDisp->isLateArrivalDispensation()) {
-                                            $row[] = 'MENUNGGU PRESENSI';
-                                            $row[] = '-';
-                                            $notesList[] = "Tgl {$d}: Izin Telat";
-                                        } else {
-                                            $row[] = 'IZIN';
-                                            $row[] = 'IZIN';
-                                            $totalIzin++;
-                                            $notesList[] = "Tgl {$d}: Dispensasi";
-                                        }
-                                    } elseif ($isSunday) {
-                                        $row[] = 'LIBUR';
-                                        $row[] = 'LIBUR';
-                                    } else {
-                                        $row[] = '-';
-                                        $row[] = '-';
-                                        if ($dateObj->lte(now())) {
-                                            $totalTidakAbsen++;
-                                        }
-                                    }
-                                }
-                            }
-
-                            $row[] = $totalHadir;
-                            $row[] = $totalCuti;
-                            $row[] = $totalIzin;
-                            $row[] = $totalTerlambat;
-                            $row[] = number_format($totalDenda, 0, ',', '.');
-                            $row[] = $totalTidakAbsen;
-                            $row[] = implode('; ', array_slice(array_unique($notesList), 0, 3));
-
-                            fputcsv($file, $row);
-                        }
-
-                        fclose($file);
-                    };
-
-                    return response()->stream($callback, 200, $headers);
+                    // Default: Buka Halaman Pratinjau & Cetak Resmi
+                    return redirect()->route('admin.attendance.matrix-preview', [
+                        'year' => $year,
+                        'month' => $month,
+                        'branch_id' => $branchId,
+                    ]);
                 }),
             CreateAction::make()
                 ->label('Input Presensi Manual')
