@@ -47,6 +47,16 @@ class ReimbursementResource extends Resource
         return 'warning';
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->employee !== null;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->employee !== null;
+    }
+
     public static function canEdit(Model $record): bool
     {
         return $record->status === 'Pending' && $record->employee_id === auth()->user()?->employee?->id;

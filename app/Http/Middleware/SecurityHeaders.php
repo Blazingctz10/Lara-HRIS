@@ -14,7 +14,7 @@ class SecurityHeaders
     public function handle(Request $request, Closure $next): Response
     {
         // Remove X-Powered-By if set by PHP runtime
-        if (function_exists('header_remove')) {
+        if (function_exists('header_remove') && ! headers_sent()) {
             header_remove('X-Powered-By');
         }
 

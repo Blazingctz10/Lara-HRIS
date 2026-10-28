@@ -208,7 +208,7 @@
                         onmouseover="this.style.background='#e2e8f0'"
                         onmouseout="this.style.background='#f1f5f9'"
                     >
-                        <span>Format CSV (.csv)</span>
+                        <span>Unduh Template CSV Pegawai (.csv)</span>
                     </a>
                 </div>
 

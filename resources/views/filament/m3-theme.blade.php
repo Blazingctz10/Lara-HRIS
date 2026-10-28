@@ -985,4 +985,21 @@ select option {
 .fi-modal-content .space-y-3 > * + * { margin-top: 0.75rem !important; }
 .fi-modal-content .space-y-4 > * + * { margin-top: 1rem !important; }
 .fi-modal-content .space-y-6 > * + * { margin-top: 1.5rem !important; }
+
+/* =============================================================================
+   14. HEADER ACTION BUTTONS INTERACTION SAFEGUARD
+   ============================================================================= */
+.fi-header-actions-ctn {
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+.fi-header-actions-ctn .fi-btn,
+.fi-header-actions-ctn a.fi-btn,
+.fi-header-actions-ctn a.fi-ac-btn-action {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    user-select: none !important;
+}
 </style>

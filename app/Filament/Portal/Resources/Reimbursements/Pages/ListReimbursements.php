@@ -13,7 +13,9 @@ class ListReimbursements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('Ajukan Klaim Reimbursement Baru'),
+            CreateAction::make()
+                ->label('Ajukan Klaim Reimbursement Baru')
+                ->url(fn (): string => static::getResource()::getUrl('create')),
         ];
     }
 }
