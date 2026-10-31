@@ -41,6 +41,12 @@ class PositionsTable
                     })
                     ->sortable(),
 
+                TextColumn::make('min_salary')
+                    ->label('Standar Gaji Pokok')
+                    ->formatStateUsing(fn ($state) => $state ? 'Rp ' . number_format((float) $state, 0, ',', '.') : 'Sesuai UMK')
+                    ->color('success')
+                    ->sortable(),
+
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),

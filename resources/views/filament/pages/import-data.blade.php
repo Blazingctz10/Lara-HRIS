@@ -222,6 +222,18 @@
                     >
                         <span>Unduh Template CSV Pegawai (.csv)</span>
                     </a>
+                    <a
+                        href="{{ route('admin.download-template.recruitment-tracker') }}"
+                        download="template_recruitment_tracker_bpr.csv"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #eff6ff; color: #1e40af; font-size: 0.82rem; font-weight: 700; text-decoration: none; border: 1px solid #bfdbfe; transition: all 0.2s ease;"
+                        onmouseover="this.style.background='#dbeafe'"
+                        onmouseout="this.style.background='#eff6ff'"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.765Z" />
+                        </svg>
+                        <span>Unduh Template Recruitment Tracker (.csv)</span>
+                    </a>
                 </div>
 
                 <div style="border-top: 1px dashed var(--m3-outline-variant, #b6cac0); padding-top: 1.25rem; margin-bottom: 1.25rem;">

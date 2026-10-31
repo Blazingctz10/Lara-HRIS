@@ -8,6 +8,7 @@
         $totalUsersCount = $data['totalUsersCount'] ?? 0;
         $dispensationCount = $data['dispensationCount'] ?? 0;
         $overtimePendingCount = $data['overtimePendingCount'] ?? 0;
+        $draftPayrollCount = $data['draftPayrollCount'] ?? 0;
     @endphp
 
     <style>
@@ -275,6 +276,18 @@
                     </svg>
                     <span>Tambah Pegawai</span>
                 </a>
+
+                @if($role === 'hr_admin' || $role === 'super_admin' || $role === 'direksi')
+                    <a href="{{ url('/admin/payrolls') }}" title="Kelola Penggajian & Rilis Slip Gaji" class="m3-shortcut-chip {{ $draftPayrollCount > 0 ? 'm3-chip-amber' : 'm3-chip-emerald' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
+                        </svg>
+                        <span>Penggajian & Slip</span>
+                        @if($draftPayrollCount > 0)
+                            <span class="m3-chip-count" style="background: #f59e0b; color: #ffffff;">{{ $draftPayrollCount }} Draf</span>
+                        @endif
+                    </a>
+                @endif
 
                 @if($role === 'hr_admin')
                     <a href="{{ url('/admin/import-data') }}" title="Pusat Migrasi Data Excel/CSV" class="m3-shortcut-chip m3-chip-neutral">

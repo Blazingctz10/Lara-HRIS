@@ -44,6 +44,18 @@ class PositionForm
                                 ->default('Staff')
                                 ->required(),
 
+                            TextInput::make('min_salary')
+                                ->label('Rentang Gaji Minimum (Rp)')
+                                ->numeric()
+                                ->prefix('Rp')
+                                ->placeholder('Contoh: 4500000'),
+
+                            TextInput::make('max_salary')
+                                ->label('Rentang Gaji Maksimum (Rp)')
+                                ->numeric()
+                                ->prefix('Rp')
+                                ->placeholder('Contoh: 7500000'),
+
                             Toggle::make('is_active')
                                 ->label('Status Aktif')
                                 ->default(true),

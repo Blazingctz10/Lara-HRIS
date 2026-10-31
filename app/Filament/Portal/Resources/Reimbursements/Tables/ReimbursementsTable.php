@@ -29,7 +29,7 @@ class ReimbursementsTable
 
                 TextColumn::make('amount')
                     ->label('Nominal')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
                     ->sortable()
                     ->weight('bold')
                     ->color('success'),

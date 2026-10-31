@@ -1991,4 +1991,81 @@ CSV;
             ];
         }
     }
+
+    /**
+     * Menghasilkan template CSV Recruitment Tracker & Pelamar Kerja (Standar Rekrutmen Mudah / Digipromaster)
+     */
+    public function generateRecruitmentTrackerTemplateCsv(): string
+    {
+        $headers = [
+            'Nama_Pelamar',
+            'Email',
+            'Nomor_Telepon_WA',
+            'Posisi_Dilamar',
+            'Status_Seleksi',
+            'Pendidikan_Terakhir',
+            'Jurusan',
+            'Universitas_Institusi',
+            'IPK',
+            'Pengalaman_Kerja_Tahun',
+            'Ekspektasi_Gaji',
+            'Catatan_Interview_HR',
+        ];
+
+        $sampleRows = [
+            [
+                'Aulia Rahmadani, S.E.',
+                'aulia.rahmadani@gmail.com',
+                '081277665544',
+                'Customer Service (CS)',
+                'Screening',
+                'S-1',
+                'Manajemen Keuangan',
+                'Universitas Internasional Batam',
+                '3.65',
+                '2',
+                '4500000',
+                'Komunikatif, berpenampilan rapi, pengalaman 2 tahun di CS retail perbankan.',
+            ],
+            [
+                'Budi Setiawan, S.Kom.',
+                'budi.setiawan@gmail.com',
+                '081388990011',
+                'IT Support & Developer',
+                'Interview',
+                'S-1',
+                'Teknik Informatika',
+                'Politeknik Negeri Batam',
+                '3.72',
+                '3',
+                '6000000',
+                'Paham networking, SQL server, dan troubleshooting jaringan LAN cabang.',
+            ],
+            [
+                'Citra Ananda, A.Md.',
+                'citra.ananda@gmail.com',
+                '081299001122',
+                'Teller Kas & Kliring',
+                'Baru',
+                'D-3',
+                'Akuntansi Perbankan',
+                'Politeknik Negeri Padang',
+                '3.55',
+                '1',
+                '4200000',
+                'Teliti dalam hitung kas fisik, sertifikat uji kompetensi kasir kas.',
+            ],
+        ];
+
+        $output = fopen('php://temp', 'r+');
+        fputcsv($output, $headers);
+        foreach ($sampleRows as $row) {
+            fputcsv($output, $row);
+        }
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        return $csv;
+    }
 }

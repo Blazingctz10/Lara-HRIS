@@ -50,7 +50,7 @@ class MyRecentReimbursementsWidget extends BaseWidget
 
                 TextColumn::make('amount')
                     ->label('Nominal Klaim')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
                     ->weight('bold')
                     ->color('success'),
 

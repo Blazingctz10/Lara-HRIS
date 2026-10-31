@@ -37,6 +37,7 @@ class AdminShortcutWidget extends Widget
         $totalUsersCount = \App\Models\User::count();
         $dispensationCount = \App\Models\AttendanceDispensation::count();
         $overtimePendingCount = \App\Models\Overtime::accessibleBy()->where('status', 'Pending')->count();
+        $draftPayrollCount = \App\Models\Payroll::accessibleBy()->where('status', 'Draft')->count();
 
         return [
             'role' => $role,
@@ -46,6 +47,7 @@ class AdminShortcutWidget extends Widget
             'totalUsersCount' => $totalUsersCount,
             'dispensationCount' => $dispensationCount,
             'overtimePendingCount' => $overtimePendingCount,
+            'draftPayrollCount' => $draftPayrollCount,
         ];
     }
 }

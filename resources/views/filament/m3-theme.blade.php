@@ -443,6 +443,57 @@ body.fi-body {
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow-md) !important;
     transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Prevent container elements from clipping floating popovers, datepickers, and select dropdowns */
+.fi-section,
+.fi-section-content-ctn,
+.fi-section-content,
+.fi-fo-field-wrp,
+.fi-fo-field-wrp-ctn,
+.fi-tabs,
+.fi-tabs-content,
+.fi-grid {
+    overflow: visible !important;
+}
+
+/* Hierarchical stacking order: earlier sections naturally float over later sections */
+.fi-section:not(.fi-section-not-contained):nth-child(1) { z-index: 24; }
+.fi-section:not(.fi-section-not-contained):nth-child(2) { z-index: 22; }
+.fi-section:not(.fi-section-not-contained):nth-child(3) { z-index: 20; }
+.fi-section:not(.fi-section-not-contained):nth-child(4) { z-index: 18; }
+.fi-section:not(.fi-section-not-contained):nth-child(5) { z-index: 16; }
+.fi-section:not(.fi-section-not-contained):nth-child(6) { z-index: 14; }
+.fi-section:not(.fi-section-not-contained):nth-child(7) { z-index: 12; }
+.fi-section:not(.fi-section-not-contained):nth-child(8) { z-index: 10; }
+
+/* Dynamic priority elevation when focused or when dropdown/calendar is open */
+.fi-section:not(.fi-section-not-contained):focus-within,
+.fi-section:not(.fi-section-not-contained):has(:focus),
+.fi-section:not(.fi-section-not-contained):has([aria-expanded="true"]),
+.fi-section:not(.fi-section-not-contained):has(.fi-dropdown-panel:not([style*="display: none"])),
+.fi-section:not(.fi-section-not-contained):has(.fi-fo-date-time-picker-panel:not([style*="display: none"])) {
+    z-index: 90 !important;
+}
+
+/* Dropdown & Datepicker Popovers: Topmost Z-Index Layer */
+.fi-dropdown-panel,
+.fi-fo-date-time-picker-panel,
+.fi-popover-content,
+[x-popover],
+.choices__list--dropdown {
+    z-index: 99999 !important;
+    box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(14, 104, 56, 0.2) !important;
+}
+
+:is(.dark) .fi-dropdown-panel,
+:is(.dark) .fi-fo-date-time-picker-panel,
+:is(.dark) .fi-popover-content {
+    background: #0f1c14 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
 }
 
 .fi-section:not(.fi-section-not-contained):hover,

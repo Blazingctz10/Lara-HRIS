@@ -794,13 +794,19 @@
             </svg>
             <span>Akses Cepat Pengujian (Password: <code>password</code>):</span>
           </div>
-          <div style="margin-bottom: 0.25rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
+          <div style="margin-bottom: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
             <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Super Admin IT (Akses Penuh Seluruh Sistem)">
-              👑 admin@bprbandaraya.com (Administrator IT BPR)
+              👑 admin@bprbandaraya.com (IT Admin)
+            </span>
+            <span class="quick-pill" onclick="fillDemo('hrd@bprbandaraya.com', 'password')" title="Human Capital / HR Admin (Penggajian, Cuti & Presensi)">
+              👥 hrd@bprbandaraya.com (HR Admin)
+            </span>
+            <span class="quick-pill" onclick="fillDemo('ria@bprbandaraya.com', 'password')" title="Staf Karyawan Normal (Portal ESS - Slip Gaji Pribadi, Cuti, Presensi)">
+              👤 ria@bprbandaraya.com (Karyawan Normal)
             </span>
           </div>
-          <div style="font-size: 0.72rem; color: var(--glass-text-muted); line-height: 1.4; margin-top: 0.35rem;">
-            Akun peran lain (Direksi, HR, Pincab, Pegawai) dapat didaftarkan melalui menu <strong>Manajemen Pengguna</strong> atau diimpor otomatis melalui modul <strong>Impor Data</strong>.
+          <div style="font-size: 0.72rem; color: var(--glass-text-muted); line-height: 1.4;">
+            Klik salah satu akun di atas untuk mengisi formulir otomatis, lalu tekan tombol <strong>Masuk ke Sistem</strong>.
           </div>
         </div>
         @endif

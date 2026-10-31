@@ -92,6 +92,23 @@ class TemplateDownloadController extends Controller
         ]);
     }
 
+    /**
+     * Download template CSV Recruitment Tracker & Pelamar Kerja
+     */
+    public function downloadRecruitmentTracker(): StreamedResponse
+    {
+        $this->checkAdminAccess();
+
+        $service = app(DataMigrationService::class);
+        $csv = $service->generateRecruitmentTrackerTemplateCsv();
+
+        return response()->streamDownload(function () use ($csv) {
+            echo $csv;
+        }, 'template_recruitment_tracker_bpr.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     protected function checkAdminAccess(): void
     {
         $user = auth()->user();

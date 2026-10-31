@@ -18,6 +18,7 @@ class AuthenticationTest extends TestCase
         $accounts = [
             'direksi@bprbandaraya.com' => '/admin',
             'admin@bprbandaraya.com' => '/admin',
+            'hrd@bprbandaraya.com' => '/admin',
             'ratna.dewi@bprbandaraya.com' => '/admin',
             'pincab.botania@bprbandaraya.com' => '/admin',
             'teller.botania@bprbandaraya.com' => '/portal',
