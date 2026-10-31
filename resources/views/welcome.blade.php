@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
 
 <script>
   (function() {
-    const savedTheme = localStorage.getItem('hris_theme') || 'dark';
+    const savedTheme = localStorage.getItem('hris_theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
   })();
 </script>
@@ -785,7 +785,8 @@
           </button>
         </form>
 
-        <!-- Demo Accounts Quick Fill (Updated with Seeded Accounts) -->
+        <!-- Demo Accounts Quick Fill (Hanya Tampil di Mode Pengembangan / Non-Production) -->
+        @if (config('app.env') !== 'production')
         <div class="quick-accounts-box">
           <div class="quick-accounts-heading">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
@@ -793,34 +794,16 @@
             </svg>
             <span>Akses Cepat Pengujian (Password: <code>password</code>):</span>
           </div>
-          <div style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-            <span style="font-size: 0.72rem; font-weight: 700; width: 100%; color: var(--glass-text-muted);">Admin & Manajemen (/admin):</span>
+          <div style="margin-bottom: 0.25rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
             <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Super Admin IT (Akses Penuh Seluruh Sistem)">
-              admin@bprbandaraya.com
-            </span>
-            <span class="quick-pill" onclick="fillDemo('direktur.utama@bprbandaraya.com', 'password')" title="Direktur Utama">
-              direktur.utama@bprbandaraya.com
-            </span>
-            <span class="quick-pill" onclick="fillDemo('hrd@bprbandaraya.com', 'password')" title="HC Manager Budi Santoso">
-              hrd@bprbandaraya.com
-            </span>
-            <span class="quick-pill" onclick="fillDemo('pincab.botania@bprbandaraya.com', 'password')" title="Pincab Botania Ahmad Fauzi">
-              pincab.botania@bprbandaraya.com
+              👑 admin@bprbandaraya.com (Administrator IT BPR)
             </span>
           </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-            <span style="font-size: 0.72rem; font-weight: 700; width: 100%; color: var(--glass-text-muted);">Portal Pegawai (/portal ESS - Presensi, Cuti & Reimburse):</span>
-            <span class="quick-pill" onclick="fillDemo('siti.teller@bprbandaraya.com', 'password')" title="Teller Siti Rahmadani">
-              siti.teller@bprbandaraya.com
-            </span>
-            <span class="quick-pill" onclick="fillDemo('mega.cs@bprbandaraya.com', 'password')" title="CS Mega Utami">
-              mega.cs@bprbandaraya.com
-            </span>
-            <span class="quick-pill" onclick="fillDemo('rizky.ao@bprbandaraya.com', 'password')" title="AO Rizky Pratama">
-              rizky.ao@bprbandaraya.com
-            </span>
+          <div style="font-size: 0.72rem; color: var(--glass-text-muted); line-height: 1.4; margin-top: 0.35rem;">
+            Akun peran lain (Direksi, HR, Pincab, Pegawai) dapat didaftarkan melalui menu <strong>Manajemen Pengguna</strong> atau diimpor otomatis melalui modul <strong>Impor Data</strong>.
           </div>
         </div>
+        @endif
       </div>
 
       <!-- Footer -->
@@ -860,7 +843,7 @@
       applyTheme(newTheme);
     }
 
-    const savedTheme = localStorage.getItem('hris_theme') || 'dark';
+    const savedTheme = localStorage.getItem('hris_theme') || 'light';
     applyTheme(savedTheme);
 
     function togglePasswordVisibility() {

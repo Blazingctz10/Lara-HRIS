@@ -273,8 +273,8 @@
         <div class="m3-memo-head">
             <div class="m3-memo-head-left">
                 <div class="m3-memo-icon-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="m3-memo-head-icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.786.917 1.385.917h.034c.82 0 1.488-.696 1.436-1.514l-.32-4.99m-3.52 2.804c.48-.12.955-.258 1.424-.415M10.34 6.66c.48.12.955.258 1.424.415m0 0a22.25 22.25 0 0 1 3.52 2.804l.32-4.99c.052-.818-.616-1.514-1.436-1.514h-.034c-.599 0-1.138.367-1.385.917a15.42 15.42 0 0 0-.985 2.783Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="m3-memo-head-icon" style="width: 24px; height: 24px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
                     </svg>
                 </div>
                 <div>

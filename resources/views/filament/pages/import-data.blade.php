@@ -163,23 +163,23 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(14, 104, 56, 0.05); padding: 1.1rem; border-radius: 14px; margin-bottom: 1.25rem; font-size: 0.85rem;" class="dark:bg-emerald-950/20 dark:border dark:border-emerald-800/30">
-                    <p style="margin-bottom: 0.5rem; font-weight: 700; color: #0E6838;" class="dark:text-emerald-400">Fitur Otomatisasi Cerdas:</p>
-                    <ul style="display: flex; flex-direction: column; gap: 0.4rem; padding-left: 0; list-style: none; color: #475569;" class="dark:text-gray-300">
+                <div style="background: rgba(14, 104, 56, 0.08); padding: 1.25rem; border-radius: 16px; margin-bottom: 1.5rem; font-size: 0.875rem; border: 1px solid rgba(14, 104, 56, 0.2);" class="dark:bg-emerald-950/40 dark:border-emerald-500/40">
+                    <p style="margin-bottom: 0.65rem; font-weight: 800; font-size: 0.9rem;" class="text-emerald-800 dark:text-emerald-300">Fitur Otomatisasi Cerdas:</p>
+                    <ul style="display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0; list-style: none;" class="text-slate-700 dark:text-slate-200">
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0E6838" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;" class="dark:stroke-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-emerald-600 dark:text-emerald-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Jika Cabang, Divisi, atau Jabatan belum ada, sistem akan <strong>membuatnya otomatis</strong>.</span>
                         </li>
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0E6838" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;" class="dark:stroke-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-emerald-600 dark:text-emerald-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Akun login portal langsung dibuat dengan kata sandi default <code>password</code>.</span>
                         </li>
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0E6838" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;" class="dark:stroke-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-emerald-600 dark:text-emerald-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Jatah saldo cuti tahunan awal (12 hari) otomatis diaktifkan untuk setiap pegawai.</span>
@@ -190,11 +190,23 @@
                 {{-- Unduh Native (Bukan wire:click agar tidak memicu 419 expired) --}}
                 <div style="margin-bottom: 1.25rem; display: flex; gap: 0.65rem; flex-wrap: wrap;">
                     <a
-                        href="{{ route('admin.download-template.employee-xls') }}"
-                        download="template_migrasi_pegawai_bpr.xls"
+                        href="{{ route('admin.download-template.employee-bpr-cv') }}"
+                        download="template_cv_karyawan_bpr_bandaraya.csv"
                         style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25);"
                         onmouseover="this.style.background='#0a4d29'"
                         onmouseout="this.style.background='#0E6838'"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                        <span>Unduh Format Formulir CV BPR (.csv)</span>
+                    </a>
+                    <a
+                        href="{{ route('admin.download-template.employee-xls') }}"
+                        download="template_migrasi_pegawai_bpr.xls"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #064e3b; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(6, 78, 59, 0.25);"
+                        onmouseover="this.style.background='#022c22'"
+                        onmouseout="this.style.background='#064e3b'"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -214,12 +226,12 @@
 
                 <div style="border-top: 1px dashed var(--m3-outline-variant, #b6cac0); padding-top: 1.25rem; margin-bottom: 1.25rem;">
                     <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        Pilih Berkas Excel (.xls) atau CSV yang Sudah Diisi:
+                        Pilih Berkas Excel (.xlsx, .xls), CSV (.csv), atau PDF (.pdf) Data Pegawai:
                     </label>
                     <input
                         type="file"
                         wire:model="employeeFile"
-                        accept=".xls,.csv,.txt"
+                        accept=".xls,.xlsx,.csv,.txt,.pdf"
                         style="display: block; width: 100%; font-size: 0.85rem; padding: 0.6rem; border: 1px solid var(--m3-outline-variant, #b6cac0); border-radius: 12px; background: var(--m3-surface, #ffffff);"
                     />
                     @error('employeeFile')
@@ -260,23 +272,23 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(243, 122, 32, 0.08); padding: 1.1rem; border-radius: 14px; margin-bottom: 1.25rem; font-size: 0.85rem;" class="dark:bg-amber-950/20 dark:border dark:border-amber-800/30">
-                    <p style="margin-bottom: 0.5rem; font-weight: 700; color: #F37A20;">Fleksibilitas Data Absensi:</p>
-                    <ul style="display: flex; flex-direction: column; gap: 0.4rem; padding-left: 0; list-style: none; color: #475569;" class="dark:text-gray-300">
+                <div style="background: rgba(243, 122, 32, 0.08); padding: 1.25rem; border-radius: 16px; margin-bottom: 1.5rem; font-size: 0.875rem; border: 1px solid rgba(243, 122, 32, 0.2);" class="dark:bg-amber-950/40 dark:border-amber-500/40">
+                    <p style="margin-bottom: 0.65rem; font-weight: 800; font-size: 0.9rem;" class="text-amber-800 dark:text-amber-300">Fleksibilitas Data Absensi:</p>
+                    <ul style="display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0; list-style: none;" class="text-slate-700 dark:text-slate-200">
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#F37A20" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-amber-600 dark:text-amber-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Mendukung ekspor file log dari mesin Solution, ZKTeco, maupun rekapan bulanan Excel.</span>
                         </li>
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#F37A20" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-amber-600 dark:text-amber-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Pencocokan dilakukan otomatis berdasarkan <strong>NIP Pegawai</strong> dan <strong>Tanggal</strong>.</span>
                         </li>
                         <li style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#F37A20" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;" class="text-amber-600 dark:text-amber-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                             <span>Jika data tanggal sudah ada, sistem akan memperbarui jam pulang secara akurat.</span>
@@ -311,12 +323,12 @@
 
                 <div style="border-top: 1px dashed var(--m3-outline-variant, #b6cac0); padding-top: 1.25rem; margin-bottom: 1.25rem;">
                     <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        Pilih Berkas Excel (.xls) atau CSV Log Presensi:
+                        Pilih Berkas Excel (.xlsx, .xls) atau CSV (.csv) Log Presensi:
                     </label>
                     <input
                         type="file"
                         wire:model="attendanceFile"
-                        accept=".xls,.csv,.txt"
+                        accept=".xls,.xlsx,.csv,.txt"
                         style="display: block; width: 100%; font-size: 0.85rem; padding: 0.6rem; border: 1px solid var(--m3-outline-variant, #b6cac0); border-radius: 12px; background: var(--m3-surface, #ffffff);"
                     />
                     @error('attendanceFile')

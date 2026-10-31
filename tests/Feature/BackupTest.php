@@ -36,43 +36,49 @@ class BackupTest extends TestCase
     public function test_admin_can_generate_database_backup(): void
     {
         $admin = User::where('role', 'super_admin')->first();
+        $backupDir = storage_path('app/backups');
+        if (! File::exists($backupDir)) {
+            File::makeDirectory($backupDir, 0755, true);
+        }
+        $existing = collect(File::files($backupDir))->map(fn ($f) => $f->getPathname())->all();
 
         Livewire::actingAs($admin)
             ->test(BackupData::class)
             ->call('createDatabaseBackup')
             ->assertHasNoErrors();
 
-        $backupDir = storage_path('app/backups');
-        $files = File::files($backupDir);
-
-        $newFiles = collect($files)->filter(fn ($f) => str_starts_with($f->getFilename(), 'backup_hris_db_'));
+        $after = collect(File::files($backupDir))->map(fn ($f) => $f->getPathname());
+        $newFiles = $after->diff($existing);
 
         $this->assertNotEmpty($newFiles, 'Backup file should have been generated');
 
         // Only cleanup test files generated in this test
-        foreach ($newFiles as $file) {
-            File::delete($file->getPathname());
+        foreach ($newFiles as $filePath) {
+            File::delete($filePath);
         }
     }
 
     public function test_admin_can_generate_full_backup_zip(): void
     {
         $admin = User::where('role', 'super_admin')->first();
+        $backupDir = storage_path('app/backups');
+        if (! File::exists($backupDir)) {
+            File::makeDirectory($backupDir, 0755, true);
+        }
+        $existing = collect(File::files($backupDir))->map(fn ($f) => $f->getPathname())->all();
 
         Livewire::actingAs($admin)
             ->test(BackupData::class)
             ->call('createFullBackup')
             ->assertHasNoErrors();
 
-        $backupDir = storage_path('app/backups');
-        $files = File::files($backupDir);
+        $after = collect(File::files($backupDir))->map(fn ($f) => $f->getPathname());
+        $newFiles = $after->diff($existing);
 
-        $zipFiles = collect($files)->filter(fn ($f) => str_starts_with($f->getFilename(), 'backup_hris_full_'));
+        $this->assertNotEmpty($newFiles, 'Full backup ZIP file should have been generated');
 
-        $this->assertNotEmpty($zipFiles, 'Full backup ZIP file should have been generated');
-
-        foreach ($zipFiles as $file) {
-            File::delete($file->getPathname());
+        foreach ($newFiles as $filePath) {
+            File::delete($filePath);
         }
     }
 

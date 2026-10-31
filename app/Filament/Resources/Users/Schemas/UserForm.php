@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Models\Branch;
+use App\Models\Employee;
+use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
@@ -20,6 +22,35 @@ class UserForm
                     ->description('Kelola kredensial login, role hak akses sistem, dan penempatan cabang pegawai.')
                     ->icon('heroicon-o-shield-check')
                     ->schema([
+                        Select::make('employee_id')
+                            ->label('Hubungkan dengan Data Pegawai Terdaftar (Opsional)')
+                            ->placeholder('Pilih nama pegawai untuk mengisi form secara otomatis...')
+                            ->options(function (?User $record) {
+                                return Employee::query()
+                                    ->when($record?->id, function ($q) use ($record) {
+                                        $q->whereNull('user_id')->orWhere('user_id', $record->id);
+                                    }, function ($q) {
+                                        $q->whereNull('user_id');
+                                    })
+                                    ->orderBy('full_name')
+                                    ->get()
+                                    ->mapWithKeys(fn (Employee $e) => [$e->id => "{$e->full_name} (NIP: {$e->nip}) - {$e->email}"]);
+                            })
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state && ($employee = Employee::find($state))) {
+                                    $set('name', $employee->full_name);
+                                    $set('email', $employee->email);
+                                    if ($employee->branch_id) {
+                                        $set('branch_id', $employee->branch_id);
+                                    }
+                                }
+                            })
+                            ->dehydrated(false)
+                            ->columnSpanFull()
+                            ->helperText('Pilih pegawai dari basis data untuk mengisi Nama, Email, dan Kantor Penempatan secara otomatis.'),
+
                         Grid::make(2)->schema([
                             TextInput::make('name')
                                 ->label('Nama Pengguna / Pegawai')

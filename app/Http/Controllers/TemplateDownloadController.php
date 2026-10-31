@@ -8,6 +8,23 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class TemplateDownloadController extends Controller
 {
     /**
+     * Download template CSV Formulir CV Biodata Karyawan Resmi BPR Banda Raya
+     */
+    public function downloadEmployeeBprCv(): StreamedResponse
+    {
+        $this->checkAdminAccess();
+
+        $service = app(DataMigrationService::class);
+        $csv = $service->generateEmployeeBprCvTemplateCsv();
+
+        return response()->streamDownload(function () use ($csv) {
+            echo $csv;
+        }, 'template_cv_karyawan_bpr_bandaraya.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
      * Download template CSV Master Pegawai via Native HTTP GET
      */
     public function downloadEmployee(): StreamedResponse

@@ -1,3 +1,15 @@
+<!-- Early Theme Initializer (Defaults to Clean Light Mode if Not Set) -->
+<script>
+    (function() {
+        const theme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'light';
+        if (theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    })();
+</script>
+
 <!-- Apple VisionOS / macOS Liquid Glass System with High-Precision Light & Dark Ergonomics -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

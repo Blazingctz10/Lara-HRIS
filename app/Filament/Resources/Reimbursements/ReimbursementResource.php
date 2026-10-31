@@ -19,7 +19,7 @@ class ReimbursementResource extends Resource
 {
     protected static ?string $model = Reimbursement::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
     protected static string|UnitEnum|null $navigationGroup = 'Klaim & Reimbursement';
 

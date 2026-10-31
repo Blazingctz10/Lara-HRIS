@@ -19,7 +19,7 @@ class OvertimeResource extends Resource
 {
     protected static ?string $model = Overtime::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-fire';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
 
     protected static string|UnitEnum|null $navigationGroup = 'Presensi & Kehadiran';
 

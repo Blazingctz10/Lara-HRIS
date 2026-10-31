@@ -99,6 +99,12 @@ class EmployeesTable
                         'Resigned', 'Terminated' => 'danger',
                         default => 'gray',
                     }),
+
+                TextColumn::make('user_id')
+                    ->label('Akun Portal')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Belum Ada')
+                    ->color(fn ($state) => $state ? 'success' : 'gray'),
             ])
             ->filters([
                 SelectFilter::make('branch_id')
@@ -130,23 +136,25 @@ class EmployeesTable
                     ->outlined(),
 
                 Action::make('reset_password')
-                    ->label('Ubah Sandi')
-                    ->icon('heroicon-o-key')
-                    ->color('warning')
+                    ->label(fn (Employee $record) => $record->user_id ? 'Ubah Sandi' : 'Aktivasi Akun')
+                    ->icon(fn (Employee $record) => $record->user_id ? 'heroicon-o-key' : 'heroicon-o-user-plus')
+                    ->color(fn (Employee $record) => $record->user_id ? 'warning' : 'success')
                     ->button()
                     ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
-                    ->modalHeading(fn (Employee $record) => "Ubah Kata Sandi Akun - {$record->full_name}")
-                    ->modalDescription(fn (Employee $record) => "Perbarui kata sandi akun masuk portal untuk pegawai {$record->full_name} ({$record->email}). Kata sandi default sistem adalah 'password'.")
-                    ->modalSubmitActionLabel('Simpan Kata Sandi')
+                    ->modalHeading(fn (Employee $record) => $record->user_id ? "Ubah Kata Sandi Akun - {$record->full_name}" : "Aktivasi Akun Portal Pegawai - {$record->full_name}")
+                    ->modalDescription(fn (Employee $record) => $record->user_id
+                        ? "Perbarui kata sandi akun masuk portal untuk pegawai {$record->full_name} ({$record->email})."
+                        : "Buat dan aktifkan akun login portal ESS untuk pegawai {$record->full_name} dengan email resmi {$record->email}. Kata sandi awal default: 'password'.")
+                    ->modalSubmitActionLabel(fn (Employee $record) => $record->user_id ? 'Simpan Kata Sandi' : 'Aktifkan Akun')
                     ->modalCancelActionLabel('Batal')
                     ->form([
                         TextInput::make('new_password')
-                            ->label('Kata Sandi Baru')
+                            ->label('Kata Sandi Masuk')
                             ->password()
                             ->revealable()
                             ->default('password')
                             ->required()
-                            ->helperText('Default: password. Masukkan kata sandi baru untuk akun pegawai ini.'),
+                            ->helperText('Default: password. Masukkan kata sandi yang akan digunakan pegawai saat login portal.'),
                     ])
                     ->action(function (Employee $record, array $data) {
                         $newPassword = $data['new_password'];
@@ -169,7 +177,7 @@ class EmployeesTable
                         }
 
                         Notification::make()
-                            ->title('Kata sandi pegawai berhasil diperbarui!')
+                            ->title($record->user_id ? 'Kata sandi pegawai berhasil diperbarui!' : 'Akun portal pegawai berhasil diaktifkan!')
                             ->body("Akun {$record->email} kini dapat masuk dengan kata sandi yang disetel.")
                             ->success()
                             ->send();

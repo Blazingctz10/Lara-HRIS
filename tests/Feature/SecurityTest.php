@@ -196,5 +196,8 @@ class SecurityTest extends TestCase
 
         $response = $this->get(route('admin.download-template.employee'));
         $response->assertStatus(200);
+
+        $responseCv = $this->get(route('admin.download-template.employee-bpr-cv'));
+        $responseCv->assertStatus(200);
     }
 }
