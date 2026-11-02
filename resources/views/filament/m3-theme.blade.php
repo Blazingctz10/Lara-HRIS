@@ -283,14 +283,15 @@ body.fi-body {
 /* Sidebar Nav Item: Apple Floating Capsule */
 .fi-sidebar-item-btn {
     border-radius: 14px !important;
-    padding: 0.65rem 0.95rem !important;
-    margin: 0.2rem 0.65rem !important;
+    padding: 0.65rem 0.95rem;
+    margin: 0.2rem 0.65rem;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
     letter-spacing: -0.01em !important;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     color: var(--glass-text-secondary) !important;
     border: 1px solid transparent !important;
+    box-sizing: border-box !important;
 }
 
 .fi-sidebar-item-btn:hover {
@@ -298,7 +299,108 @@ body.fi-body {
     color: var(--glass-text-main) !important;
     border-color: var(--glass-border) !important;
     box-shadow: var(--glass-shadow-sm) !important;
+}
+
+.fi-sidebar.fi-sidebar-open .fi-sidebar-item-btn:hover {
     transform: translateX(3px);
+}
+
+/* =============================================================================
+   COLLAPSED SIDEBAR (ICON-ONLY MODE) - SYMMETRICAL SQUIRCLE ICONS
+   Fixes cut-off active capsules & asymmetrical clipping against sidebar border
+   ============================================================================= */
+.fi-sidebar:not(.fi-sidebar-open) {
+    width: var(--collapsed-sidebar-width, 4.5rem) !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-nav {
+    padding-inline: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    overflow-x: hidden !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-nav-groups {
+    margin-inline: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-group {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-group-items {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item-btn {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    min-width: 2.75rem !important;
+    max-width: 2.75rem !important;
+    padding: 0 !important;
+    margin: 0.25rem auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 14px !important;
+    border: 1px solid transparent !important;
+    box-sizing: border-box !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item-btn:hover {
+    transform: scale(1.08) !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item-icon {
+    margin: 0 !important;
+    justify-self: center !important;
+    align-self: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-header {
+    padding-inline: 0 !important;
+    justify-content: center !important;
+    display: flex !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-footer {
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-database-notifications-btn,
+.fi-sidebar:not(.fi-sidebar-open) .fi-user-menu-trigger {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    padding: 0 !important;
+    margin: 0.25rem auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 14px !important;
 }
 
 /* Active Nav Item: Explicit Pure White Text & Icon on Emerald Glass Capsule */
