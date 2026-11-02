@@ -8,6 +8,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class PositionForm
 {
@@ -46,15 +47,21 @@ class PositionForm
 
                             TextInput::make('min_salary')
                                 ->label('Rentang Gaji Minimum (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
-                                ->placeholder('Contoh: 4500000'),
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : null)
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : null)
+                                ->placeholder('Contoh: 4.500.000'),
 
                             TextInput::make('max_salary')
                                 ->label('Rentang Gaji Maksimum (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
-                                ->placeholder('Contoh: 7500000'),
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : null)
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : null)
+                                ->placeholder('Contoh: 7.500.000'),
 
                             Toggle::make('is_active')
                                 ->label('Status Aktif')

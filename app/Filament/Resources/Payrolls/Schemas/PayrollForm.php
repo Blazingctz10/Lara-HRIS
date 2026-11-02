@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class PayrollForm
 {
@@ -52,38 +53,56 @@ class PayrollForm
                         Grid::make(3)->schema([
                             TextInput::make('basic_salary')
                                 ->label('Gaji Pokok (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : null)
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->required(),
 
                             TextInput::make('position_allowance')
                                 ->label('Tunjangan Jabatan (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('transport_allowance')
                                 ->label('Tunjangan Transport (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('meal_allowance')
                                 ->label('Uang Makan (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('overtime_pay')
                                 ->label('Uang Lembur (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('reimbursement_pay')
                                 ->label('Pencairan Reimburse (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
                         ]),
                     ]),
@@ -94,32 +113,47 @@ class PayrollForm
                         Grid::make(3)->schema([
                             TextInput::make('bpjs_tk_deduction')
                                 ->label('BPJS Ketenagakerjaan (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('bpjs_kes_deduction')
                                 ->label('BPJS Kesehatan (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('pph21_deduction')
                                 ->label('Pajak PPh 21 (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('late_penalty_deduction')
                                 ->label('Denda Keterlambatan (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
 
                             TextInput::make('loan_deduction')
                                 ->label('Potongan Kasbon / Pinjaman (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->default(0),
                         ]),
                     ]),
@@ -129,8 +163,11 @@ class PayrollForm
                         Grid::make(3)->schema([
                             TextInput::make('net_salary')
                                 ->label('Gaji Bersih / Take Home Pay (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : null)
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
                                 ->required(),
 
                             DatePicker::make('payment_date')

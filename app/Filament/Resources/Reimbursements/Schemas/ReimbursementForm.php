@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class ReimbursementForm
 {
@@ -52,8 +53,12 @@ class ReimbursementForm
 
                             TextInput::make('amount')
                                 ->label('Nominal Pengeluaran (Rp)')
-                                ->numeric()
                                 ->prefix('Rp')
+                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
+                                ->stripCharacters('.')
+                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : null)
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
+                                ->placeholder('Contoh: 150.000')
                                 ->required(),
 
                             Select::make('status')
