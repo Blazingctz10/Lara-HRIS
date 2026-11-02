@@ -29,7 +29,7 @@ class LeaveRequestObserver
                     ->icon('heroicon-o-document-text')
                     ->iconColor('warning')
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view')
+                        \Filament\Actions\Action::make('view')
                             ->label('Buka Daftar Cuti')
                             ->url('/admin/leave-requests'),
                     ])
@@ -66,7 +66,7 @@ class LeaveRequestObserver
                             ->icon('heroicon-o-check-badge')
                             ->iconColor('primary')
                             ->actions([
-                                \Filament\Notifications\Actions\Action::make('view')
+                                \Filament\Actions\Action::make('view')
                                     ->label('Otorisasi Sekarang')
                                     ->url('/admin/leave-requests'),
                             ])

@@ -26,9 +26,10 @@ class AdminShortcutWidget extends Widget
             ->count();
 
         $pendingLeaveCount = match ($role) {
-            'direksi' => LeaveRequest::where('status', 'Approved_HR')->count(),
-            'hr_admin' => LeaveRequest::where('status', 'Pending')->count(),
-            default => LeaveRequest::whereIn('status', ['Pending', 'Approved_HR'])->count(),
+            'direksi' => LeaveRequest::accessibleBy()->where('status', 'Approved_HR')->count(),
+            'hr_admin' => LeaveRequest::accessibleBy()->where('status', 'Pending')->count(),
+            'branch_manager' => LeaveRequest::accessibleBy()->where('status', 'Pending')->count(),
+            default => LeaveRequest::accessibleBy()->whereIn('status', ['Pending', 'Approved_HR'])->count(),
         };
 
         $newApplicantsCount = JobApplicant::where('status', 'Baru')

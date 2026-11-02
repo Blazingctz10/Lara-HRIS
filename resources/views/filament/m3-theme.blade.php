@@ -451,31 +451,80 @@ body.fi-body {
 .fi-section,
 .fi-section-content-ctn,
 .fi-section-content,
+.fi-sc-section,
+.fi-sc-component,
+.fi-sc-grid,
+.fi-sc-tabs-content,
+.fi-grid,
+.fi-grid-col,
 .fi-fo-field-wrp,
 .fi-fo-field-wrp-ctn,
+.fi-fo-field-content-col,
+.fi-fo-field-content,
+.fi-fo-select,
+.fi-fo-date-time-picker,
 .fi-tabs,
 .fi-tabs-content,
-.fi-grid {
+.choices {
     overflow: visible !important;
 }
 
-/* Hierarchical stacking order: earlier sections naturally float over later sections */
-.fi-section:not(.fi-section-not-contained):nth-child(1) { z-index: 24; }
-.fi-section:not(.fi-section-not-contained):nth-child(2) { z-index: 22; }
-.fi-section:not(.fi-section-not-contained):nth-child(3) { z-index: 20; }
-.fi-section:not(.fi-section-not-contained):nth-child(4) { z-index: 18; }
-.fi-section:not(.fi-section-not-contained):nth-child(5) { z-index: 16; }
-.fi-section:not(.fi-section-not-contained):nth-child(6) { z-index: 14; }
-.fi-section:not(.fi-section-not-contained):nth-child(7) { z-index: 12; }
-.fi-section:not(.fi-section-not-contained):nth-child(8) { z-index: 10; }
+.fi-input-wrp:has(.choices),
+.fi-input-wrp:has(.fi-fo-date-time-picker-panel),
+.fi-input-wrp:has([x-ref="panel"]),
+.fi-fo-select .fi-input-wrp,
+.fi-fo-date-time-picker .fi-input-wrp {
+    overflow: visible !important;
+}
+
+/* Hierarchical stacking order for grid columns (sections & form fields):
+   Earlier rows and sections naturally float over later ones when dropdowns/calendars open downwards */
+.fi-grid > .fi-grid-col,
+.fi-sc-grid > .fi-grid-col,
+.fi-tabs-content > .fi-grid > .fi-grid-col {
+    position: relative;
+}
+.fi-grid > .fi-grid-col:nth-child(1), .fi-sc-grid > .fi-grid-col:nth-child(1) { z-index: 50; }
+.fi-grid > .fi-grid-col:nth-child(2), .fi-sc-grid > .fi-grid-col:nth-child(2) { z-index: 47; }
+.fi-grid > .fi-grid-col:nth-child(3), .fi-sc-grid > .fi-grid-col:nth-child(3) { z-index: 44; }
+.fi-grid > .fi-grid-col:nth-child(4), .fi-sc-grid > .fi-grid-col:nth-child(4) { z-index: 41; }
+.fi-grid > .fi-grid-col:nth-child(5), .fi-sc-grid > .fi-grid-col:nth-child(5) { z-index: 38; }
+.fi-grid > .fi-grid-col:nth-child(6), .fi-sc-grid > .fi-grid-col:nth-child(6) { z-index: 35; }
+.fi-grid > .fi-grid-col:nth-child(7), .fi-sc-grid > .fi-grid-col:nth-child(7) { z-index: 32; }
+.fi-grid > .fi-grid-col:nth-child(8), .fi-sc-grid > .fi-grid-col:nth-child(8) { z-index: 29; }
+.fi-grid > .fi-grid-col:nth-child(9), .fi-sc-grid > .fi-grid-col:nth-child(9) { z-index: 26; }
+.fi-grid > .fi-grid-col:nth-child(10), .fi-sc-grid > .fi-grid-col:nth-child(10) { z-index: 23; }
+.fi-grid > .fi-grid-col:nth-child(11), .fi-sc-grid > .fi-grid-col:nth-child(11) { z-index: 20; }
+.fi-grid > .fi-grid-col:nth-child(12), .fi-sc-grid > .fi-grid-col:nth-child(12) { z-index: 17; }
+.fi-grid > .fi-grid-col:nth-child(13), .fi-sc-grid > .fi-grid-col:nth-child(13) { z-index: 14; }
+.fi-grid > .fi-grid-col:nth-child(14), .fi-sc-grid > .fi-grid-col:nth-child(14) { z-index: 11; }
+.fi-grid > .fi-grid-col:nth-child(15), .fi-sc-grid > .fi-grid-col:nth-child(15) { z-index: 8; }
+.fi-grid > .fi-grid-col:nth-child(16), .fi-sc-grid > .fi-grid-col:nth-child(16) { z-index: 5; }
 
 /* Dynamic priority elevation when focused or when dropdown/calendar is open */
+.fi-grid > .fi-grid-col:focus-within,
+.fi-grid > .fi-grid-col:has(:focus),
+.fi-grid > .fi-grid-col:has([aria-expanded="true"]),
+.fi-grid > .fi-grid-col:has(.choices.is-open),
+.fi-grid > .fi-grid-col:has(.choices__list--dropdown.is-active),
+.fi-grid > .fi-grid-col:has(.fi-dropdown-panel),
+.fi-grid > .fi-grid-col:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
+.fi-grid > .fi-grid-col:has([x-ref="panel"]:not([style*="display: none"])),
+.fi-sc-section:focus-within,
+.fi-sc-section:has(:focus),
+.fi-sc-section:has([aria-expanded="true"]),
+.fi-sc-section:has(.choices.is-open),
+.fi-sc-section:has(.choices__list--dropdown.is-active),
+.fi-sc-section:has(.fi-dropdown-panel),
+.fi-sc-section:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
 .fi-section:not(.fi-section-not-contained):focus-within,
 .fi-section:not(.fi-section-not-contained):has(:focus),
 .fi-section:not(.fi-section-not-contained):has([aria-expanded="true"]),
+.fi-section:not(.fi-section-not-contained):has(.choices.is-open),
+.fi-section:not(.fi-section-not-contained):has(.choices__list--dropdown.is-active),
 .fi-section:not(.fi-section-not-contained):has(.fi-dropdown-panel:not([style*="display: none"])),
 .fi-section:not(.fi-section-not-contained):has(.fi-fo-date-time-picker-panel:not([style*="display: none"])) {
-    z-index: 90 !important;
+    z-index: 150 !important;
 }
 
 /* Dropdown & Datepicker Popovers: Topmost Z-Index Layer */
@@ -490,7 +539,8 @@ body.fi-body {
 
 :is(.dark) .fi-dropdown-panel,
 :is(.dark) .fi-fo-date-time-picker-panel,
-:is(.dark) .fi-popover-content {
+:is(.dark) .fi-popover-content,
+:is(.dark) .choices__list--dropdown {
     background: #0f1c14 !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
     box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
@@ -878,7 +928,7 @@ select option {
     backdrop-filter: var(--glass-blur-lg) !important;
     -webkit-backdrop-filter: var(--glass-blur-lg) !important;
     padding: 0.6rem !important;
-    z-index: 100 !important;
+    z-index: 99999 !important;
 }
 
 /* Table Filters Dropdown Panel: ensure proper padding, height, and no button cutoff */

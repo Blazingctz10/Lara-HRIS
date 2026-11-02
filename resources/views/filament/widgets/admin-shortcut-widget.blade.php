@@ -261,6 +261,16 @@
                     @endif
                 </a>
 
+                <a href="{{ url('/admin/overtimes') }}" title="Pengajuan Lembur Pegawai yang Memerlukan Persetujuan" class="m3-shortcut-chip {{ $overtimePendingCount > 0 ? 'm3-chip-amber' : 'm3-chip-neutral' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span>{{ $role === 'branch_manager' ? 'Lembur Cabang' : 'Approval Lembur' }}</span>
+                    @if($overtimePendingCount > 0)
+                        <span class="m3-chip-count" style="background: #EA580C; color: #ffffff;">{{ $overtimePendingCount }}</span>
+                    @endif
+                </a>
+
                 @if($role === 'hr_admin' || $role === 'super_admin')
                     <a href="{{ url('/admin/attendance-dispensations') }}" title="Logbook Dispensasi Kehadiran HRD & GA" class="m3-shortcut-chip m3-chip-emerald">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
@@ -268,14 +278,14 @@
                         </svg>
                         <span>Logbook HR & GA</span>
                     </a>
-                @endif
 
-                <a href="{{ url('/admin/employees/create') }}" title="Daftarkan Pegawai Baru" class="m3-shortcut-chip m3-chip-emerald">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 13px; height: 13px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <span>Tambah Pegawai</span>
-                </a>
+                    <a href="{{ url('/admin/employees/create') }}" title="Daftarkan Pegawai Baru" class="m3-shortcut-chip m3-chip-emerald">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 13px; height: 13px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span>Tambah Pegawai</span>
+                    </a>
+                @endif
 
                 @if($role === 'hr_admin' || $role === 'super_admin' || $role === 'direksi')
                     <a href="{{ url('/admin/payrolls') }}" title="Kelola Penggajian & Rilis Slip Gaji" class="m3-shortcut-chip {{ $draftPayrollCount > 0 ? 'm3-chip-amber' : 'm3-chip-emerald' }}">
