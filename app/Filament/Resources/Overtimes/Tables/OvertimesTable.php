@@ -68,13 +68,13 @@ class OvertimesTable
             ])
             ->recordActions([
                 Action::make('approve_pincab')
-                    ->label('Acc Pincab')
+                    ->label('Setujui (Pemimpin Cabang)')
                     ->icon('heroicon-m-check')
                     ->color('info')
                     ->button()
                     ->visible(fn (Overtime $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Lembur (Pincab)')
+                    ->modalHeading('Konfirmasi Persetujuan Lembur (Pemimpin Cabang)')
                     ->modalDescription(fn (Overtime $record) => "Setujui surat perintah kerja lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam?")
                     ->modalSubmitActionLabel('Ya, Setujui Lembur')
                     ->modalCancelActionLabel('Batal')
@@ -86,22 +86,22 @@ class OvertimesTable
                         ]);
 
                         Notification::make()
-                            ->title('Lembur Disetujui Pincab')
+                            ->title('Lembur Disetujui Pemimpin Cabang')
                             ->body("Pengajuan lembur {$record->employee->full_name} berhasil disetujui.")
                             ->success()
                             ->send();
                     }),
 
                 Action::make('approve_hr')
-                    ->label('Acc HR HO')
+                    ->label('Setujui (SDM Kantor Pusat)')
                     ->icon('heroicon-m-check-badge')
                     ->color('success')
                     ->button()
                     ->visible(fn (Overtime $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Final Lembur (HR Head Office)')
+                    ->modalHeading('Konfirmasi Persetujuan Final Lembur (SDM Kantor Pusat)')
                     ->modalDescription(fn (Overtime $record) => "Setujui dan verifikasi lembur pegawai {$record->employee->full_name} selama {$record->duration_hours} jam untuk perhitungan insentif/uang lembur pada periode payroll?")
-                    ->modalSubmitActionLabel('Ya, Setujui HR')
+                    ->modalSubmitActionLabel('Ya, Setujui Pengajuan')
                     ->modalCancelActionLabel('Batal')
                     ->modalIcon('heroicon-o-check-badge')
                     ->action(function (Overtime $record) {

@@ -102,12 +102,12 @@
                         Rp {{ number_format($unpaidSum, 0, ',', '.') }} Siap Dicairkan
                     </span>
                     <span style="color: #64748b; font-size: 0.75rem;" class="dark:text-gray-400">
-                        ({{ $unpaidCount }} klaim disetujui Pincab)
+                        ({{ $unpaidCount }} klaim disetujui Pemimpin Cabang)
                     </span>
                 </div>
             </div>
         @else
-            {{-- Label Akses Cepat Karyawan --}}
+            {{-- Label Akses Cepat Pegawai --}}
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
                 <div style="width: 26px; height: 26px; border-radius: 8px; background: rgba(14, 104, 56, 0.12); color: #0E6838; display: flex; align-items: center; justify-content: center;" class="dark:bg-emerald-950/60 dark:text-emerald-400">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
@@ -115,7 +115,7 @@
                     </svg>
                 </div>
                 <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #475569;" class="dark:text-gray-300">
-                    Akses Cepat Karyawan
+                    Akses Cepat Pegawai
                 </span>
                 <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 0.15rem;" class="hidden sm:block dark:bg-white/10"></div>
             </div>

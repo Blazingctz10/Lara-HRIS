@@ -278,7 +278,7 @@
 
                     <div>
                         <div class="m3-att-greeting">
-                            Halo, {{ $employee?->full_name ?? auth()->user()->name }}
+                            Selamat Datang, {{ $employee?->full_name ?? auth()->user()->name }}
                         </div>
                         <div class="m3-att-sub">
                             {{ $employee?->position?->name ?? 'Staf' }} &bull; {{ $employee?->department?->name ?? 'Operasional & Layanan Kas' }}
@@ -314,7 +314,7 @@
                         <div class="m3-stat-num">
                             {{ $leaveSummary['annual_remaining'] }} Hari
                         </div>
-                        <div class="m3-stat-sub">Hak Cuti Tahunan &bull; Detail &rarr;</div>
+                        <div class="m3-stat-sub">Hak Cuti Tahunan &bull; Lihat Rincian</div>
                     </div>
                 </a>
 
@@ -330,7 +330,7 @@
                         <div class="m3-stat-num">
                             {{ $leaveSummary['block_remaining'] }} Hari
                         </div>
-                        <div class="m3-stat-sub">Mandatori Bank &bull; Ajukan &rarr;</div>
+                        <div class="m3-stat-sub">Kewajiban OJK &bull; Ajukan Permohonan</div>
                     </div>
                 </a>
 

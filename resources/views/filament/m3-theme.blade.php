@@ -1,4 +1,4 @@
-<!-- Early Theme Initializer (Defaults to Clean Light Mode if Not Set) -->
+<!-- Early Theme Initializer & UI Stacking Controller (Defaults to Clean Light Mode if Not Set) -->
 <script>
     (function() {
         const theme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'light';
@@ -7,6 +7,39 @@
         } else if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         }
+
+        // Active Field & Section Elevation System (guarantees opened dropdowns/calendars are always above following sections)
+        document.addEventListener('focusin', function(e) {
+            const sec = e.target.closest('.fi-section');
+            const col = e.target.closest('.fi-grid > .fi-grid-col, .fi-sc > .fi-grid-col, .fi-grid-col');
+            document.querySelectorAll('.fi-elevated-active').forEach(node => {
+                if (node !== sec && node !== col && !node.contains(e.target)) {
+                    node.classList.remove('fi-elevated-active');
+                }
+            });
+            if (sec) sec.classList.add('fi-elevated-active');
+            if (col) col.classList.add('fi-elevated-active');
+        }, true);
+
+        document.addEventListener('click', function(e) {
+            setTimeout(function() {
+                const activeTriggers = document.querySelectorAll('[aria-expanded="true"]');
+                if (activeTriggers.length === 0) {
+                    document.querySelectorAll('.fi-elevated-active').forEach(node => {
+                        if (!node.contains(document.activeElement)) {
+                            node.classList.remove('fi-elevated-active');
+                        }
+                    });
+                } else {
+                    activeTriggers.forEach(el => {
+                        const sec = el.closest('.fi-section');
+                        const col = el.closest('.fi-grid > .fi-grid-col, .fi-sc > .fi-grid-col, .fi-grid-col');
+                        if (sec) sec.classList.add('fi-elevated-active');
+                        if (col) col.classList.add('fi-elevated-active');
+                    });
+                }
+            }, 15);
+        }, true);
     })();
 </script>
 
@@ -455,6 +488,7 @@ body.fi-body {
 .fi-sc-component,
 .fi-sc-grid,
 .fi-sc-tabs-content,
+.fi-sc-tabs-tab,
 .fi-grid,
 .fi-grid-col,
 .fi-fo-field-wrp,
@@ -462,6 +496,8 @@ body.fi-body {
 .fi-fo-field-content-col,
 .fi-fo-field-content,
 .fi-fo-select,
+.fi-fo-select-wrp,
+.fi-select-input-ctn,
 .fi-fo-date-time-picker,
 .fi-tabs,
 .fi-tabs-content,
@@ -469,7 +505,9 @@ body.fi-body {
     overflow: visible !important;
 }
 
+.fi-input-wrp,
 .fi-input-wrp:has(.choices),
+.fi-input-wrp:has(.fi-dropdown-panel),
 .fi-input-wrp:has(.fi-fo-date-time-picker-panel),
 .fi-input-wrp:has([x-ref="panel"]),
 .fi-fo-select .fi-input-wrp,
@@ -477,45 +515,50 @@ body.fi-body {
     overflow: visible !important;
 }
 
-/* Hierarchical stacking order for grid columns (sections & form fields):
-   Earlier rows and sections naturally float over later ones when dropdowns/calendars open downwards */
+/* Hierarchical natural stacking order for grid columns, sections, and form fields:
+   Earlier rows and sections naturally float OVER later ones when dropdowns/calendars open downwards */
 .fi-grid > .fi-grid-col,
+.fi-sc > .fi-grid-col,
 .fi-sc-grid > .fi-grid-col,
-.fi-tabs-content > .fi-grid > .fi-grid-col {
-    position: relative;
+.fi-tabs-content > .fi-grid > .fi-grid-col,
+.fi-sc-tabs-tab > .fi-grid > .fi-grid-col,
+.fi-sc-tabs-tab > .fi-sc > .fi-grid-col {
+    position: relative !important;
 }
-.fi-grid > .fi-grid-col:nth-child(1), .fi-sc-grid > .fi-grid-col:nth-child(1) { z-index: 50; }
-.fi-grid > .fi-grid-col:nth-child(2), .fi-sc-grid > .fi-grid-col:nth-child(2) { z-index: 47; }
-.fi-grid > .fi-grid-col:nth-child(3), .fi-sc-grid > .fi-grid-col:nth-child(3) { z-index: 44; }
-.fi-grid > .fi-grid-col:nth-child(4), .fi-sc-grid > .fi-grid-col:nth-child(4) { z-index: 41; }
-.fi-grid > .fi-grid-col:nth-child(5), .fi-sc-grid > .fi-grid-col:nth-child(5) { z-index: 38; }
-.fi-grid > .fi-grid-col:nth-child(6), .fi-sc-grid > .fi-grid-col:nth-child(6) { z-index: 35; }
-.fi-grid > .fi-grid-col:nth-child(7), .fi-sc-grid > .fi-grid-col:nth-child(7) { z-index: 32; }
-.fi-grid > .fi-grid-col:nth-child(8), .fi-sc-grid > .fi-grid-col:nth-child(8) { z-index: 29; }
-.fi-grid > .fi-grid-col:nth-child(9), .fi-sc-grid > .fi-grid-col:nth-child(9) { z-index: 26; }
-.fi-grid > .fi-grid-col:nth-child(10), .fi-sc-grid > .fi-grid-col:nth-child(10) { z-index: 23; }
-.fi-grid > .fi-grid-col:nth-child(11), .fi-sc-grid > .fi-grid-col:nth-child(11) { z-index: 20; }
-.fi-grid > .fi-grid-col:nth-child(12), .fi-sc-grid > .fi-grid-col:nth-child(12) { z-index: 17; }
-.fi-grid > .fi-grid-col:nth-child(13), .fi-sc-grid > .fi-grid-col:nth-child(13) { z-index: 14; }
-.fi-grid > .fi-grid-col:nth-child(14), .fi-sc-grid > .fi-grid-col:nth-child(14) { z-index: 11; }
-.fi-grid > .fi-grid-col:nth-child(15), .fi-sc-grid > .fi-grid-col:nth-child(15) { z-index: 8; }
-.fi-grid > .fi-grid-col:nth-child(16), .fi-sc-grid > .fi-grid-col:nth-child(16) { z-index: 5; }
 
-/* Dynamic priority elevation when focused or when dropdown/calendar is open */
-.fi-grid > .fi-grid-col:focus-within,
-.fi-grid > .fi-grid-col:has(:focus),
-.fi-grid > .fi-grid-col:has([aria-expanded="true"]),
-.fi-grid > .fi-grid-col:has(.choices.is-open),
-.fi-grid > .fi-grid-col:has(.choices__list--dropdown.is-active),
-.fi-grid > .fi-grid-col:has(.fi-dropdown-panel),
-.fi-grid > .fi-grid-col:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
-.fi-grid > .fi-grid-col:has([x-ref="panel"]:not([style*="display: none"])),
+.fi-grid > .fi-grid-col:nth-child(1), .fi-sc > .fi-grid-col:nth-child(1), .fi-sc-grid > .fi-grid-col:nth-child(1) { z-index: 70 !important; }
+.fi-grid > .fi-grid-col:nth-child(2), .fi-sc > .fi-grid-col:nth-child(2), .fi-sc-grid > .fi-grid-col:nth-child(2) { z-index: 66 !important; }
+.fi-grid > .fi-grid-col:nth-child(3), .fi-sc > .fi-grid-col:nth-child(3), .fi-sc-grid > .fi-grid-col:nth-child(3) { z-index: 62 !important; }
+.fi-grid > .fi-grid-col:nth-child(4), .fi-sc > .fi-grid-col:nth-child(4), .fi-sc-grid > .fi-grid-col:nth-child(4) { z-index: 58 !important; }
+.fi-grid > .fi-grid-col:nth-child(5), .fi-sc > .fi-grid-col:nth-child(5), .fi-sc-grid > .fi-grid-col:nth-child(5) { z-index: 54 !important; }
+.fi-grid > .fi-grid-col:nth-child(6), .fi-sc > .fi-grid-col:nth-child(6), .fi-sc-grid > .fi-grid-col:nth-child(6) { z-index: 50 !important; }
+.fi-grid > .fi-grid-col:nth-child(7), .fi-sc > .fi-grid-col:nth-child(7), .fi-sc-grid > .fi-grid-col:nth-child(7) { z-index: 46 !important; }
+.fi-grid > .fi-grid-col:nth-child(8), .fi-sc > .fi-grid-col:nth-child(8), .fi-sc-grid > .fi-grid-col:nth-child(8) { z-index: 42 !important; }
+.fi-grid > .fi-grid-col:nth-child(9), .fi-sc > .fi-grid-col:nth-child(9), .fi-sc-grid > .fi-grid-col:nth-child(9) { z-index: 38 !important; }
+.fi-grid > .fi-grid-col:nth-child(10), .fi-sc > .fi-grid-col:nth-child(10), .fi-sc-grid > .fi-grid-col:nth-child(10) { z-index: 34 !important; }
+.fi-grid > .fi-grid-col:nth-child(11), .fi-sc > .fi-grid-col:nth-child(11), .fi-sc-grid > .fi-grid-col:nth-child(11) { z-index: 30 !important; }
+.fi-grid > .fi-grid-col:nth-child(12), .fi-sc > .fi-grid-col:nth-child(12), .fi-sc-grid > .fi-grid-col:nth-child(12) { z-index: 26 !important; }
+.fi-grid > .fi-grid-col:nth-child(13), .fi-sc > .fi-grid-col:nth-child(13), .fi-sc-grid > .fi-grid-col:nth-child(13) { z-index: 22 !important; }
+.fi-grid > .fi-grid-col:nth-child(14), .fi-sc > .fi-grid-col:nth-child(14), .fi-sc-grid > .fi-grid-col:nth-child(14) { z-index: 18 !important; }
+.fi-grid > .fi-grid-col:nth-child(15), .fi-sc > .fi-grid-col:nth-child(15), .fi-sc-grid > .fi-grid-col:nth-child(15) { z-index: 14 !important; }
+.fi-grid > .fi-grid-col:nth-child(16), .fi-sc > .fi-grid-col:nth-child(16), .fi-sc-grid > .fi-grid-col:nth-child(16) { z-index: 10 !important; }
+
+/* Dynamic priority elevation when focused or when dropdown/calendar is ACTIVELY open */
+.fi-elevated-active,
+.fi-grid-col:focus-within,
+.fi-grid-col:has(:focus),
+.fi-grid-col:has([aria-expanded="true"]),
+.fi-grid-col:has(.choices.is-open),
+.fi-grid-col:has(.choices__list--dropdown.is-active),
+.fi-grid-col:has(.fi-dropdown-panel:not([style*="display: none"])),
+.fi-grid-col:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
+.fi-grid-col:has([x-ref="panel"]:not([style*="display: none"])),
 .fi-sc-section:focus-within,
 .fi-sc-section:has(:focus),
 .fi-sc-section:has([aria-expanded="true"]),
 .fi-sc-section:has(.choices.is-open),
 .fi-sc-section:has(.choices__list--dropdown.is-active),
-.fi-sc-section:has(.fi-dropdown-panel),
+.fi-sc-section:has(.fi-dropdown-panel:not([style*="display: none"])),
 .fi-sc-section:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
 .fi-section:not(.fi-section-not-contained):focus-within,
 .fi-section:not(.fi-section-not-contained):has(:focus),
@@ -524,7 +567,8 @@ body.fi-body {
 .fi-section:not(.fi-section-not-contained):has(.choices__list--dropdown.is-active),
 .fi-section:not(.fi-section-not-contained):has(.fi-dropdown-panel:not([style*="display: none"])),
 .fi-section:not(.fi-section-not-contained):has(.fi-fo-date-time-picker-panel:not([style*="display: none"])) {
-    z-index: 150 !important;
+    position: relative !important;
+    z-index: 850 !important;
 }
 
 /* Dropdown & Datepicker Popovers: Topmost Z-Index Layer */
@@ -918,9 +962,9 @@ select option {
    10. DROPDOWNS & USER MENU
    ============================================================================= */
 .fi-dropdown-panel {
-    min-width: 20rem !important;
-    max-width: 28rem !important;
-    width: max-content !important;
+    min-width: 18rem;
+    max-width: 28rem;
+    width: max-content;
     border-radius: 20px !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow-lg) !important;
@@ -929,6 +973,16 @@ select option {
     -webkit-backdrop-filter: var(--glass-blur-lg) !important;
     padding: 0.6rem !important;
     z-index: 99999 !important;
+}
+
+/* Select Form Input Dropdown Panel: naturally match input container */
+.fi-input-wrp .fi-dropdown-panel,
+.fi-select-input-ctn .fi-dropdown-panel,
+.fi-fo-select .fi-dropdown-panel {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Table Filters Dropdown Panel: ensure proper padding, height, and no button cutoff */

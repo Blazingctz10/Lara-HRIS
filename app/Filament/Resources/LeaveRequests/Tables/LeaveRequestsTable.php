@@ -76,11 +76,11 @@ class LeaveRequestsTable
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'ACC HRD (Final Direksi ≤ 2 Hari)',
+                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
                         'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
                         'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
                         'Approved_HR' => 'Menunggu Otorisasi Direksi',
-                        'Pending' => 'Menunggu Verifikasi HR',
+                        'Pending' => 'Menunggu Verifikasi SDM',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),
@@ -101,10 +101,10 @@ class LeaveRequestsTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'Pending' => 'Menunggu Verifikasi HR',
+                        'Pending' => 'Menunggu Verifikasi SDM',
                         'Approved_HR' => 'Menunggu Otorisasi Direksi',
                         'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'ACC HRD (Final Direksi ≤ 2 Hari)',
+                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
                         'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
                         'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
                         'Rejected' => 'Ditolak',
@@ -180,17 +180,17 @@ class LeaveRequestsTable
                             ->send();
                     }),
 
-                // 3. KHUSUS DIREKSI: Cuti Singkat (<= 2 Hari) cukup di-ACC HRD
+                // 3. KHUSUS DIREKSI: Cuti Singkat (<= 2 Hari) cukup disahkan SDM
                 Action::make('acc_hrd_direksi')
-                    ->label('ACC HRD (Final Direksi ≤ 2 Hari)')
+                    ->label('Persetujuan SDM (Final Cuti Direksi ≤ 2 Hari)')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->button()
                     ->visible(fn (LeaveRequest $record) => $record->isDireksiRequest() && $record->total_days <= 2 && in_array($record->status, ['Pending', 'Pending_HRD']) && (auth()->user()->isHrAdmin() || auth()->user()->isSuperAdmin()))
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi ACC Cuti Direksi oleh HRD')
-                    ->modalDescription(fn (LeaveRequest $record) => "Sesuai regulasi BPR Banda Raya, cuti singkat Direksi (≤ 2 hari) dapat disahkan langsung oleh HRD tanpa ke Dewan Komisaris. Lanjutkan pengesahan?")
-                    ->modalSubmitActionLabel('Ya, ACC Cuti Direksi')
+                    ->modalHeading('Konfirmasi Persetujuan Cuti Direksi oleh SDM')
+                    ->modalDescription(fn (LeaveRequest $record) => "Sesuai regulasi internal PT BPR Banda Raya, cuti singkat Direksi (≤ 2 hari) dapat disahkan langsung oleh Divisi SDM tanpa ke Dewan Komisaris. Lanjutkan pengesahan?")
+                    ->modalSubmitActionLabel('Ya, Setujui Cuti Direksi')
                     ->modalCancelActionLabel('Batal')
                     ->action(function (LeaveRequest $record) {
                         $record->update([

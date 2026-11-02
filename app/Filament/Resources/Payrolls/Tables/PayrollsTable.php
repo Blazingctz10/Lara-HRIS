@@ -86,9 +86,9 @@ class PayrollsTable
                 SelectFilter::make('status')
                     ->label('Filter Status')
                     ->options([
-                        'Draft' => 'Draft',
-                        'Approved' => 'Approved',
-                        'Paid' => 'Paid (Rilis)',
+                        'Draft' => 'Draf Penggajian',
+                        'Approved' => 'Disetujui',
+                        'Paid' => 'Dibayarkan / Rilis',
                     ]),
             ])
             ->actions([
@@ -105,13 +105,13 @@ class PayrollsTable
                     ->modalContent(fn (Payroll $record) => view('filament.modals.payroll-slip-detail', ['record' => $record])),
 
                 Action::make('mark_as_paid')
-                    ->label('Rilis / Bayar')
+                    ->label('Rilis & Bayar')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->visible(fn (Payroll $record): bool => $record->status !== 'Paid' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->requiresConfirmation()
                     ->modalHeading('Rilis Slip Gaji ke Portal Pegawai')
-                    ->modalDescription('Slip gaji ini akan berstatus Paid dan otomatis dapat diakses oleh pegawai di Portal ESS pribadinya.')
+                    ->modalDescription('Slip gaji ini akan berstatus resmi dan dapat langsung diakses oleh pegawai melalui Portal Mandiri Pegawai.')
                     ->action(function (Payroll $record) {
                         $record->update([
                             'status' => 'Paid',

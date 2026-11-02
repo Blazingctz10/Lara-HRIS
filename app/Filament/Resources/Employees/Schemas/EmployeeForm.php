@@ -138,30 +138,30 @@ class EmployeeForm
                                     ]),
 
                                 Section::make('III. Masa Kerja & Status Ketenagakerjaan')
-                                    ->description('Tanggal bergabung, evaluasi kontrak/probation, hingga masa pensiun/keluar')
+                                    ->description('Tanggal bergabung, evaluasi kontrak kerja atau masa percobaan, hingga pengakhiran hubungan kerja')
                                     ->schema([
                                         Grid::make(3)->schema([
                                             Select::make('employment_status')
                                                 ->label('Status Ketenagakerjaan')
                                                 ->options([
-                                                    'Permanent' => 'Permanent (Karyawan Tetap)',
-                                                    'Contract' => 'Contract (PKWT)',
-                                                    'Probation' => 'Probation (Masa Percobaan)',
-                                                    'Internship' => 'Internship (Magang)',
+                                                    'Permanent' => 'Pegawai Tetap (PKWTT)',
+                                                    'Contract' => 'Perjanjian Kerja Waktu Tertentu (PKWT)',
+                                                    'Probation' => 'Masa Percobaan (Probation)',
+                                                    'Internship' => 'Peserta Magang (Internship)',
                                                 ])
                                                 ->default('Contract')
                                                 ->live()
                                                 ->required(),
 
                                             DatePicker::make('join_date')
-                                                ->label('Join Date (Mulai Bekerja)')
+                                                ->label('Tanggal Mulai Bekerja (TMT)')
                                                 ->default(now())
                                                 ->required()
                                                 ->native(false),
 
                                             DatePicker::make('permanent_date')
-                                                ->label('Tanggal Pengangkatan Tetap (Permanent)')
-                                                ->helperText('Diisi saat diangkat menjadi Karyawan Tetap')
+                                                ->label('Tanggal Pengangkatan Pegawai Tetap')
+                                                ->helperText('Diisi saat pegawai resmi diangkat sebagai Pegawai Tetap')
                                                 ->native(false),
 
                                             DatePicker::make('contract_end_date')
@@ -170,34 +170,34 @@ class EmployeeForm
                                                 ->native(false),
 
                                             DatePicker::make('probation_end_date')
-                                                ->label('Tanggal Akhir Masa Percobaan')
+                                                ->label('Tanggal Berakhir Masa Percobaan')
                                                 ->visible(fn ($get) => $get('employment_status') === 'Probation')
                                                 ->native(false),
 
                                             Select::make('status')
-                                                ->label('Status Pegawai Saat Ini')
+                                                ->label('Status Keaktifan Pegawai')
                                                 ->options([
-                                                    'Active' => 'Aktif Bekerja',
-                                                    'On Leave' => 'Cuti Panjang',
-                                                    'Resigned' => 'Keluar (Mengundurkan Diri)',
-                                                    'Terminated' => 'Keluar (Diberhentikan / Habis Kontrak / Pensiun)',
+                                                    'Active' => 'Aktif',
+                                                    'On Leave' => 'Cuti Di Luar Tanggungan',
+                                                    'Resigned' => 'Mengundurkan Diri',
+                                                    'Terminated' => 'Berakhir Hubungan Kerja / Pensiun',
                                                 ])
                                                 ->default('Active')
                                                 ->live()
                                                 ->required(),
 
                                             DatePicker::make('exit_date')
-                                                ->label('Tanggal Keluar')
+                                                ->label('Tanggal Efektif Berakhir')
                                                 ->visible(fn ($get) => in_array($get('status'), ['Resigned', 'Terminated']))
                                                 ->native(false),
 
                                             Select::make('exit_reason')
-                                                ->label('Keterangan / Alasan Keluar')
+                                                ->label('Alasan Pengakhiran Hubungan Kerja')
                                                 ->options([
-                                                    'Mengundurkan diri' => 'Mengundurkan diri',
-                                                    'Habis kontrak' => 'Habis kontrak',
-                                                    'Diberhentikan' => 'Diberhentikan',
-                                                    'Usia Pensiun' => 'Usia Pensiun',
+                                                    'Mengundurkan diri' => 'Mengundurkan Diri',
+                                                    'Habis kontrak' => 'Berakhir Masa Kontrak',
+                                                    'Diberhentikan' => 'Pemutusan Hubungan Kerja (PHK)',
+                                                    'Usia Pensiun' => 'Batas Usia Pensiun (BUP)',
                                                 ])
                                                 ->visible(fn ($get) => in_array($get('status'), ['Resigned', 'Terminated'])),
                                         ]),
@@ -313,15 +313,15 @@ class EmployeeForm
                                                 ->placeholder('Pilih Status PTKP'),
 
                                             TextInput::make('emergency_contact_name')
-                                                ->label('Nama Kontak Darurat (Emergency Call)')
-                                                ->placeholder('Nama kontak keluarga'),
+                                                ->label('Nama Kontak Darurat')
+                                                ->placeholder('Nama lengkap kontak keluarga'),
 
                                             TextInput::make('emergency_contact_phone')
-                                                ->label('No. HP Kontak Darurat')
+                                                ->label('Nomor Telepon Kontak Darurat')
                                                 ->placeholder('Contoh: 0812xxxxxxx'),
 
                                             TextInput::make('emergency_contact_relation')
-                                                ->label('Hubungan')
+                                                ->label('Hubungan Keluarga')
                                                 ->placeholder('Contoh: Istri, Suami, Orang Tua'),
                                         ]),
                                     ]),

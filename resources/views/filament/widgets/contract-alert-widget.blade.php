@@ -197,7 +197,7 @@
                         Peringatan Jatuh Tempo Kontrak & Masa Percobaan (60 Hari ke Depan)
                     </h3>
                     <p class="m3-contract-desc">
-                        Monitoring otomatis pegawai PKWT / Masa Percobaan yang perlu evaluasi perpanjangan
+                        Pemantauan otomatis pegawai PKWT dan masa percobaan yang memerlukan evaluasi perpanjangan hubungan kerja
                     </p>
                 </div>
             </div>
@@ -211,7 +211,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="#10b981" style="width: 18px; height: 18px;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
-                <span>Tidak ada kontrak kerja atau masa probation pegawai yang akan berakhir dalam 60 hari ke depan.</span>
+                <span>Tidak ada kontrak kerja (PKWT) atau masa percobaan pegawai yang akan berakhir dalam 60 hari ke depan.</span>
             </div>
         @else
             <div>
@@ -246,10 +246,10 @@
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <div style="text-align: right;">
                                 <div style="font-size: 0.725rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; color: {{ $isUrgent ? '#ef4444' : '#ea580c' }};">
-                                    {{ $isProbation ? 'Habis Probation: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') : 'Habis Kontrak: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') }}
+                                    {{ $isProbation ? 'Masa Percobaan Berakhir: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') : 'Kontrak Berakhir: ' . ($targetDate ? \Carbon\Carbon::parse($targetDate)->format('d M Y') : '-') }}
                                 </div>
                                 <div class="m3-contract-days-label">
-                                    {{ $daysLeft >= 0 ? "Sisa {$daysLeft} Hari Lagi" : "Telah Lewat " . abs($daysLeft) . " Hari" }}
+                                    {{ $daysLeft >= 0 ? "Tersisa {$daysLeft} Hari" : "Terlewat " . abs($daysLeft) . " Hari" }}
                                 </div>
                             </div>
                             <a href="{{ url('/admin/employees/' . $emp->id . '/edit') }}" class="m3-eval-btn">

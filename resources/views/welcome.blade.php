@@ -792,21 +792,21 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
             </svg>
-            <span>Akses Cepat Pengujian (Password: <code>password</code>):</span>
+            <span>Akses Cepat Pengujian (Kata Sandi: <code>password</code>):</span>
           </div>
           <div style="margin-bottom: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-            <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Super Admin IT (Akses Penuh Seluruh Sistem)">
-              👑 admin@bprbandaraya.com (IT Admin)
+            <span class="quick-pill" onclick="fillDemo('admin@bprbandaraya.com', 'password')" title="Administrator IT (Akses Penuh Pengelolaan Sistem)">
+              admin@bprbandaraya.com (Administrator IT)
             </span>
-            <span class="quick-pill" onclick="fillDemo('hrd@bprbandaraya.com', 'password')" title="Human Capital / HR Admin (Penggajian, Cuti & Presensi)">
-              👥 hrd@bprbandaraya.com (HR Admin)
+            <span class="quick-pill" onclick="fillDemo('hrd@bprbandaraya.com', 'password')" title="Administrator SDM (Penggajian, Cuti & Presensi)">
+              hrd@bprbandaraya.com (Administrator SDM)
             </span>
-            <span class="quick-pill" onclick="fillDemo('ria@bprbandaraya.com', 'password')" title="Staf Karyawan Normal (Portal ESS - Slip Gaji Pribadi, Cuti, Presensi)">
-              👤 ria@bprbandaraya.com (Karyawan Normal)
+            <span class="quick-pill" onclick="fillDemo('ria@bprbandaraya.com', 'password')" title="Pegawai Operasional (Portal Mandiri Pegawai - Cuti, Presensi & Slip Gaji)">
+              ria@bprbandaraya.com (Pegawai Staf)
             </span>
           </div>
           <div style="font-size: 0.72rem; color: var(--glass-text-muted); line-height: 1.4;">
-            Klik salah satu akun di atas untuk mengisi formulir otomatis, lalu tekan tombol <strong>Masuk ke Sistem</strong>.
+            Pilih salah satu akun di atas untuk mengisi formulir secara otomatis, kemudian klik tombol <strong>Masuk ke Sistem</strong>.
           </div>
         </div>
         @endif

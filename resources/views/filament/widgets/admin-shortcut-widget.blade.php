@@ -144,14 +144,14 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
                     </svg>
-                    <span>Backup DB</span>
+                    <span>Cadangan Basis Data</span>
                 </a>
 
-                <a href="{{ url('/admin/attendance-dispensations') }}" title="Logbook Dispensasi & Izin Kehadiran (WA/DM)" class="m3-shortcut-chip m3-chip-emerald">
+                <a href="{{ url('/admin/attendance-dispensations') }}" title="Logbook Dispensasi & Izin Kehadiran Pegawai" class="m3-shortcut-chip m3-chip-emerald">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                     </svg>
-                    <span>Logbook Dispensasi</span>
+                    <span>Dispensasi Kehadiran</span>
                     @if($dispensationCount > 0)
                         <span class="m3-chip-count" style="background: #0E6838; color: #ffffff;">{{ $dispensationCount }}</span>
                     @endif
@@ -161,14 +161,14 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                     </svg>
-                    <span>Migrasi Excel</span>
+                    <span>Impor & Migrasi Data</span>
                 </a>
 
                 <a href="{{ url('/admin/leave-requests') }}" title="Antrean Cuti Menunggu Persetujuan" class="m3-shortcut-chip {{ $pendingLeaveCount > 0 ? 'm3-chip-emerald' : 'm3-chip-neutral' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v7.5" />
                     </svg>
-                    <span>Cuti Pending</span>
+                    <span>Persetujuan Cuti</span>
                     @if($pendingLeaveCount > 0)
                         <span class="m3-chip-count" style="background: #0E6838; color: #ffffff;">{{ $pendingLeaveCount }}</span>
                     @endif
@@ -178,7 +178,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
                     </svg>
-                    <span>Klaim Belum Cair</span>
+                    <span>Klaim Belum Dicairkan</span>
                     @if($unpaidClaimsCount > 0)
                         <span class="m3-chip-count" style="background: #F37A20; color: #ffffff;">{{ $unpaidClaimsCount }}</span>
                     @endif
@@ -255,7 +255,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
                     </svg>
-                    <span>Klaim Belum Cair</span>
+                    <span>Klaim Belum Dicairkan</span>
                     @if($unpaidClaimsCount > 0)
                         <span class="m3-chip-count" style="background: #F37A20; color: #ffffff;">{{ $unpaidClaimsCount }}</span>
                     @endif
@@ -265,18 +265,18 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
-                    <span>{{ $role === 'branch_manager' ? 'Lembur Cabang' : 'Approval Lembur' }}</span>
+                    <span>{{ $role === 'branch_manager' ? 'Lembur Cabang' : 'Persetujuan Lembur' }}</span>
                     @if($overtimePendingCount > 0)
                         <span class="m3-chip-count" style="background: #EA580C; color: #ffffff;">{{ $overtimePendingCount }}</span>
                     @endif
                 </a>
 
                 @if($role === 'hr_admin' || $role === 'super_admin')
-                    <a href="{{ url('/admin/attendance-dispensations') }}" title="Logbook Dispensasi Kehadiran HRD & GA" class="m3-shortcut-chip m3-chip-emerald">
+                    <a href="{{ url('/admin/attendance-dispensations') }}" title="Logbook Dispensasi Kehadiran SDM & Umum" class="m3-shortcut-chip m3-chip-emerald">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                         </svg>
-                        <span>Logbook HR & GA</span>
+                        <span>Dispensasi Kehadiran</span>
                     </a>
 
                     <a href="{{ url('/admin/employees/create') }}" title="Daftarkan Pegawai Baru" class="m3-shortcut-chip m3-chip-emerald">

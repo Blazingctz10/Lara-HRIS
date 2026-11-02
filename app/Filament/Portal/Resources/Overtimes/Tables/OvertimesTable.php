@@ -52,9 +52,9 @@ class OvertimesTable
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'Pending' => 'Menunggu Review Pincab',
-                        'Approved_Pincab' => 'Disetujui Pincab',
-                        'Approved_HR' => 'Disetujui HR HO (Siap Cair)',
+                        'Pending' => 'Menunggu Persetujuan Pemimpin Cabang',
+                        'Approved_Pincab' => 'Disetujui Pemimpin Cabang',
+                        'Approved_HR' => 'Disetujui SDM Kantor Pusat',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),

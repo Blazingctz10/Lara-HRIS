@@ -60,11 +60,11 @@ class LeaveRequestsTable
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'ACC HRD (Final Direksi ≤ 2 Hari)',
+                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
                         'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
                         'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
-                        'Approved_HR' => 'Menunggu Otorisasi Direksi (Verifikasi HR OK)',
-                        'Pending' => 'Menunggu Verifikasi HR',
+                        'Approved_HR' => 'Diverifikasi SDM (Menunggu Otorisasi Direksi)',
+                        'Pending' => 'Menunggu Verifikasi SDM',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),

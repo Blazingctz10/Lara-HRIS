@@ -54,9 +54,9 @@ class ReimbursementsTable
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'Pending' => 'Menunggu Review Pincab',
-                        'Approved_Pincab' => 'Disetujui Pincab (Proses Kasir)',
-                        'Paid' => 'Telah Ditransfer / Cair',
+                        'Pending' => 'Menunggu Persetujuan Pemimpin Cabang',
+                        'Approved_Pincab' => 'Disetujui Pemimpin Cabang (Menunggu Pencairan)',
+                        'Paid' => 'Telah Dicairkan',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),

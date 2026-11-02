@@ -83,13 +83,13 @@ class ReimbursementsTable
                     ->modalContent(fn (Reimbursement $record) => view('filament.modals.reimbursement-detail', ['record' => $record])),
 
                 Action::make('approve_pincab')
-                    ->label('Acc Pincab')
+                    ->label('Setujui (Pemimpin Cabang)')
                     ->icon('heroicon-m-check')
                     ->color('info')
                     ->button()
                     ->visible(fn (Reimbursement $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Klaim (Pincab)')
+                    ->modalHeading('Konfirmasi Persetujuan Klaim (Pemimpin Cabang)')
                     ->modalDescription(fn (Reimbursement $record) => "Apakah Anda yakin ingin menyetujui klaim reimbursement '{$record->title}' sebesar Rp " . number_format($record->amount, 0, ',', '.') . " untuk pegawai {$record->employee->full_name}?")
                     ->modalSubmitActionLabel('Ya, Setujui Klaim')
                     ->modalCancelActionLabel('Batal')
@@ -101,22 +101,22 @@ class ReimbursementsTable
                         ]);
 
                         Notification::make()
-                            ->title('Klaim Disetujui Pincab')
-                            ->body("Klaim Rp " . number_format($record->amount, 0, ',', '.') . " {$record->employee->full_name} telah disetujui Pincab.")
+                            ->title('Klaim Disetujui Pemimpin Cabang')
+                            ->body("Klaim Rp " . number_format($record->amount, 0, ',', '.') . " untuk pegawai {$record->employee->full_name} telah disetujui Pemimpin Cabang.")
                             ->success()
                             ->send();
                     }),
 
                 Action::make('mark_paid')
-                    ->label('Bayar / Lunas')
+                    ->label('Konfirmasi Pencairan')
                     ->icon('heroicon-m-banknotes')
                     ->color('success')
                     ->button()
                     ->visible(fn (Reimbursement $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Pelunasan / Pencairan Dana Klaim')
-                    ->modalDescription(fn (Reimbursement $record) => "Apakah Anda yakin dana sebesar Rp " . number_format($record->amount, 0, ',', '.') . " untuk klaim '{$record->title}' telah dicairkan / ditransfer kepada {$record->employee->full_name}? Status klaim akan diubah menjadi 'Paid' (Lunas).")
-                    ->modalSubmitActionLabel('Ya, Konfirmasi Lunas')
+                    ->modalHeading('Konfirmasi Pencairan Dana Klaim')
+                    ->modalDescription(fn (Reimbursement $record) => "Apakah Anda yakin dana sebesar Rp " . number_format($record->amount, 0, ',', '.') . " untuk klaim '{$record->title}' telah dicairkan kepada pegawai {$record->employee->full_name}?")
+                    ->modalSubmitActionLabel('Ya, Konfirmasi Pencairan')
                     ->modalCancelActionLabel('Batal')
                     ->modalIcon('heroicon-o-banknotes')
                     ->action(function (Reimbursement $record) {
