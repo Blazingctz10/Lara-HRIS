@@ -8,35 +8,50 @@
             document.documentElement.classList.add('dark');
         }
 
-        // Active Field & Section Elevation System (guarantees opened dropdowns/calendars are always above following sections)
-        document.addEventListener('focusin', function(e) {
-            const sec = e.target.closest('.fi-section');
-            const col = e.target.closest('.fi-grid > .fi-grid-col, .fi-sc > .fi-grid-col, .fi-grid-col');
+        // Active Field & Section Ancestor Chain Elevation System (guarantees opened dropdowns/calendars are always above following sections)
+        function elevateChain(target) {
+            if (!target || !target.closest) return;
+            let curr = target;
+            while (curr && curr !== document.body) {
+                if (curr.classList && (
+                    curr.classList.contains('fi-section') ||
+                    curr.classList.contains('fi-sc-section') ||
+                    curr.classList.contains('fi-sc-component') ||
+                    curr.classList.contains('fi-grid-col') ||
+                    curr.classList.contains('fi-input-wrp') ||
+                    curr.classList.contains('fi-fo-field-wrp') ||
+                    curr.classList.contains('fi-fo-field-wrp-ctn')
+                )) {
+                    curr.classList.add('fi-elevated-active');
+                }
+                curr = curr.parentElement;
+            }
+        }
+
+        function clearElevation() {
             document.querySelectorAll('.fi-elevated-active').forEach(node => {
-                if (node !== sec && node !== col && !node.contains(e.target)) {
+                if (!node.contains(document.activeElement)) {
                     node.classList.remove('fi-elevated-active');
                 }
             });
-            if (sec) sec.classList.add('fi-elevated-active');
-            if (col) col.classList.add('fi-elevated-active');
+        }
+
+        document.addEventListener('focusin', function(e) {
+            clearElevation();
+            elevateChain(e.target);
         }, true);
 
         document.addEventListener('click', function(e) {
             setTimeout(function() {
-                const activeTriggers = document.querySelectorAll('[aria-expanded="true"]');
-                if (activeTriggers.length === 0) {
-                    document.querySelectorAll('.fi-elevated-active').forEach(node => {
-                        if (!node.contains(document.activeElement)) {
-                            node.classList.remove('fi-elevated-active');
-                        }
-                    });
-                } else {
-                    activeTriggers.forEach(el => {
-                        const sec = el.closest('.fi-section');
-                        const col = el.closest('.fi-grid > .fi-grid-col, .fi-sc > .fi-grid-col, .fi-grid-col');
-                        if (sec) sec.classList.add('fi-elevated-active');
-                        if (col) col.classList.add('fi-elevated-active');
-                    });
+                clearElevation();
+                const activeTriggers = document.querySelectorAll(
+                    '[aria-expanded="true"], .choices.is-open, .choices__list--dropdown.is-active, .fi-fo-date-time-picker-panel:not([style*="display: none"]), .fi-dropdown-panel:not([style*="display: none"])'
+                );
+                activeTriggers.forEach(el => {
+                    elevateChain(el);
+                });
+                if (document.activeElement && document.activeElement !== document.body) {
+                    elevateChain(document.activeElement);
                 }
             }, 15);
         }, true);
@@ -508,10 +523,17 @@ body.fi-body {
    3. APPLE FROSTED GLASS TOPBAR
    ============================================================================= */
 .fi-topbar-ctn {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 950 !important;
+    overflow: visible !important;
     overflow-x: visible !important;
+    overflow-y: visible !important;
 }
 
 .fi-topbar {
+    position: relative !important;
+    z-index: 951 !important;
     background: var(--glass-surface) !important;
     backdrop-filter: var(--glass-blur-md) !important;
     -webkit-backdrop-filter: var(--glass-blur-md) !important;
@@ -530,6 +552,26 @@ body.fi-body {
 
 .fi-topbar nav {
     background: transparent !important;
+}
+
+.fi-topbar-start,
+.fi-topbar-end,
+.fi-user-menu,
+.fi-user-menu-trigger,
+.fi-topbar-database-notifications-btn {
+    position: relative !important;
+    z-index: 952 !important;
+}
+
+.fi-topbar .fi-dropdown-panel,
+.fi-user-menu .fi-dropdown-panel {
+    z-index: 99999 !important;
+    box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(14, 104, 56, 0.25) !important;
+}
+
+:is(.dark) .fi-topbar .fi-dropdown-panel,
+:is(.dark) .fi-user-menu .fi-dropdown-panel {
+    box-shadow: 0 24px 56px -4px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
 }
 
 .fi-topbar-end {
@@ -654,26 +696,27 @@ body.fi-body {
 .fi-sc-grid > .fi-grid-col,
 .fi-tabs-content > .fi-grid > .fi-grid-col,
 .fi-sc-tabs-tab > .fi-grid > .fi-grid-col,
-.fi-sc-tabs-tab > .fi-sc > .fi-grid-col {
+.fi-sc-tabs-tab > .fi-sc > .fi-grid-col,
+.fi-sc > .fi-sc-component,
+.fi-sc > div,
+.fi-sc-section,
+.fi-section {
     position: relative !important;
 }
 
-.fi-grid > .fi-grid-col:nth-child(1), .fi-sc > .fi-grid-col:nth-child(1), .fi-sc-grid > .fi-grid-col:nth-child(1) { z-index: 70 !important; }
-.fi-grid > .fi-grid-col:nth-child(2), .fi-sc > .fi-grid-col:nth-child(2), .fi-sc-grid > .fi-grid-col:nth-child(2) { z-index: 66 !important; }
-.fi-grid > .fi-grid-col:nth-child(3), .fi-sc > .fi-grid-col:nth-child(3), .fi-sc-grid > .fi-grid-col:nth-child(3) { z-index: 62 !important; }
-.fi-grid > .fi-grid-col:nth-child(4), .fi-sc > .fi-grid-col:nth-child(4), .fi-sc-grid > .fi-grid-col:nth-child(4) { z-index: 58 !important; }
-.fi-grid > .fi-grid-col:nth-child(5), .fi-sc > .fi-grid-col:nth-child(5), .fi-sc-grid > .fi-grid-col:nth-child(5) { z-index: 54 !important; }
-.fi-grid > .fi-grid-col:nth-child(6), .fi-sc > .fi-grid-col:nth-child(6), .fi-sc-grid > .fi-grid-col:nth-child(6) { z-index: 50 !important; }
-.fi-grid > .fi-grid-col:nth-child(7), .fi-sc > .fi-grid-col:nth-child(7), .fi-sc-grid > .fi-grid-col:nth-child(7) { z-index: 46 !important; }
-.fi-grid > .fi-grid-col:nth-child(8), .fi-sc > .fi-grid-col:nth-child(8), .fi-sc-grid > .fi-grid-col:nth-child(8) { z-index: 42 !important; }
-.fi-grid > .fi-grid-col:nth-child(9), .fi-sc > .fi-grid-col:nth-child(9), .fi-sc-grid > .fi-grid-col:nth-child(9) { z-index: 38 !important; }
-.fi-grid > .fi-grid-col:nth-child(10), .fi-sc > .fi-grid-col:nth-child(10), .fi-sc-grid > .fi-grid-col:nth-child(10) { z-index: 34 !important; }
-.fi-grid > .fi-grid-col:nth-child(11), .fi-sc > .fi-grid-col:nth-child(11), .fi-sc-grid > .fi-grid-col:nth-child(11) { z-index: 30 !important; }
-.fi-grid > .fi-grid-col:nth-child(12), .fi-sc > .fi-grid-col:nth-child(12), .fi-sc-grid > .fi-grid-col:nth-child(12) { z-index: 26 !important; }
-.fi-grid > .fi-grid-col:nth-child(13), .fi-sc > .fi-grid-col:nth-child(13), .fi-sc-grid > .fi-grid-col:nth-child(13) { z-index: 22 !important; }
-.fi-grid > .fi-grid-col:nth-child(14), .fi-sc > .fi-grid-col:nth-child(14), .fi-sc-grid > .fi-grid-col:nth-child(14) { z-index: 18 !important; }
-.fi-grid > .fi-grid-col:nth-child(15), .fi-sc > .fi-grid-col:nth-child(15), .fi-sc-grid > .fi-grid-col:nth-child(15) { z-index: 14 !important; }
-.fi-grid > .fi-grid-col:nth-child(16), .fi-sc > .fi-grid-col:nth-child(16), .fi-sc-grid > .fi-grid-col:nth-child(16) { z-index: 10 !important; }
+/* Descending natural z-indexes for sequential siblings */
+.fi-grid > :nth-child(1), .fi-sc > :nth-child(1), .fi-sc-grid > :nth-child(1), .fi-sc-section:nth-of-type(1), .fi-section:nth-of-type(1) { z-index: 60 !important; }
+.fi-grid > :nth-child(2), .fi-sc > :nth-child(2), .fi-sc-grid > :nth-child(2), .fi-sc-section:nth-of-type(2), .fi-section:nth-of-type(2) { z-index: 55 !important; }
+.fi-grid > :nth-child(3), .fi-sc > :nth-child(3), .fi-sc-grid > :nth-child(3), .fi-sc-section:nth-of-type(3), .fi-section:nth-of-type(3) { z-index: 50 !important; }
+.fi-grid > :nth-child(4), .fi-sc > :nth-child(4), .fi-sc-grid > :nth-child(4), .fi-sc-section:nth-of-type(4), .fi-section:nth-of-type(4) { z-index: 45 !important; }
+.fi-grid > :nth-child(5), .fi-sc > :nth-child(5), .fi-sc-grid > :nth-child(5), .fi-sc-section:nth-of-type(5), .fi-section:nth-of-type(5) { z-index: 40 !important; }
+.fi-grid > :nth-child(6), .fi-sc > :nth-child(6), .fi-sc-grid > :nth-child(6), .fi-sc-section:nth-of-type(6), .fi-section:nth-of-type(6) { z-index: 35 !important; }
+.fi-grid > :nth-child(7), .fi-sc > :nth-child(7), .fi-sc-grid > :nth-child(7), .fi-sc-section:nth-of-type(7), .fi-section:nth-of-type(7) { z-index: 30 !important; }
+.fi-grid > :nth-child(8), .fi-sc > :nth-child(8), .fi-sc-grid > :nth-child(8), .fi-sc-section:nth-of-type(8), .fi-section:nth-of-type(8) { z-index: 25 !important; }
+.fi-grid > :nth-child(9), .fi-sc > :nth-child(9), .fi-sc-grid > :nth-child(9), .fi-sc-section:nth-of-type(9), .fi-section:nth-of-type(9) { z-index: 20 !important; }
+.fi-grid > :nth-child(10), .fi-sc > :nth-child(10), .fi-sc-grid > :nth-child(10), .fi-sc-section:nth-of-type(10), .fi-section:nth-of-type(10) { z-index: 15 !important; }
+.fi-grid > :nth-child(11), .fi-sc > :nth-child(11), .fi-sc-grid > :nth-child(11), .fi-sc-section:nth-of-type(11), .fi-section:nth-of-type(11) { z-index: 10 !important; }
+.fi-grid > :nth-child(12), .fi-sc > :nth-child(12), .fi-sc-grid > :nth-child(12), .fi-sc-section:nth-of-type(12), .fi-section:nth-of-type(12) { z-index: 5 !important; }
 
 /* Dynamic priority elevation when focused or when dropdown/calendar is ACTIVELY open */
 .fi-elevated-active,
@@ -685,6 +728,11 @@ body.fi-body {
 .fi-grid-col:has(.fi-dropdown-panel:not([style*="display: none"])),
 .fi-grid-col:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
 .fi-grid-col:has([x-ref="panel"]:not([style*="display: none"])),
+.fi-sc-component:focus-within,
+.fi-sc-component:has(:focus),
+.fi-sc-component:has([aria-expanded="true"]),
+.fi-sc-component:has(.fi-dropdown-panel:not([style*="display: none"])),
+.fi-sc-component:has(.fi-fo-date-time-picker-panel:not([style*="display: none"])),
 .fi-sc-section:focus-within,
 .fi-sc-section:has(:focus),
 .fi-sc-section:has([aria-expanded="true"]),
@@ -700,7 +748,7 @@ body.fi-body {
 .fi-section:not(.fi-section-not-contained):has(.fi-dropdown-panel:not([style*="display: none"])),
 .fi-section:not(.fi-section-not-contained):has(.fi-fo-date-time-picker-panel:not([style*="display: none"])) {
     position: relative !important;
-    z-index: 850 !important;
+    z-index: 900 !important;
 }
 
 /* Dropdown & Datepicker Popovers: Topmost Z-Index Layer */
