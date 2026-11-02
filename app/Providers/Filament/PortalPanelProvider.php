@@ -42,6 +42,10 @@ class PortalPanelProvider extends PanelProvider
                 fn (): string => view('filament.m3-theme')->render()
             )
             ->renderHook(
+                PanelsRenderHook::SIDEBAR_LOGO_AFTER,
+                fn (): string => view('filament.components.sidebar-collapsed-brand')->render()
+            )
+            ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => view('filament.components.role-indicator')->render()
             )

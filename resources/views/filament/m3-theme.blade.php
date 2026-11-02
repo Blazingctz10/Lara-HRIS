@@ -379,7 +379,37 @@ body.fi-body {
 .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-header {
     padding-inline: 0 !important;
     justify-content: center !important;
+    align-items: center !important;
     display: flex !important;
+    height: var(--topbar-height) !important;
+}
+
+/* Collapsed Sidebar Compact Brand Emblem */
+.fi-sidebar-collapsed-brand-ctn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    margin: auto !important;
+    border-radius: 14px !important;
+    background: var(--glass-surface-subtle) !important;
+    border: 1px solid var(--glass-border-subtle) !important;
+    box-shadow: var(--glass-shadow-sm) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.fi-sidebar-collapsed-brand-ctn:hover {
+    background: var(--glass-surface-hover) !important;
+    border-color: var(--glass-border) !important;
+    transform: scale(1.08) !important;
+}
+
+.fi-sidebar-collapsed-brand-logo {
+    height: 1.85rem !important;
+    width: 1.85rem !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
 }
 
 .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-footer {
