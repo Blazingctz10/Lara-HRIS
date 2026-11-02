@@ -12,6 +12,11 @@ class ContractAlertWidget extends Widget
 
     protected string $view = 'filament.widgets.contract-alert-widget';
 
+    public static function canView(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+    }
+
     public function getExpiringContracts()
     {
         $today = Carbon::today();

@@ -17,6 +17,11 @@ class EmployeesByBranchChartWidget extends ChartWidget
         'lg' => 1,
     ];
 
+    public static function canView(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
+    }
+
     protected function getData(): array
     {
         $branches = Branch::where('is_active', true)->withCount('employees')->get();

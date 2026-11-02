@@ -39,7 +39,7 @@
         ],
     };
 
-    $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'direksi']);
+    $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
 @endphp
 
 <style>

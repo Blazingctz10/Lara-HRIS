@@ -302,3 +302,4 @@ class BackupService
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
+

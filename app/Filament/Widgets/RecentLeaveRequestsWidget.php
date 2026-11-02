@@ -15,6 +15,11 @@ class RecentLeaveRequestsWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+    }
+
     public function table(Table $table): Table
     {
         return $table

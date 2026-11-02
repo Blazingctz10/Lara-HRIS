@@ -17,6 +17,11 @@ class AdminShortcutWidget extends Widget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+    }
+
     public function getData(): array
     {
         $role = auth()->user()?->role ?? 'employee';

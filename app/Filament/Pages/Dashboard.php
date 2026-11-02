@@ -16,6 +16,11 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Dashboard';
 
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+    }
+
     public function getWidgets(): array
     {
         return [

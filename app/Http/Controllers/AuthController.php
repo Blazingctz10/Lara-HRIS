@@ -168,6 +168,12 @@ class AuthController extends Controller
             return redirect()->intended('/admin');
         }
 
+        // Pastikan role karyawan biasa tidak pernah diarahkan ke rute panel admin melalui intended URL
+        $intendedUrl = (string) session('url.intended', '');
+        if (str_contains($intendedUrl, '/admin')) {
+            session()->forget('url.intended');
+        }
+
         return redirect()->intended('/portal');
     }
 }

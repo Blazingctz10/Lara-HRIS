@@ -118,6 +118,58 @@ class SecurityTest extends TestCase
 
         $response = $this->get('/portal');
         $response->assertStatus(200);
+
+        // Akses langsung ke panel admin via HTTP GET wajib ditolak 403 Forbidden
+        $adminResponse = $this->get('/admin');
+        $adminResponse->assertStatus(403);
+    }
+
+    public function test_admin_widgets_deny_access_to_regular_employees(): void
+    {
+        $employee = User::where('role', 'employee')->first();
+        $hrAdmin = User::where('role', 'hr_admin')->first();
+        $this->assertNotNull($employee);
+        $this->assertNotNull($hrAdmin);
+
+        // 1. Karyawan biasa tidak boleh melihat satupun widget manajerial admin
+        $this->actingAs($employee);
+        $this->assertFalse(\App\Filament\Widgets\BankStatsOverview::canView());
+        $this->assertFalse(\App\Filament\Widgets\AdminShortcutWidget::canView());
+        $this->assertFalse(\App\Filament\Widgets\RecentLeaveRequestsWidget::canView());
+        $this->assertFalse(\App\Filament\Widgets\EmployeesByBranchChartWidget::canView());
+        $this->assertFalse(\App\Filament\Widgets\WeeklyAttendanceChartWidget::canView());
+        $this->assertFalse(\App\Filament\Widgets\ContractAlertWidget::canView());
+        $this->assertFalse(\App\Filament\Pages\Dashboard::canAccess());
+        $this->assertFalse(\App\Filament\Resources\Announcements\AnnouncementResource::canViewAny());
+
+        // 2. HR Admin berwenang melihat widget admin
+        $this->actingAs($hrAdmin);
+        $this->assertTrue(\App\Filament\Widgets\BankStatsOverview::canView());
+        $this->assertTrue(\App\Filament\Widgets\AdminShortcutWidget::canView());
+        $this->assertTrue(\App\Filament\Widgets\RecentLeaveRequestsWidget::canView());
+        $this->assertTrue(\App\Filament\Widgets\EmployeesByBranchChartWidget::canView());
+        $this->assertTrue(\App\Filament\Widgets\WeeklyAttendanceChartWidget::canView());
+        $this->assertTrue(\App\Filament\Widgets\ContractAlertWidget::canView());
+        $this->assertTrue(\App\Filament\Pages\Dashboard::canAccess());
+        $this->assertTrue(\App\Filament\Resources\Announcements\AnnouncementResource::canViewAny());
+    }
+
+    public function test_employee_intended_admin_url_is_safely_sanitized(): void
+    {
+        $employee = User::where('role', 'employee')->first();
+        $this->assertNotNull($employee);
+
+        // Simulasikan session intended URL menuju ke /admin
+        session(['url.intended' => 'http://localhost/admin']);
+
+        $response = $this->post('/login', [
+            'email' => $employee->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($employee);
+        // Karyawan wajib diarahkan ke /portal, bukan /admin
+        $response->assertRedirect('/portal');
     }
 
     public function test_login_audit_trail_logs_success_and_failures(): void

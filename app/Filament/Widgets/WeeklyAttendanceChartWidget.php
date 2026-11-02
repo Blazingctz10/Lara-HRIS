@@ -17,6 +17,11 @@ class WeeklyAttendanceChartWidget extends ChartWidget
         'lg' => 1,
     ];
 
+    public static function canView(): bool
+    {
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+    }
+
     protected function getData(): array
     {
         $days = [];
