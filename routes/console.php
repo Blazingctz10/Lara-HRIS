@@ -89,3 +89,29 @@ Artisan::command('hris:standardize-passwords', function () {
         })
     );
 })->purpose('Standarisasi seluruh akun pengguna ke kata sandi default: password');
+
+Artisan::command('hris:backup {--type=full : Tipe arsip cadangan (full|db)}', function (\App\Services\BackupService $backupService) {
+    $type = $this->option('type') ?: 'full';
+    $this->info("Memulai pencadangan sistem Core HRIS PT BPR Banda Raya (Mode: {$type})...");
+
+    try {
+        if ($type === 'db') {
+            $filename = $backupService->createDatabaseBackup();
+            $this->info("✓ Cadangan basis data berhasil diamankan: {$filename}");
+        } else {
+            $filename = $backupService->createFullBackup('Sistem Terjadwal (Automated Scheduler)');
+            $this->info("✓ Cadangan arsip lengkap (DB + Dokumen + Snapshot JSON) berhasil dibuat: {$filename}");
+        }
+    } catch (\Throwable $e) {
+        $this->error("Gagal melakukan pencadangan: {$e->getMessage()}");
+        return 1;
+    }
+
+    return 0;
+})->purpose('Pencadangan otomatis database dan lampiran dokumen resmi HRIS');
+
+\Illuminate\Support\Facades\Schedule::command('hris:backup --type=full')
+    ->dailyAt('02:00')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/backup.log'));
+
