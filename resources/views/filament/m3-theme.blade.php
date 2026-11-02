@@ -391,40 +391,17 @@ body.fi-body {
     align-self: center !important;
 }
 
+/* Collapsed Sidebar: clean header without empty boxes or redundant duplicate logos */
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-header-ctn,
 .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-header {
-    padding-inline: 0 !important;
-    justify-content: center !important;
-    align-items: center !important;
-    display: flex !important;
-    height: var(--topbar-height) !important;
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: none !important;
 }
 
-/* Collapsed Sidebar Compact Brand Emblem */
-.fi-sidebar-collapsed-brand-ctn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 2.75rem !important;
-    height: 2.75rem !important;
-    margin: auto !important;
-    border-radius: 14px !important;
-    background: var(--glass-surface-subtle) !important;
-    border: 1px solid var(--glass-border-subtle) !important;
-    box-shadow: var(--glass-shadow-sm) !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.fi-sidebar-collapsed-brand-ctn:hover {
-    background: var(--glass-surface-hover) !important;
-    border-color: var(--glass-border) !important;
-    transform: scale(1.08) !important;
-}
-
-.fi-sidebar-collapsed-brand-logo {
-    height: 1.85rem !important;
-    width: 1.85rem !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-nav {
+    padding-top: 1rem !important;
 }
 
 .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-footer {
@@ -1065,14 +1042,24 @@ select option {
 /* =============================================================================
    9. VISIONOS FROSTED MODALS & DIALOGS
    ============================================================================= */
+.fi-modal {
+    z-index: 999990 !important;
+}
+
 .fi-modal-close-overlay {
+    z-index: 999991 !important;
     background: rgba(7, 13, 9, 0.65) !important;
     backdrop-filter: blur(16px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
+.fi-modal-window-ctn {
+    z-index: 999995 !important;
+}
+
 .fi-modal-window {
+    z-index: 999999 !important;
     border-radius: 28px !important;
     background: var(--glass-surface) !important;
     backdrop-filter: var(--glass-blur-lg) !important;

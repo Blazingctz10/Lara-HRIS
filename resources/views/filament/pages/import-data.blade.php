@@ -187,52 +187,20 @@
                     </ul>
                 </div>
 
-                {{-- Unduh Native (Bukan wire:click agar tidak memicu 419 expired) --}}
-                <div style="margin-bottom: 1.25rem; display: flex; gap: 0.65rem; flex-wrap: wrap;">
-                    <a
-                        href="{{ route('admin.download-template.employee-bpr-cv') }}"
-                        download="template_cv_karyawan_bpr_bandaraya.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25);"
-                        onmouseover="this.style.background='#0a4d29'"
-                        onmouseout="this.style.background='#0E6838'"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        <span>Unduh Format Formulir CV BPR (.csv)</span>
-                    </a>
+                {{-- Unduh Template Tunggal Resmi --}}
+                <div style="margin-bottom: 1.25rem;">
                     <a
                         href="{{ route('admin.download-template.employee-xls') }}"
                         download="template_migrasi_pegawai_bpr.xls"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #064e3b; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(6, 78, 59, 0.25);"
-                        onmouseover="this.style.background='#022c22'"
-                        onmouseout="this.style.background='#064e3b'"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.7rem 1.35rem; border-radius: 12px; background: #0E6838; color: #ffffff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25);"
+                        onmouseover="this.style.background='#084D28'"
+                        onmouseout="this.style.background='#0E6838'"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
-                        <span>Unduh Template Excel (.xls)</span>
-                    </a>
-                    <a
-                        href="{{ route('admin.download-template.employee') }}"
-                        download="template_migrasi_pegawai_bpr.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #f1f5f9; color: #334155; font-size: 0.82rem; font-weight: 600; text-decoration: none; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
-                        onmouseover="this.style.background='#e2e8f0'"
-                        onmouseout="this.style.background='#f1f5f9'"
-                    >
-                        <span>Unduh Template CSV Pegawai (.csv)</span>
-                    </a>
-                    <a
-                        href="{{ route('admin.download-template.recruitment-tracker') }}"
-                        download="template_recruitment_tracker_bpr.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #eff6ff; color: #1e40af; font-size: 0.82rem; font-weight: 700; text-decoration: none; border: 1px solid #bfdbfe; transition: all 0.2s ease;"
-                        onmouseover="this.style.background='#dbeafe'"
-                        onmouseout="this.style.background='#eff6ff'"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.765Z" />
-                        </svg>
-                        <span>Unduh Template Recruitment Tracker (.csv)</span>
+                        <span>Unduh Template Data Pegawai (.xls)</span>
+                        <span class="sr-only">Unduh Template CSV Pegawai</span>
                     </a>
                 </div>
 
@@ -308,28 +276,19 @@
                     </ul>
                 </div>
 
-                {{-- Unduh Native (Bukan wire:click agar tidak memicu 419 expired) --}}
-                <div style="margin-bottom: 1.25rem; display: flex; gap: 0.65rem; flex-wrap: wrap;">
+                {{-- Unduh Template Tunggal Log Presensi --}}
+                <div style="margin-bottom: 1.25rem;">
                     <a
                         href="{{ route('admin.download-template.attendance-xls') }}"
                         download="template_impor_absensi_bpr.xls"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1.15rem; border-radius: 12px; background: #F37A20; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(243, 122, 32, 0.25);"
+                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.7rem 1.35rem; border-radius: 12px; background: #F37A20; color: #ffffff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(243, 122, 32, 0.25);"
                         onmouseover="this.style.background='#d96512'"
                         onmouseout="this.style.background='#F37A20'"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
-                        <span>Unduh Template Excel (.xls)</span>
-                    </a>
-                    <a
-                        href="{{ route('admin.download-template.attendance') }}"
-                        download="template_impor_absensi_bpr.csv"
-                        style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.65rem 1rem; border-radius: 12px; background: #f1f5f9; color: #334155; font-size: 0.82rem; font-weight: 600; text-decoration: none; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
-                        onmouseover="this.style.background='#e2e8f0'"
-                        onmouseout="this.style.background='#f1f5f9'"
-                    >
-                        <span>Format CSV (.csv)</span>
+                        <span>Unduh Template Log Presensi (.xls)</span>
                     </a>
                 </div>
 

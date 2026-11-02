@@ -41,26 +41,38 @@ class PayrollsTable
 
                 TextColumn::make('basic_salary')
                     ->label('Gaji Pokok')
-                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
+                    ->html()
+                    ->formatStateUsing(fn ($state) => view('filament.components.sensitive-salary-cell', [
+                        'value' => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-',
+                        'color' => 'default',
+                    ])->render())
                     ->sortable(),
 
                 TextColumn::make('total_earnings')
                     ->label('Total Bruto')
-                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
-                    ->color('info')
+                    ->html()
+                    ->formatStateUsing(fn ($state) => view('filament.components.sensitive-salary-cell', [
+                        'value' => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-',
+                        'color' => 'info',
+                    ])->render())
                     ->sortable(),
 
                 TextColumn::make('deductions')
                     ->label('Potongan')
-                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
-                    ->color('danger')
+                    ->html()
+                    ->formatStateUsing(fn ($state) => view('filament.components.sensitive-salary-cell', [
+                        'value' => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-',
+                        'color' => 'danger',
+                    ])->render())
                     ->sortable(),
 
                 TextColumn::make('net_salary')
                     ->label('Gaji Bersih (THP)')
-                    ->formatStateUsing(fn ($state) => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-')
-                    ->weight('bold')
-                    ->color('success')
+                    ->html()
+                    ->formatStateUsing(fn ($state) => view('filament.components.sensitive-salary-cell', [
+                        'value' => $state !== null ? 'Rp ' . number_format((float) $state, 0, ',', '.') : '-',
+                        'color' => 'success',
+                    ])->render())
                     ->sortable(),
 
                 TextColumn::make('status')

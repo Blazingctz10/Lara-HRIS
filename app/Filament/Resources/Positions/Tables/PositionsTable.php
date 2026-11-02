@@ -43,8 +43,15 @@ class PositionsTable
 
                 TextColumn::make('min_salary')
                     ->label('Standar Gaji Pokok')
-                    ->formatStateUsing(fn ($state) => $state ? 'Rp ' . number_format((float) $state, 0, ',', '.') : 'Sesuai UMK')
-                    ->color('success')
+                    ->html()
+                    ->formatStateUsing(function ($state) {
+                        if (!$state) return 'Sesuai UMK';
+                        $formatted = 'Rp ' . number_format((float) $state, 0, ',', '.');
+                        return view('filament.components.sensitive-salary-cell', [
+                            'value' => $formatted,
+                            'color' => 'success',
+                        ])->render();
+                    })
                     ->sortable(),
 
                 IconColumn::make('is_active')
