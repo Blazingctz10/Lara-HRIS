@@ -51,6 +51,8 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('120s')
             ->font('Plus Jakarta Sans', provider: \Filament\FontProviders\LocalFontProvider::class)
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('20rem')
+            ->collapsedSidebarWidth('4.75rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

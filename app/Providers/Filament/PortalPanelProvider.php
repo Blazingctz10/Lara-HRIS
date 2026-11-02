@@ -50,6 +50,8 @@ class PortalPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('120s')
             ->font('Plus Jakarta Sans', provider: \Filament\FontProviders\LocalFontProvider::class)
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('20rem')
+            ->collapsedSidebarWidth('4.75rem')
             ->discoverResources(in: app_path('Filament/Portal/Resources'), for: 'App\\Filament\\Portal\\Resources')
             ->discoverPages(in: app_path('Filament/Portal/Pages'), for: 'App\\Filament\\Portal\\Pages')
             ->pages([

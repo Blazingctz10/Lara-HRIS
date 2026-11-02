@@ -1,11 +1,17 @@
-<!-- Early Theme Initializer & UI Stacking Controller (Defaults to Clean Light Mode if Not Set) -->
+<!-- Early Theme Initializer & UI Stacking Controller (Robust Light/Dark/System Sync) -->
 <script>
     (function() {
-        const theme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'light';
-        if (theme === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else if (theme === 'dark') {
+        const theme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'system';
+        let isDark = false;
+        if (theme === 'dark') {
+            isDark = true;
+        } else if (theme === 'system') {
+            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        if (isDark) {
             document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
 
         // Active Field & Section Ancestor Chain Elevation System (guarantees opened dropdowns/calendars are always above following sections)
@@ -310,8 +316,8 @@ body.fi-body {
 /* Sidebar Nav Item: Apple Floating Capsule */
 .fi-sidebar-item-btn {
     border-radius: 14px !important;
-    padding: 0.65rem 0.95rem;
-    margin: 0.2rem 0.65rem;
+    padding: 0.65rem 0.95rem !important;
+    margin: 0.2rem 0.65rem !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
     letter-spacing: -0.01em !important;
@@ -319,6 +325,22 @@ body.fi-body {
     color: var(--glass-text-secondary) !important;
     border: 1px solid transparent !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+.fi-sidebar-open .fi-sidebar-item-label {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.fi-sidebar-open .fi-sidebar-item-badge-ctn {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
 }
 
 .fi-sidebar-item-btn:hover {
@@ -452,11 +474,8 @@ body.fi-body {
 }
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-label,
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > span,
-.fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label,
-.fi-sidebar-item-btn[aria-current="page"] > span,
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn span,
-.fi-sidebar-item-btn[aria-current="page"] span {
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label {
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
     font-weight: 700 !important;
@@ -483,11 +502,8 @@ body.fi-body {
 }
 
 :is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-label,
-:is(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > span,
-:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label,
-:is(.dark) .fi-sidebar-item-btn[aria-current="page"] > span,
-:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn span,
-:is(.dark) .fi-sidebar-item-btn[aria-current="page"] span {
+:is(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-sidebar-item-label {
     color: #A7F3D0 !important;
     -webkit-text-fill-color: #A7F3D0 !important;
     font-weight: 700 !important;
@@ -501,6 +517,71 @@ body.fi-body {
 :is(.dark) .fi-sidebar-item-btn[aria-current="page"] svg {
     color: #34D399 !important;
     stroke: #34D399 !important;
+}
+
+/* High-Contrast Sidebar Badge System (No more invisible white-on-white numbers) */
+.fi-sidebar-item .fi-badge {
+    border-radius: 9999px !important;
+    padding: 0.15rem 0.6rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-width: 1px !important;
+}
+
+/* Badge on Active Emerald Capsule */
+.fi-sidebar-item.fi-active .fi-badge,
+.fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge,
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+}
+
+.fi-sidebar-item.fi-active .fi-badge,
+.fi-sidebar-item.fi-active .fi-badge span,
+.fi-sidebar-item.fi-active .fi-badge .fi-badge-label,
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge,
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge span,
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+/* Badge on Inactive Item (Light Mode) */
+.fi-sidebar-item:not(.fi-active) .fi-badge,
+.fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge {
+    background: #FEF3C7 !important;
+    border-color: #FCD34D !important;
+}
+
+.fi-sidebar-item:not(.fi-active) .fi-badge,
+.fi-sidebar-item:not(.fi-active) .fi-badge span,
+.fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label,
+.fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge span {
+    color: #92400E !important;
+    -webkit-text-fill-color: #92400E !important;
+    font-weight: 800 !important;
+}
+
+/* Badge on Inactive Item (Dark Mode) */
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge,
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge {
+    background: rgba(245, 158, 11, 0.22) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge,
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge span,
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label,
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge span {
+    color: #FBBF24 !important;
+    -webkit-text-fill-color: #FBBF24 !important;
+    font-weight: 800 !important;
 }
 
 .fi-sidebar-group-label {
@@ -741,13 +822,61 @@ body.fi-body {
 .choices__list--dropdown {
     position: absolute !important;
     z-index: 999999 !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(14, 104, 56, 0.2) !important;
+    border-radius: 16px !important;
+    padding: 0.4rem !important;
+    box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(14, 104, 56, 0.15) !important;
+}
+
+:is(.dark) .choices__list--dropdown {
+    background: #0f1c14 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.choices__list--dropdown .choices__item {
+    border-radius: 10px !important;
+    padding: 0.6rem 0.85rem !important;
+    font-size: 0.875rem !important;
+    color: var(--glass-text-main) !important;
+    transition: all 0.15s ease !important;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list--dropdown .choices__item--selectable:hover {
+    background: rgba(14, 104, 56, 0.1) !important;
+    color: #0E6838 !important;
+}
+
+:is(.dark) .choices__list--dropdown .choices__item--selectable.is-highlighted,
+:is(.dark) .choices__list--dropdown .choices__item--selectable:hover {
+    background: rgba(52, 211, 153, 0.18) !important;
+    color: #34D399 !important;
+}
+
+.choices__list--dropdown .choices__input {
+    background: var(--glass-surface-subtle) !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--glass-text-main) !important;
+    padding: 0.5rem 0.75rem !important;
+    margin-bottom: 0.4rem !important;
+}
+
+.fi-dropdown-panel,
+.fi-fo-date-time-picker-panel,
+.fi-popover-content,
+[x-popover] {
+    position: absolute !important;
+    z-index: 999999 !important;
+    background: #FFFFFF !important;
     box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(14, 104, 56, 0.2) !important;
 }
 
 :is(.dark) .fi-dropdown-panel,
 :is(.dark) .fi-fo-date-time-picker-panel,
-:is(.dark) .fi-popover-content,
-:is(.dark) .choices__list--dropdown {
+:is(.dark) .fi-popover-content {
     background: #0f1c14 !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
     box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
@@ -1027,8 +1156,24 @@ select option {
     color: #F4F7F5 !important;
 }
 
+/* Placeholders & Affixes Contrast Safeguards */
+.fi-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--glass-text-muted) !important;
+    opacity: 0.75 !important;
+}
+
+.fi-input-wrp-prefix,
+.fi-input-wrp-suffix,
+.fi-input-wrp-prefix span,
+.fi-input-wrp-suffix span {
+    color: var(--glass-text-muted) !important;
+    font-weight: 700 !important;
+}
+
 /* =============================================================================
-   8. APPLE BADGES & STATUS CHIPS
+   8. APPLE BADGES & STATUS CHIPS (CRISP CONTRAST IN BOTH LIGHT & DARK)
    ============================================================================= */
 .fi-badge {
     border-radius: 9999px !important;
@@ -1036,13 +1181,137 @@ select option {
     font-weight: 700 !important;
     padding: 0.32rem 0.85rem !important;
     letter-spacing: 0.2px !important;
-    backdrop-filter: var(--glass-blur-sm) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
 }
 
-:is(.dark) .fi-badge {
-    border-color: rgba(255, 255, 255, 0.12) !important;
+/* Light mode badges */
+.fi-badge.fi-color-success {
+    background: #D1FAE5 !important;
+    color: #065F46 !important;
+    border-color: #A7F3D0 !important;
+}
+.fi-badge.fi-color-warning {
+    background: #FEF3C7 !important;
+    color: #92400E !important;
+    border-color: #FDE68A !important;
+}
+.fi-badge.fi-color-danger {
+    background: #FEE2E2 !important;
+    color: #991B1B !important;
+    border-color: #FECACA !important;
+}
+.fi-badge.fi-color-info,
+.fi-badge.fi-color-primary {
+    background: #CCE8D7 !important;
+    color: #064E26 !important;
+    border-color: #A7F3D0 !important;
+}
+.fi-badge.fi-color-gray {
+    background: #E2E8F0 !important;
+    color: #1E293B !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* Dark mode badges */
+:is(.dark) .fi-badge.fi-color-success {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #6EE7B7 !important;
+    border-color: rgba(52, 211, 153, 0.35) !important;
+}
+:is(.dark) .fi-badge.fi-color-warning {
+    background: rgba(245, 158, 11, 0.2) !important;
+    color: #FCD34D !important;
+    border-color: rgba(251, 191, 36, 0.35) !important;
+}
+:is(.dark) .fi-badge.fi-color-danger {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #FCA5A5 !important;
+    border-color: rgba(248, 113, 113, 0.35) !important;
+}
+:is(.dark) .fi-badge.fi-color-info,
+:is(.dark) .fi-badge.fi-color-primary {
+    background: rgba(14, 104, 56, 0.35) !important;
+    color: #A7F3D0 !important;
+    border-color: rgba(52, 211, 153, 0.4) !important;
+}
+:is(.dark) .fi-badge.fi-color-gray {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #E2E8F0 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.fi-badge span,
+.fi-badge .fi-badge-label {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    font-weight: 700 !important;
+}
+
+/* =============================================================================
+   APPLE SEGMENTED TABS (CONSISTENT LIGHT & DARK MODE)
+   ============================================================================= */
+.fi-tabs,
+.fi-sc-tabs-tablist {
+    background: var(--glass-surface-subtle) !important;
+    border-radius: 16px !important;
+    padding: 0.35rem !important;
+    border: 1px solid var(--glass-border) !important;
+    gap: 0.35rem !important;
+}
+
+.fi-tabs-item,
+.fi-sc-tabs-tablist button {
+    border-radius: 12px !important;
+    padding: 0.6rem 1.15rem !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    color: var(--glass-text-secondary) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
+}
+
+.fi-tabs-item:hover,
+.fi-sc-tabs-tablist button:hover {
+    color: var(--glass-text-main) !important;
+    background: var(--glass-surface-hover) !important;
+}
+
+.fi-tabs-item.fi-active,
+.fi-tabs-item[aria-selected="true"],
+.fi-sc-tabs-tablist button.fi-active,
+.fi-sc-tabs-tablist button[aria-selected="true"] {
+    background: linear-gradient(135deg, #0E6838 0%, #084D28 100%) !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 4px 12px rgba(14, 104, 56, 0.35) !important;
+}
+
+.fi-tabs-item.fi-active .fi-tabs-item-label,
+.fi-sc-tabs-tablist button.fi-active span {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+:is(.dark) .fi-tabs-item.fi-active,
+:is(.dark) .fi-tabs-item[aria-selected="true"],
+:is(.dark) .fi-sc-tabs-tablist button.fi-active,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.28), rgba(14, 104, 56, 0.5)) !important;
+    color: #A7F3D0 !important;
+    -webkit-text-fill-color: #A7F3D0 !important;
+    border: 1px solid rgba(52, 211, 153, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(52, 211, 153, 0.2) !important;
+}
+
+:is(.dark) .fi-tabs-item.fi-active .fi-tabs-item-label,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active span {
+    color: #A7F3D0 !important;
+    -webkit-text-fill-color: #A7F3D0 !important;
 }
 
 /* =============================================================================
