@@ -536,8 +536,7 @@ CSV;
                 // 1. Tangani Email & Domain (.com)
                 $email = trim($data['email_kantor'] ?? ($data['email'] ?? ($data['email_dinas'] ?? '')));
                 if (empty($email)) {
-                    $cleanNip = Str::slug($nip);
-                    $email = "pegawai.{$cleanNip}@bprbandaraya.com";
+                    $email = $this->generateCorporateEmail($fullName, $nip);
                 }
                 // Pastikan domain .com
                 $email = str_ireplace('@bprbandaraya.co.id', '@bprbandaraya.com', $email);
@@ -785,8 +784,7 @@ CSV;
                 // 3. Tangani Akun User & Domain Email (.com)
                 $email = $empData['email'] ?? '';
                 if (empty($email)) {
-                    $cleanNip = Str::slug(str_replace(' ', '', $nip));
-                    $email = "pegawai.{$cleanNip}@bprbandaraya.com";
+                    $email = $this->generateCorporateEmail($fullName, $nip);
                 }
                 $email = str_ireplace('@bprbandaraya.co.id', '@bprbandaraya.com', $email);
 
@@ -1261,6 +1259,53 @@ CSV;
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Menghasilkan email resmi @bprbandaraya.com berbasis nama panggilan/nama depan pegawai.
+     * Mengikuti konvensi resmi PT BPR Banda Raya (contoh: elfira@bprbandaraya.com).
+     */
+    public function generateCorporateEmail(string $fullName, ?string $fallbackNip = null): string
+    {
+        $words = array_values(array_filter(explode(' ', trim($fullName))));
+        if (empty($words)) {
+            $cleanNip = Str::slug(str_replace(' ', '', (string) $fallbackNip));
+            return "pegawai.{$cleanNip}@bprbandaraya.com";
+        }
+
+        $cleanWord = fn (string $w) => strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $w));
+
+        // Abaikan gelar / prefix umum jika ada kata berikutnya
+        $ignorePrefixes = ['m', 'm.', 'muh', 'muhammad', 'moch', 'mohammad', 'dwi'];
+        $callName = $cleanWord($words[0]);
+        if (count($words) > 1 && in_array($callName, $ignorePrefixes)) {
+            $callName = $cleanWord($words[1]);
+        }
+
+        $domain = '@bprbandaraya.com';
+        $candidate = $callName . $domain;
+
+        if (! User::where('email', $candidate)->exists() && ! Employee::where('email', $candidate)->exists()) {
+            return $candidate;
+        }
+
+        // Jika nama panggilan bentrok, gunakan namaDepan.namaBelakang
+        if (count($words) > 1) {
+            $candidate2 = $cleanWord($words[0]) . '.' . $cleanWord($words[1]) . $domain;
+            if (! User::where('email', $candidate2)->exists() && ! Employee::where('email', $candidate2)->exists()) {
+                return $candidate2;
+            }
+        }
+
+        if (count($words) > 2) {
+            $candidate3 = $callName . '.' . $cleanWord(end($words)) . $domain;
+            if (! User::where('email', $candidate3)->exists() && ! Employee::where('email', $candidate3)->exists()) {
+                return $candidate3;
+            }
+        }
+
+        $cleanNip = Str::slug(str_replace(' ', '', (string) $fallbackNip));
+        return $cleanNip ? "{$callName}.{$cleanNip}{$domain}" : "{$callName}" . rand(10, 99) . $domain;
     }
 
     /**

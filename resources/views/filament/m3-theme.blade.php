@@ -1047,6 +1047,48 @@ body.fi-body {
     color: var(--glass-text-main) !important;
 }
 
+/* Table Grouping Header Rows (Harvyn Workforce Clean Collapsible Headers) */
+.fi-ta-group-header-row {
+    background: #F8FAFC !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    border-top: 1px solid var(--glass-border) !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+}
+
+:is(.dark) .fi-ta-group-header-row {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-ta-group-header-row:hover {
+    background: #F1F5F9 !important;
+}
+
+:is(.dark) .fi-ta-group-header-row:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.fi-ta-group-header-cell {
+    padding: 0.75rem 1rem !important;
+}
+
+.fi-ta-group-heading {
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    color: var(--glass-text-main) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.fi-ta-group-description {
+    font-size: 0.785rem !important;
+    font-weight: 500 !important;
+    color: var(--glass-text-secondary) !important;
+    margin-left: 0.5rem !important;
+}
+
 .fi-ta-search-field .fi-input-wrp {
     border-radius: 9999px !important;
 }
