@@ -40,7 +40,7 @@ class CareerMovementsTable
             ])
             ->defaultGroup('employee.full_name')
             ->collapsedGroupsByDefault()
-            ->groupingSettingsHidden(false)
+            ->groupingSettingsHidden(true)
             ->filters([
                 SelectFilter::make('employee_id')
                     ->label('Pilih Nama Pegawai')
@@ -63,7 +63,7 @@ class CareerMovementsTable
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('type')
                     ->label('Tipe SK')
@@ -78,21 +78,27 @@ class CareerMovementsTable
                 TextColumn::make('sk_number')
                     ->label('Nomor SK')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap(),
 
-                TextColumn::make('fromBranch.name')
-                    ->label('Dari Cabang')
-                    ->placeholder('-'),
-
-                TextColumn::make('toBranch.name')
-                    ->label('Ke Cabang')
+                TextColumn::make('branch_transfer')
+                    ->label('Cabang Penempatan')
+                    ->state(function (CareerMovement $record): string {
+                        $from = $record->fromBranch?->name;
+                        $to = $record->toBranch?->name;
+                        if ($from && $to && $from !== $to) {
+                            return "{$from} → {$to}";
+                        }
+                        return $to ?? ($from ?? '-');
+                    })
                     ->badge()
                     ->color('primary')
-                    ->placeholder('-'),
+                    ->wrap(),
 
                 TextColumn::make('toPosition.name')
                     ->label('Jabatan Baru')
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->wrap(),
 
                 TextColumn::make('effective_date')
                     ->label('Tgl Efektif')

@@ -915,21 +915,25 @@ body.fi-body {
     box-shadow: var(--glass-shadow-lg) !important;
 }
 
-/* Stat Cards */
+/* Stat Cards (Harvyn High-Performance Surface) */
 .fi-wi-stats-overview-stat {
-    border-radius: 22px !important;
-    background: var(--glass-surface) !important;
-    backdrop-filter: var(--glass-blur-md) !important;
-    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    border-radius: 16px !important;
+    background: #FFFFFF !important;
     border: 1px solid var(--glass-border) !important;
-    box-shadow: var(--glass-shadow-md) !important;
-    padding: 1.35rem 1.6rem !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    padding: 1.25rem 1.5rem !important;
+    transition: all 0.2s ease !important;
+}
+
+:is(.dark) .fi-wi-stats-overview-stat {
+    background: #0B1713 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 .fi-wi-stats-overview-stat:hover {
-    box-shadow: var(--glass-shadow-lg) !important;
-    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-2px);
     border-color: var(--glass-border-strong) !important;
 }
 
@@ -979,18 +983,28 @@ body.fi-body {
    5. DATA TABLES: RAZOR-SHARP ERGONOMICS (NO WASHED-OUT CELLS)
    ============================================================================= */
 .fi-ta-ctn {
-    border-radius: 24px !important;
-    overflow: visible !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
     border: 1px solid var(--glass-border) !important;
-    background: var(--glass-surface) !important;
-    backdrop-filter: var(--glass-blur-md) !important;
-    -webkit-backdrop-filter: var(--glass-blur-md) !important;
-    box-shadow: var(--glass-shadow-md) !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+:is(.dark) .fi-ta-ctn {
+    background: #0B1713 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 .fi-ta-content {
-    border-radius: 0 0 24px 24px !important;
+    border-radius: 0 0 16px 16px !important;
     overflow-x: auto !important;
+    width: 100% !important;
+}
+
+.fi-ta-table {
+    width: 100% !important;
+    table-layout: auto !important;
 }
 
 .fi-ta-content,
@@ -1001,20 +1015,20 @@ body.fi-body {
 }
 
 .fi-ta-header-cell {
-    background: rgba(228, 239, 232, 0.95) !important;
-    color: var(--glass-text-main) !important;
-    font-weight: 800 !important;
-    font-size: 0.78rem !important;
-    letter-spacing: 0.6px !important;
+    background: #F8FAFC !important;
+    color: #64748B !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em !important;
     text-transform: uppercase !important;
     border-bottom: 1px solid var(--glass-border) !important;
-    padding: 1rem 1.15rem !important;
+    padding: 0.75rem 1rem !important;
 }
 
 :is(.dark) .fi-ta-header-cell {
-    background: rgba(14, 22, 17, 0.85) !important;
-    color: var(--glass-text-secondary) !important;
-    border-bottom-color: var(--glass-border-subtle) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    color: #94A3B8 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .fi-ta-row {

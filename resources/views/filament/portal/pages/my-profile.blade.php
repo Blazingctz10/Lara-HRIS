@@ -48,48 +48,202 @@
             color: #cbd5e1;
         }
 
-        /* PA Bar Chart */
+        /* PA Bar Chart Precision System (Harvyn High-Contrast Dynamic Baseline) */
+        .m3-pa-chart-card {
+            background: #FFFFFF;
+            border: 1px solid var(--m3-outline-variant, #E2E8F0);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        :is(.dark) .m3-pa-chart-card {
+            background: #0B1713;
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .m3-pa-chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        :is(.dark) .m3-pa-chart-header {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .m3-pa-chart-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: #0E6838;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin: 0;
+        }
+
+        :is(.dark) .m3-pa-chart-title {
+            color: #34D399;
+        }
+
+        .m3-pa-chart-sub {
+            font-size: 0.75rem;
+            color: #64748B;
+        }
+
+        .m3-pa-legend {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #64748B;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .legend-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot.grade-a { background: #10B981; }
+        .dot.grade-b { background: #0E6838; }
+        .dot.grade-c { background: #F59E0B; }
+
         .m3-chart-container {
             display: flex;
             align-items: flex-end;
-            gap: 1.5rem;
-            height: 160px;
-            padding: 1.25rem 0.5rem 0.5rem 0.5rem;
-            border-bottom: 2px solid rgba(14, 104, 56, 0.2);
-            margin-top: 1rem;
-        }
-
-        :is(.dark) .m3-chart-container {
-            border-bottom-color: rgba(255, 255, 255, 0.15);
+            gap: 1.25rem;
+            padding: 0.5rem 0.25rem 0 0.25rem;
+            overflow-x: auto;
         }
 
         .m3-chart-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
-            max-width: 65px;
-            height: 100%;
-            justify-content: flex-end;
+            flex: 1 1 0;
+            min-width: 52px;
+            max-width: 72px;
+        }
+
+        .m3-chart-track {
+            height: 150px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-bottom: 2px solid rgba(14, 104, 56, 0.2);
+            padding-bottom: 2px;
+        }
+
+        :is(.dark) .m3-chart-track {
+            border-bottom-color: rgba(255, 255, 255, 0.15);
         }
 
         .m3-chart-bar {
             width: 100%;
             border-radius: 8px 8px 0 0;
-            background: linear-gradient(180deg, #0E6838 0%, #16a34a 100%);
             display: flex;
             align-items: flex-start;
             justify-content: center;
-            padding-top: 0.35rem;
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: 800;
-            transition: all 0.3s ease;
+            padding-top: 0.4rem;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            cursor: pointer;
         }
 
         .m3-chart-bar:hover {
-            filter: brightness(1.15);
-            transform: scaleY(1.02);
+            filter: brightness(1.12);
+            transform: translateY(-2px);
+        }
+
+        .bar-grade-a {
+            background: linear-gradient(180deg, #10B981 0%, #0E6838 100%);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .bar-grade-b {
+            background: linear-gradient(180deg, #059669 0%, #064E3B 100%);
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
+        }
+
+        .bar-grade-c {
+            background: linear-gradient(180deg, #F59E0B 0%, #B45309 100%);
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+        }
+
+        .m3-chart-score-val {
+            color: #FFFFFF;
+            font-size: 0.75rem;
+            font-weight: 800;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            letter-spacing: -0.02em;
+        }
+
+        .m3-chart-labels {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 0.5rem;
+            gap: 0.2rem;
+        }
+
+        .m3-chart-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.1rem 0.45rem;
+            border-radius: 6px;
+            line-height: 1.2;
+        }
+
+        .badge-a {
+            background: rgba(16, 185, 129, 0.15);
+            color: #065F46;
+        }
+        :is(.dark) .badge-a {
+            background: rgba(16, 185, 129, 0.25);
+            color: #6EE7B7;
+        }
+
+        .badge-b {
+            background: rgba(14, 104, 56, 0.12);
+            color: #0E6838;
+        }
+        :is(.dark) .badge-b {
+            background: rgba(52, 211, 153, 0.2);
+            color: #A7F3D0;
+        }
+
+        .badge-c {
+            background: rgba(245, 158, 11, 0.15);
+            color: #92400E;
+        }
+        :is(.dark) .badge-c {
+            background: rgba(245, 158, 11, 0.25);
+            color: #FCD34D;
+        }
+
+        .m3-chart-year-txt {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748B;
+        }
+
+        :is(.dark) .m3-chart-year-txt {
+            color: #94A3B8;
         }
     </style>
 
@@ -218,25 +372,49 @@
 
         @if($appraisals->isNotEmpty())
             {{-- Visualisasi Grafik Batang Performance Appraisal --}}
-            <div style="background: rgba(14, 104, 56, 0.03); border-radius: 14px; padding: 1rem 1.25rem; margin-top: 1rem;" class="dark:bg-white/5">
-                <p style="font-size: 0.78rem; font-weight: 700; color: #0E6838; text-transform: uppercase; letter-spacing: 0.5px;" class="dark:text-emerald-400">
-                    Grafik Tren Angka Mutu Kinerja (Skala 0 - 4.00)
-                </p>
+            @php
+                $minScore = $appraisals->min('score') ?? 0;
+                $maxScore = $appraisals->max('score') ?? 4.00;
+                // Skala dinamis: baseline adaptif agar perbedaan nilai tahunan (misal 3.51 vs 3.73 vs 3.93) terlihat nyata dan proporsional
+                $baseline = max(0, min(3.0, floor($minScore * 2) / 2 - 0.2));
+                $range = max(0.5, 4.00 - $baseline);
+            @endphp
+            <div class="m3-pa-chart-card">
+                <div class="m3-pa-chart-header">
+                    <div>
+                        <p class="m3-pa-chart-title">Grafik Tren Angka Mutu Kinerja (Skala 0 - 4.00)</p>
+                        <span class="m3-pa-chart-sub">Perbandingan capaian nilai tahunan pegawai secara komparatif</span>
+                    </div>
+                    <div class="m3-pa-legend">
+                        <span class="legend-item"><span class="dot grade-a"></span> Grade A (≥3.75)</span>
+                        <span class="legend-item"><span class="dot grade-b"></span> Grade B (3.50 - 3.74)</span>
+                        <span class="legend-item"><span class="dot grade-c"></span> Grade C (&lt;3.50)</span>
+                    </div>
+                </div>
+
                 <div class="m3-chart-container">
                     @foreach($appraisals as $pa)
                         @php
-                            $heightPct = min(100, max(15, ($pa->score / 4.00) * 100));
+                            $pct = round(min(100, max(28, (($pa->score - $baseline) / $range) * 100)));
+                            $isGradeA = $pa->score >= 3.75;
+                            $isGradeB = $pa->score >= 3.50 && $pa->score < 3.75;
                         @endphp
                         <div class="m3-chart-col">
-                            <div class="m3-chart-bar" style="height: {{ $heightPct }}%;">
-                                {{ number_format($pa->score, 2) }}
+                            <div class="m3-chart-track">
+                                <div class="m3-chart-bar {{ $isGradeA ? 'bar-grade-a' : ($isGradeB ? 'bar-grade-b' : 'bar-grade-c') }}" 
+                                     style="height: {{ $pct }}%;" 
+                                     title="Tahun {{ $pa->period_year }}: Skor {{ number_format($pa->score, 2) }} (Grade {{ $pa->letter_grade }})">
+                                    <span class="m3-chart-score-val">{{ number_format($pa->score, 2) }}</span>
+                                </div>
                             </div>
-                            <span style="font-size: 0.75rem; font-weight: 800; margin-top: 0.35rem; color: #1e293b;" class="dark:text-gray-200">
-                                {{ $pa->letter_grade }}
-                            </span>
-                            <span style="font-size: 0.7rem; color: #64748b;" class="dark:text-gray-400">
-                                {{ $pa->period_year }}
-                            </span>
+                            <div class="m3-chart-labels">
+                                <span class="m3-chart-badge {{ $isGradeA ? 'badge-a' : ($isGradeB ? 'badge-b' : 'badge-c') }}">
+                                    {{ $pa->letter_grade }}
+                                </span>
+                                <span class="m3-chart-year-txt">
+                                    {{ $pa->period_year }}
+                                </span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
