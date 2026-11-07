@@ -50,40 +50,28 @@
         }
     }
     @media (max-width: 900px) {
-        .m3-topbar-date-pill {
+        .m3-topbar-date-text {
             display: none !important;
         }
     }
-    :is(.dark) .m3-topbar-date-pill {
-        background: rgba(16, 185, 129, 0.12) !important;
-        color: #86efac !important;
-        border-color: rgba(16, 185, 129, 0.25) !important;
+    .m3-topbar-date-text {
+        font-size: 0.825rem;
+        font-weight: 600;
+        color: #475569;
+        white-space: nowrap;
+        letter-spacing: 0.15px;
+        margin-right: 0.75rem;
+    }
+    :is(.dark) .m3-topbar-date-text {
+        color: #94a3b8;
     }
 </style>
 
 <div class="m3-role-bar" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-right: 0.5rem;">
-    <!-- Live Navbar Date Pill -->
-    <div class="m3-topbar-date-pill" style="
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.32rem 0.85rem;
-        border-radius: 9999px;
-        background: rgba(14, 104, 56, 0.08);
-        color: #0E6838;
-        border: 1px solid rgba(14, 104, 56, 0.22);
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.2px;
-        white-space: nowrap;
-        flex-shrink: 0;
-    ">
-        <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #FDB813; box-shadow: 0 0 6px rgba(253, 184, 19, 0.6);"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; opacity: 0.85;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v7.5" />
-        </svg>
-        <span>{{ now()->translatedFormat('l, d F Y') }}</span>
-    </div>
+    <!-- Plain Text Navbar Date (No Card, Polos Tanggal Saja Sesuai Permintaan) -->
+    <span class="m3-topbar-date-text">
+        {{ now()->translatedFormat('l, d F Y') }}
+    </span>
 
     <!-- Active Role Badge -->
     <div style="

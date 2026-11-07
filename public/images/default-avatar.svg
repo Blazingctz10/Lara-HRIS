@@ -20,9 +20,6 @@
   <!-- Background Circle -->
   <circle cx="64" cy="64" r="64" fill="url(#bgGrad)" />
 
-  <!-- Subtle Inner Ring -->
-  <circle cx="64" cy="64" r="61" fill="none" stroke="#FDB813" stroke-width="2" stroke-opacity="0.4" />
-
   <!-- Avatar Group -->
   <g filter="url(#shadow)">
     <!-- Head -->
