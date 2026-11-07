@@ -23,7 +23,10 @@ class EmployeesTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['branch', 'department', 'position', 'user']))
+            ->modifyQueryUsing(fn ($query) => $query
+                ->with(['branch', 'department', 'position', 'user'])
+                ->orderByRaw("CASE WHEN status = 'Active' THEN 0 ELSE 1 END")
+            )
             ->recordUrl(fn (Employee $record): string => auth()->user()?->role === 'direksi'
                 ? EmployeeResource::getUrl('view', ['record' => $record])
                 : (in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])

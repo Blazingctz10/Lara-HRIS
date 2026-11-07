@@ -17,20 +17,28 @@ class CareerMovementsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with([
-                'employee.position',
-                'employee.branch',
-                'fromBranch',
-                'toBranch',
-                'toPosition',
-            ]))
+            ->modifyQueryUsing(fn ($query) => $query
+                ->with([
+                    'employee.position',
+                    'employee.branch',
+                    'fromBranch',
+                    'toBranch',
+                    'toPosition',
+                ])
+                ->orderByRaw("CASE WHEN (SELECT status FROM employees WHERE employees.id = career_movements.employee_id) = 'Active' THEN 0 ELSE 1 END")
+            )
             ->defaultSort('effective_date', 'desc')
             ->groups([
                 Group::make('employee.full_name')
                     ->label('Nama Pegawai')
                     ->collapsible()
                     ->titlePrefixedWithLabel(false)
-                    ->getDescriptionFromRecordUsing(fn ($record) => ($record->employee?->position?->name ?? 'Pegawai') . ' • ' . ($record->employee?->branch?->name ?? 'BPR Banda Raya')),
+                    ->getDescriptionFromRecordUsing(function ($record) {
+                        $pos = $record->employee?->position?->name ?? 'Pegawai';
+                        $branch = $record->employee?->branch?->name ?? 'BPR Banda Raya';
+                        $statusBadge = $record->employee?->status === 'Resigned' ? ' • [Alumni / Resign]' : '';
+                        return "{$pos} • {$branch}{$statusBadge}";
+                    }),
                 Group::make('type')
                     ->label('Tipe SK / Mutasi')
                     ->collapsible(),
