@@ -519,10 +519,11 @@ body.fi-body {
     stroke: #34D399 !important;
 }
 
-/* High-Contrast Sidebar Badge System (No more invisible white-on-white numbers) */
-.fi-sidebar-item .fi-badge {
+/* High-Contrast Sidebar Badge System (Crisp, Highly Readable & No Invisible Text) */
+.fi-sidebar-item .fi-badge,
+.fi-sidebar-item .fi-sidebar-item-badge-ctn .fi-badge {
     border-radius: 9999px !important;
-    padding: 0.15rem 0.6rem !important;
+    padding: 0.15rem 0.55rem !important;
     font-size: 0.72rem !important;
     font-weight: 800 !important;
     line-height: 1.2 !important;
@@ -532,27 +533,51 @@ body.fi-body {
     border-width: 1px !important;
 }
 
-/* Badge on Active Emerald Capsule */
+/* Badge on Active Emerald Capsule (Sidebar) - Solid White Pill with Deep Emerald Text */
 .fi-sidebar-item.fi-active .fi-badge,
 .fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge,
 .fi-sidebar-item-btn[aria-current="page"] .fi-badge {
-    background: rgba(255, 255, 255, 0.22) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+    background: #FFFFFF !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16) !important;
 }
 
 .fi-sidebar-item.fi-active .fi-badge,
 .fi-sidebar-item.fi-active .fi-badge span,
 .fi-sidebar-item.fi-active .fi-badge .fi-badge-label,
+.fi-sidebar-item.fi-active .fi-badge .fi-badge-label-ctn,
 .fi-sidebar-item-btn[aria-current="page"] .fi-badge,
 .fi-sidebar-item-btn[aria-current="page"] .fi-badge span,
-.fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label {
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label,
+.fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label-ctn {
+    color: #0E6838 !important;
+    -webkit-text-fill-color: #0E6838 !important;
     font-weight: 800 !important;
 }
 
-/* Badge on Inactive Item (Light Mode) */
+/* Dark mode active item badge */
+:is(.dark) .fi-sidebar-item.fi-active .fi-badge,
+:is(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-badge {
+    background: #A7F3D0 !important;
+    border-color: #34D399 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+:is(.dark) .fi-sidebar-item.fi-active .fi-badge,
+:is(.dark) .fi-sidebar-item.fi-active .fi-badge span,
+:is(.dark) .fi-sidebar-item.fi-active .fi-badge .fi-badge-label,
+:is(.dark) .fi-sidebar-item.fi-active .fi-badge .fi-badge-label-ctn,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-badge,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-badge span,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label,
+:is(.dark) .fi-sidebar-item-btn[aria-current="page"] .fi-badge .fi-badge-label-ctn {
+    color: #064E3B !important;
+    -webkit-text-fill-color: #064E3B !important;
+    font-weight: 800 !important;
+}
+
+/* Badge on Inactive Item (Light Mode) - Amber Pill with Deep Brown Text */
 .fi-sidebar-item:not(.fi-active) .fi-badge,
 .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge {
     background: #FEF3C7 !important;
@@ -562,6 +587,7 @@ body.fi-body {
 .fi-sidebar-item:not(.fi-active) .fi-badge,
 .fi-sidebar-item:not(.fi-active) .fi-badge span,
 .fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label,
+.fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label-ctn,
 .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge span {
     color: #92400E !important;
     -webkit-text-fill-color: #92400E !important;
@@ -578,6 +604,7 @@ body.fi-body {
 :is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge,
 :is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge span,
 :is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label,
+:is(.dark) .fi-sidebar-item:not(.fi-active) .fi-badge .fi-badge-label-ctn,
 :is(.dark) .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-badge-ctn .fi-badge span {
     color: #FBBF24 !important;
     -webkit-text-fill-color: #FBBF24 !important;
@@ -1025,29 +1052,38 @@ body.fi-body {
 }
 
 .fi-pagination-items {
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     overflow: hidden !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
 .fi-pagination-item-btn {
-    border-radius: 8px !important;
-    font-weight: 700 !important;
-    transition: all 0.2s ease !important;
+    border-radius: 0 !important;
+    font-weight: 600 !important;
+    transition: all 0.15s ease !important;
+    padding: 0.45rem 0.85rem !important;
 }
 
+.fi-pagination-item.fi-active .fi-pagination-item-btn,
 .fi-active .fi-pagination-item-btn,
-.fi-pagination-item-active .fi-pagination-item-btn {
+.fi-pagination-item-active .fi-pagination-item-btn,
+.fi-pagination-item-btn[aria-current="page"] {
     background: #0E6838 !important;
     color: #FFFFFF !important;
-    border-radius: 8px !important;
+    font-weight: 800 !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
 }
 
+:is(.dark) .fi-pagination-item.fi-active .fi-pagination-item-btn,
 :is(.dark) .fi-active .fi-pagination-item-btn,
-:is(.dark) .fi-pagination-item-active .fi-pagination-item-btn {
+:is(.dark) .fi-pagination-item-active .fi-pagination-item-btn,
+:is(.dark) .fi-pagination-item-btn[aria-current="page"] {
     background: #10B981 !important;
     color: #022C15 !important;
-    border-radius: 8px !important;
+    font-weight: 800 !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
 }
 
@@ -1277,66 +1313,179 @@ textarea::placeholder {
 }
 
 /* =============================================================================
-   APPLE SEGMENTED TABS (CONSISTENT LIGHT & DARK MODE)
+   HARVYN HRIS SEGMENTED TABS (CLEAN, PRECISE & COHESIVE LIGHT/DARK CONTRAST)
    ============================================================================= */
-.fi-tabs,
-.fi-sc-tabs-tablist {
-    background: var(--glass-surface-subtle) !important;
-    border-radius: 16px !important;
-    padding: 0.35rem !important;
+.fi-sc-tabs {
+    border-radius: 14px !important;
     border: 1px solid var(--glass-border) !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden !important;
+}
+
+:is(.dark) .fi-sc-tabs {
+    background: #0B1713 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.fi-tabs {
+    background: #F8FAFC !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 0.45rem 0.65rem !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow-x: auto !important;
     gap: 0.35rem !important;
+}
+
+:is(.dark) .fi-tabs {
+    background: rgba(15, 23, 42, 0.45) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.fi-sc-tabs-tablist {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    box-shadow: none !important;
 }
 
 .fi-tabs-item,
 .fi-sc-tabs-tablist button {
-    border-radius: 12px !important;
-    padding: 0.6rem 1.15rem !important;
-    font-weight: 700 !important;
-    font-size: 0.85rem !important;
-    color: var(--glass-text-secondary) !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+    padding: 0.45rem 0.95rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    border-radius: 8px !important;
     border: 1px solid transparent !important;
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    color: var(--glass-text-secondary) !important;
+    box-shadow: none !important;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    background: transparent !important;
 }
 
-.fi-tabs-item:hover,
-.fi-sc-tabs-tablist button:hover {
+.fi-tabs-item svg,
+.fi-tabs-item .fi-icon,
+.fi-tabs-item .fi-tabs-item-icon,
+.fi-sc-tabs-tablist button svg {
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+    flex-shrink: 0 !important;
+    color: var(--glass-text-secondary) !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    transition: color 0.15s ease !important;
+}
+
+/* Inactive Tab Hover */
+.fi-tabs-item:not(.fi-active):hover,
+.fi-sc-tabs-tablist button:not(.fi-active):hover {
     color: var(--glass-text-main) !important;
-    background: var(--glass-surface-hover) !important;
+    background: #FFFFFF !important;
+    border-color: var(--glass-border) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
+:is(.dark) .fi-tabs-item:not(.fi-active):hover,
+:is(.dark) .fi-sc-tabs-tablist button:not(.fi-active):hover {
+    color: #F8FAFC !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.fi-tabs-item:not(.fi-active):hover svg,
+.fi-tabs-item:not(.fi-active):hover .fi-icon,
+.fi-tabs-item:not(.fi-active):hover .fi-tabs-item-icon,
+.fi-sc-tabs-tablist button:not(.fi-active):hover svg {
+    color: var(--glass-text-main) !important;
+    stroke: currentColor !important;
+}
+
+/* Active Segmented Pill - BPR Corporate Emerald (Harvyn Precision) */
 .fi-tabs-item.fi-active,
 .fi-tabs-item[aria-selected="true"],
 .fi-sc-tabs-tablist button.fi-active,
 .fi-sc-tabs-tablist button[aria-selected="true"] {
-    background: linear-gradient(135deg, #0E6838 0%, #084D28 100%) !important;
+    background: #0E6838 !important;
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 4px 12px rgba(14, 104, 56, 0.35) !important;
+    font-weight: 700 !important;
+    border: 1px solid #084D28 !important;
+    box-shadow: 0 1px 3px rgba(14, 104, 56, 0.3), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
 }
 
 .fi-tabs-item.fi-active .fi-tabs-item-label,
-.fi-sc-tabs-tablist button.fi-active span {
+.fi-tabs-item[aria-selected="true"] .fi-tabs-item-label,
+.fi-sc-tabs-tablist button.fi-active span,
+.fi-sc-tabs-tablist button[aria-selected="true"] span {
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
+    font-weight: 700 !important;
 }
 
+/* Active Tab Icon: Pure Crisp White */
+.fi-tabs-item.fi-active svg,
+.fi-tabs-item.fi-active .fi-icon,
+.fi-tabs-item.fi-active .fi-tabs-item-icon,
+.fi-tabs-item[aria-selected="true"] svg,
+.fi-tabs-item[aria-selected="true"] .fi-icon,
+.fi-tabs-item[aria-selected="true"] .fi-tabs-item-icon,
+.fi-sc-tabs-tablist button.fi-active svg,
+.fi-sc-tabs-tablist button[aria-selected="true"] svg {
+    color: #FFFFFF !important;
+    stroke: currentColor !important;
+    fill: none !important;
+}
+
+/* Dark Mode Active Pill */
 :is(.dark) .fi-tabs-item.fi-active,
 :is(.dark) .fi-tabs-item[aria-selected="true"],
 :is(.dark) .fi-sc-tabs-tablist button.fi-active,
 :is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] {
-    background: linear-gradient(135deg, rgba(52, 211, 153, 0.28), rgba(14, 104, 56, 0.5)) !important;
-    color: #A7F3D0 !important;
-    -webkit-text-fill-color: #A7F3D0 !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.4)) !important;
+    color: #34D399 !important;
+    -webkit-text-fill-color: #34D399 !important;
     border: 1px solid rgba(52, 211, 153, 0.45) !important;
-    box-shadow: 0 4px 14px rgba(52, 211, 153, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
 }
 
 :is(.dark) .fi-tabs-item.fi-active .fi-tabs-item-label,
-:is(.dark) .fi-sc-tabs-tablist button.fi-active span {
-    color: #A7F3D0 !important;
-    -webkit-text-fill-color: #A7F3D0 !important;
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-tabs-item-label,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active span,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] span {
+    color: #34D399 !important;
+    -webkit-text-fill-color: #34D399 !important;
+    font-weight: 700 !important;
+}
+
+:is(.dark) .fi-tabs-item.fi-active svg,
+:is(.dark) .fi-tabs-item.fi-active .fi-icon,
+:is(.dark) .fi-tabs-item.fi-active .fi-tabs-item-icon,
+:is(.dark) .fi-tabs-item[aria-selected="true"] svg,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-icon,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-tabs-item-icon,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active svg,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] svg {
+    color: #34D399 !important;
+    stroke: currentColor !important;
+    fill: none !important;
 }
 
 /* =============================================================================
