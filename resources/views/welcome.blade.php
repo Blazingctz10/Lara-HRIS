@@ -514,7 +514,7 @@
     opacity: 0.85;
   }
 
-  /* Submit Action Pill Button (Apple Specular Bevel Pill) */
+  /* Submit Action Button (Clean Solid Apple Specular Pill) */
   button.submit-btn {
     width: 100%;
     border: none;
@@ -530,19 +530,18 @@
     align-items: center;
     justify-content: center;
     gap: 0.65rem;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 4px 16px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   button.submit-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 24px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
-    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 104, 56, 0.32);
+    filter: brightness(1.05);
   }
 
   button.submit-btn:active {
-    transform: translateY(0) scale(0.99);
+    transform: translateY(0);
   }
 
   /* Demo Credentials Quick Switcher (Apple Glass Sub-Container) */

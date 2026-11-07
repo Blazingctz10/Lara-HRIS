@@ -1144,8 +1144,12 @@ CSV;
                 }
             } elseif ($currentSection === 'IV') {
                 if (is_numeric($cleanCells[0])) {
-                    $trainingName = $cleanCells[1] ?? '';
-                    $schedule = $cleanCells[2] ?? '';
+                    $trainingName = trim($cleanCells[1] ?? '');
+                    // Abaikan baris invalid jika nama pelatihan hanya berupa angka sisa indeks template
+                    if (is_numeric($trainingName) && strlen($trainingName) <= 3) {
+                        continue;
+                    }
+                    $schedule = \App\Models\EmployeeTraining::formatScheduleDate($cleanCells[2] ?? '');
                     $organizer = $cleanCells[3] ?? '';
                     $trainer = $cleanCells[4] ?? '';
                     $location = $cleanCells[5] ?? '';

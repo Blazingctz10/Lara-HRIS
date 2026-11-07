@@ -1024,65 +1024,90 @@ body.fi-body {
     border-radius: 9999px !important;
 }
 
+.fi-pagination-items {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
 .fi-pagination-item-btn {
-    border-radius: 9999px !important;
-    font-weight: 600 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
     transition: all 0.2s ease !important;
 }
 
+.fi-active .fi-pagination-item-btn,
 .fi-pagination-item-active .fi-pagination-item-btn {
-    background: var(--glass-primary) !important;
+    background: #0E6838 !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px var(--glass-primary-glow) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+:is(.dark) .fi-active .fi-pagination-item-btn,
+:is(.dark) .fi-pagination-item-active .fi-pagination-item-btn {
+    background: #10B981 !important;
+    color: #022C15 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
 }
 
 /* =============================================================================
    6. APPLE SPECULAR BUTTONS & CAPSULES
    ============================================================================= */
 .fi-btn {
-    border-radius: 9999px !important;
+    border-radius: 12px !important;
     font-weight: 700 !important;
     font-size: 0.875rem !important;
     letter-spacing: -0.01em !important;
     padding: 0.6rem 1.45rem !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     border: 1px solid transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+    --tw-ring-color: transparent !important;
 }
 
 .fi-btn-size-sm {
     padding: 0.4rem 1rem !important;
     font-size: 0.8rem !important;
+    border-radius: 10px !important;
 }
 
 .fi-btn-size-lg {
     padding: 0.8rem 2rem !important;
     font-size: 0.95rem !important;
+    border-radius: 14px !important;
 }
 
 /* Primary Button */
 .fi-btn-color-primary {
-    background: linear-gradient(135deg, #0E6838 0%, #09502A 100%) !important;
+    background: #0E6838 !important;
     color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 4px 14px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
 :is(.dark) .fi-btn-color-primary {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    background: #10B981 !important;
     color: #022C15 !important;
     font-weight: 800 !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
 }
 
 .fi-btn-color-primary:hover {
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 8px 24px var(--glass-primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
-    filter: brightness(1.08) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(14, 104, 56, 0.35) !important;
+    filter: brightness(1.05) !important;
+}
+
+:is(.dark) .fi-btn-color-primary:hover {
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
+    filter: brightness(1.05) !important;
 }
 
 .fi-btn-color-primary:active {
-    transform: translateY(0) scale(0.99) !important;
+    transform: translateY(0) !important;
 }
 
 /* Secondary / Gray Button */
