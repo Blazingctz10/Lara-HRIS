@@ -79,7 +79,8 @@ class MyProfile extends Page implements HasForms
             ->schema([
                 Section::make('Data Kepegawaian Resmi BPR Banda Raya')
                     ->description('Data struktur kepegawaian resmi yang telah diverifikasi oleh Divisi Human Resources (Terkunci untuk akurasi data kepatuhan audit bank).')
-                    ->icon('heroicon-m-shield-check')
+                    ->icon('heroicon-o-shield-check')
+                    ->iconColor('primary')
                     ->schema([
                         Grid::make(3)->schema([
                             TextInput::make('nip')
@@ -128,7 +129,8 @@ class MyProfile extends Page implements HasForms
 
                 Section::make('Pendidikan, Legalitas, BPJS & Pajak')
                     ->description('Arsip data latar belakang pendidikan, nomor jaminan sosial, dan status perpajakan PTKP.')
-                    ->icon('heroicon-m-academic-cap')
+                    ->icon('heroicon-o-academic-cap')
+                    ->iconColor('warning')
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('education')
@@ -165,7 +167,8 @@ class MyProfile extends Page implements HasForms
 
                 Section::make('Biodata Kontak Pribadi & Rekening Bank')
                     ->description('Pastikan foto profil, nomor telepon/WhatsApp, alamat domisili, dan nomor rekening bank Anda selalu akurat dan valid.')
-                    ->icon('heroicon-m-identification')
+                    ->icon('heroicon-o-identification')
+                    ->iconColor('primary')
                     ->schema([
                         FileUpload::make('photo_url')
                             ->label('Foto Profil Pegawai')
@@ -223,7 +226,8 @@ class MyProfile extends Page implements HasForms
 
                 Section::make('Keamanan Akun & Sandi Masuk')
                     ->description('Kosongkan bagian ini jika Anda tidak bermaksud mengganti kata sandi login Anda.')
-                    ->icon('heroicon-m-key')
+                    ->icon('heroicon-o-key')
+                    ->iconColor('primary')
                     ->schema([
                         TextInput::make('current_password')
                             ->label('Kata Sandi Saat Ini')

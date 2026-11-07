@@ -745,7 +745,7 @@ body.fi-body {
 
 .fi-section:not(.fi-section-not-contained),
 .fi-card {
-    border-radius: 24px !important;
+    border-radius: 16px !important;
     background: var(--glass-surface) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow-md) !important;
@@ -955,9 +955,14 @@ body.fi-body {
 }
 
 .fi-section-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
     border-bottom: 1px solid var(--glass-border-subtle) !important;
-    padding: 1.25rem 1.65rem !important;
-    background: rgba(255, 255, 255, 0.4) !important;
+    padding: 1.15rem 1.5rem !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 16px 16px 0 0 !important;
+    transition: background 0.2s ease, border-radius 0.2s ease !important;
 }
 
 :is(.dark) .fi-section-header {
@@ -965,18 +970,82 @@ body.fi-body {
     border-bottom-color: var(--glass-border-subtle) !important;
 }
 
-.fi-section-header-title {
+/* When collapsed: NO border-bottom and full rounded corners */
+.fi-section.fi-collapsed .fi-section-header,
+.fi-collapsed > .fi-section-header,
+.fi-section:not(:has(.fi-section-content-ctn:not([style*="display: none"]))) .fi-section-header {
+    border-bottom: none !important;
+    border-radius: 16px !important;
+}
+
+.fi-section-header > .fi-icon,
+.fi-section-header svg:not(.fi-section-collapse-btn svg) {
+    color: #0E6838 !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+    background: rgba(14, 104, 56, 0.08) !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+    box-sizing: content-box !important;
+}
+
+:is(.dark) .fi-section-header > .fi-icon,
+:is(.dark) .fi-section-header svg:not(.fi-section-collapse-btn svg) {
+    color: #34D399 !important;
+    background: rgba(52, 211, 153, 0.12) !important;
+}
+
+.fi-section-header-content {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+}
+
+.fi-section-collapse-btn {
+    margin-left: auto !important;
+    align-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: #64748B !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-section-collapse-btn:hover {
+    background: rgba(14, 104, 56, 0.1) !important;
+    color: #0E6838 !important;
+}
+
+:is(.dark) .fi-section-collapse-btn {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #94A3B8 !important;
+}
+
+:is(.dark) .fi-section-collapse-btn:hover {
+    background: rgba(52, 211, 153, 0.15) !important;
+    color: #34D399 !important;
+}
+
+.fi-section-header-title,
+.fi-section-header-heading {
     font-family: var(--glass-font-display) !important;
-    font-weight: 800 !important;
-    font-size: 1.2rem !important;
-    letter-spacing: -0.02em !important;
+    font-weight: 750 !important;
+    font-size: 1.05rem !important;
+    letter-spacing: -0.015em !important;
     color: var(--glass-text-main) !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
 }
 
 .fi-section-header-description {
     color: var(--glass-text-muted) !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.4 !important;
+    margin-top: 0.15rem !important;
 }
 
 /* =============================================================================
