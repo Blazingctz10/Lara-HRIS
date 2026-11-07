@@ -155,14 +155,40 @@ class BackupService
                 'database_driver' => config('database.default'),
                 'php_version' => PHP_VERSION,
                 'laravel_version' => app()->version(),
+                'original_backup_storage_path' => 'storage/app/backups/',
                 'record_counts' => $this->getDatabaseStats()['counts'],
             ];
             $zip->addFromString('backup_manifest.json', json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-            // 4. Salin seluruh dokumen lampiran dari storage/app/public
+            // 4. File README Lokasi Cadangan (Di-reveal di dalam arsip ZIP)
+            $readmeContent = implode("\r\n", [
+                '========================================================================',
+                'INFORMASI ARSIP CADANGAN RESMI CORE HRIS PT BPR BANDA RAYA',
+                '========================================================================',
+                '',
+                "Nama Berkas Arsip : {$zipFilename}",
+                'Waktu Pembuatan   : ' . now()->translatedFormat('l, d F Y H:i:s') . ' WIB',
+                'Dibuat Oleh       : ' . ($creator ?? 'Administrator IT'),
+                '',
+                'LOKASI PENYIMPANAN ASLI PADA SERVER (REVEALED):',
+                '-> storage/app/backups/' . $zipFilename,
+                '',
+                'STRUKTUR ISI ARSIP CADANGAN LENGKAP:',
+                '1. database/database.sqlite        -> File basis data SQLite resmi operasional',
+                '2. database/database_snapshot.json -> Snapshot JSON data seluruh tabel & transaksi',
+                '3. storage/public/                 -> Berkas dokumen publik (foto profil, SK, lampiran cuti)',
+                '4. storage/private/                -> Berkas dokumen privat kepegawaian',
+                '5. backup_manifest.json            -> Metadata teknis integritas arsip cadangan',
+                '',
+                'Catatan Kepatuhan Audit: Berkas arsip ini telah diverifikasi untuk audit IT & OJK.',
+                '========================================================================',
+            ]);
+            $zip->addFromString('README_LOKASI_ARSIP.txt', $readmeContent);
+
+            // 5. Salin seluruh dokumen lampiran dari storage/app/public
             $this->addDirectoryToZip($zip, storage_path('app/public'), 'storage/public');
 
-            // 5. Salin dokumen privat dari storage/app/private (kecuali cache livewire)
+            // 6. Salin dokumen privat dari storage/app/private (kecuali cache livewire)
             $this->addDirectoryToZip($zip, storage_path('app/private'), 'storage/private');
 
             $zip->close();

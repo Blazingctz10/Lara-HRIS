@@ -1812,14 +1812,27 @@ textarea::placeholder {
 /* =============================================================================
    11. APPLE FLOATING TOASTS & NOTIFICATIONS
    ============================================================================= */
+.fi-no {
+    z-index: 999999 !important;
+    top: 4.75rem !important;
+    pointer-events: none !important;
+}
+
 .fi-no-notification {
-    border-radius: 20px !important;
-    background: var(--glass-surface) !important;
-    backdrop-filter: var(--glass-blur-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
-    border: 1px solid var(--glass-border) !important;
-    box-shadow: var(--glass-shadow-lg) !important;
-    padding: 1.1rem 1.35rem !important;
+    pointer-events: auto !important;
+    border-radius: 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(14, 104, 56, 0.2) !important;
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    padding: 1.15rem 1.4rem !important;
+    max-width: 420px !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+:is(.dark) .fi-no-notification {
+    background: #0D1612 !important;
+    border-color: rgba(74, 222, 128, 0.25) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
 }
 
 .fi-no-notification-title {
@@ -1828,13 +1841,32 @@ textarea::placeholder {
     font-size: 0.95rem !important;
     letter-spacing: -0.01em !important;
     color: var(--glass-text-main) !important;
+    display: block !important;
+    margin-bottom: 0.25rem !important;
+}
+
+:is(.dark) .fi-no-notification-title {
+    color: #FFFFFF !important;
 }
 
 .fi-no-notification-date,
 .fi-no-notification-body {
-    font-size: 0.85rem !important;
-    color: var(--glass-text-muted) !important;
-    line-height: 1.45 !important;
+    font-size: 0.825rem !important;
+    color: var(--glass-text-secondary) !important;
+    line-height: 1.5 !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+}
+
+:is(.dark) .fi-no-notification-date,
+:is(.dark) .fi-no-notification-body {
+    color: #CBD5E1 !important;
+}
+
+.fi-no-notification-icon {
+    width: 22px !important;
+    height: 22px !important;
+    flex-shrink: 0 !important;
 }
 
 /* =============================================================================

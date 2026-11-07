@@ -212,13 +212,29 @@
 
     <!-- Table of Available Archives -->
     <div style="margin-top: 1rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <h4 style="font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em;">
                 Daftar Arsip Cadangan Tersimpan ({{ count($backupFiles) }})
             </h4>
-            <span style="font-size: 0.8rem; opacity: 0.75;">
-                Lokasi: <code style="font-family: monospace; padding: 0.15rem 0.4rem; background: var(--m3-surface-container, #d6e3d9); border-radius: 6px;">storage/app/backups/</code>
-            </span>
+            <div x-data="{ showLocation: false }" style="font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <span style="opacity: 0.75;">Lokasi Berkas:</span>
+                <template x-if="!showLocation">
+                    <span style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                        <code style="font-family: monospace; padding: 0.15rem 0.45rem; background: var(--m3-surface-container, #d6e3d9); border-radius: 6px; letter-spacing: 2px;">••••••••••••••••••</code>
+                        <button type="button" @click="showLocation = true" title="Tampilkan lokasi direktori server" style="background: none; border: none; cursor: pointer; color: var(--m3-primary, #0E6838); font-size: 0.75rem; text-decoration: underline; font-weight: 700; padding: 0;">
+                            Buka
+                        </button>
+                    </span>
+                </template>
+                <template x-if="showLocation">
+                    <span style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                        <code style="font-family: monospace; padding: 0.15rem 0.45rem; background: var(--m3-surface-container, #d6e3d9); border-radius: 6px; font-weight: 700;">storage/app/backups/</code>
+                        <button type="button" @click="showLocation = false" title="Sembunyikan lokasi server" style="background: none; border: none; cursor: pointer; opacity: 0.65; font-size: 0.75rem; text-decoration: underline; padding: 0;">
+                            Tutup
+                        </button>
+                    </span>
+                </template>
+            </div>
         </div>
 
         <div class="m3-table-wrap">
