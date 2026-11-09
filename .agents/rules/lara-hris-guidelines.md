@@ -1,6 +1,6 @@
 ---
 description: Pedoman desain Material 3 Expressive, penanganan error domain (DB/AUTH/SYS/VAL/HR), konsistensi ikon Heroicons, dan anti-clipping pada Lara-HRIS PT BPR Banda Raya.
-globs: ["**/*.php", "**/*.blade.php", "**/*.css", "**/*.js"]
+trigger: always_on
 ---
 
 # Pedoman Pengembangan Lara-HRIS (PT BPR Banda Raya)
@@ -18,13 +18,21 @@ Aturan ini wajib dipatuhi oleh asisten AI dan pengembang saat menambahkan, mengu
 - **Dark Surface:** `#0D1410` (Background utama), `#141E18` (Surface card), `#19261E` (Container)
 - **Light Surface:** `#F4F6F4` (Background utama), `#FFFFFF` (Surface card), `#F0F5F2` (Container)
 
-### B. Geometri & Radius Bentuk (Squircles & Pills)
+### B. Geometri & Radius Bentuk (Squircles & Pills - Ref Harvyn HRIS)
 - **Dialog / Modal Window:** `border-radius: 28px !important;` (M3 Container)
-- **Widget & Section Card:** `border-radius: 24px !important;`
-- **Form Input:** `border-radius: 16px !important;`
-- **Tombol Aksi, Badges, & Chips:** `border-radius: 9999px !important;` (M3 Full Pill)
+- **Widget & Section Card:** `border-radius: 16px !important;` (Squircle proporsional, hindari distorsi kapsul)
+- **Form Input & Textarea:** `border-radius: 14px !important;`
+- **Tombol Aksi, Badges, & Status Chips:** `border-radius: 9999px !important;` (M3 Full Pill)
+- **Collapsed Section Header:** `.fi-section.fi-collapsed .fi-section-header { border-bottom: none !important; }` (Menghilangkan garis ganda)
 
-### C. Aturan Larangan Inline Style Pada Teks Dark Mode
+### C. Hierarki UI & Anti-Clutter
+- **Hindari Card-in-Card Bertumpuk:** Jangan membungkus kartu profil atau formulir di dalam container berlapis tanpa pemisah visual yang bersih.
+- **Header Tanggal & Status:** Tampilkan tanggal kalender secara bersih dan terintegrasi di navbar/topbar tanpa nesting card ganda.
+- **Penyembunyian Path Sensitif:** Path direktori lokal server (seperti direktori backup `storage/app/backups/`) wajib disamarkan (`••••••••`) di antarmuka web dan hanya dapat dilihat saat di-reveal atau di dalam berkas ZIP backup manifest (`README_LOKASI_ARSIP.txt`).
+- **Kelompok Pegawai & Riwayat Karir:** Daftar mutasi/promosi dikelompokkan per nama pegawai (collapsible) dengan memprioritaskan pegawai aktif di atas pegawai yang sudah berhenti/resign.
+- **Standar Email Resmi:** Seluruh email akun resmi pegawai BPR Banda Raya menggunakan domain `@bprbandaraya.com` (contoh: `nama@bprbandaraya.com`).
+
+### D. Aturan Larangan Inline Style Pada Teks Dark Mode
 > [!CRITICAL]
 > **JANGAN PERNAH** menggunakan inline style warna statis seperti `style="color: #131a15"` pada teks dinamis atau judul card. Inline style memiliki spesifisitas tertinggi dan akan menimpa varian gelap Tailwind (`dark:text-white`).
 > Selalu gunakan CSS class dengan selektor `:is(.dark) .selector { color: #FFFFFF !important; }` atau variabel CSS `--m3-on-surface`.
@@ -64,7 +72,7 @@ Semua exception yang tidak tertangani otomatis dikonversi oleh `App\Support\Hris
 
 ## 3. Penyeragaman Icon Set (Unified Heroicons)
 
-Gunakan **Heroicons** secara konsisten di seluruh bagian backoffice, portal, dan view:
+Gunakan **Heroicons Outline** (`heroicon-o-*`) secara konsisten di seluruh bagian backoffice, portal, dan view:
 - **Presensi / Kehadiran:** `heroicon-o-clock`
 - **Pengajuan Cuti:** `heroicon-o-document-check` (baik di Admin maupun Portal)
 - **Pengajuan Lembur:** `heroicon-o-fire`
@@ -81,10 +89,11 @@ Gunakan **Heroicons** secara konsisten di seluruh bagian backoffice, portal, dan
 
 ---
 
-## 4. Ergonomi Topbar & Anti-Clipping di Portal Karyawan
+## 4. Ergonomi Topbar, Notifikasi & Anti-Clipping di Portal Karyawan
 
 Pada portal karyawan (`/portal`) yang menggunakan `->topNavigation()`, navigasi berada di satu baris horizontal:
 1. `.fi-topbar-end` dan `.fi-user-menu` **wajib** memiliki `flex-shrink: 0 !important;` agar avatar / menu profil tidak pernah tertekan ke kanan.
 2. `.fi-topbar-ctn` harus `overflow-x: visible !important;`.
 3. Pada komponen `role-indicator.blade.php`, gunakan `@media (max-width: 1320px)` untuk menyembunyikan label nama cabang pada layar menengah/laptop, sehingga tersisa ruang yang cukup lega bagi menu user profile.
 4. Pada `.fi-dropdown-header span`, gunakan `white-space: normal !important; word-break: break-word !important;` agar nama akun panjang seperti `Super Administrator BPR Banda Raya` tidak terpotong elipsis.
+5. Notification toast container (`.fi-no`) **wajib** memiliki `z-index: 999999 !important;` dan offset `top: 4.75rem !important;` agar tidak tertutup atau bertabrakan dengan bilah navigasi atas (topbar).
