@@ -6,6 +6,14 @@
 *.md diff=markdown
 *.php diff=php
 
+# Production export exclusions (git archive)
 /.github export-ignore
-CHANGELOG.md export-ignore
+/.agents export-ignore
+/tests export-ignore
 .styleci.yml export-ignore
+CHANGELOG.md export-ignore
+phpunit.xml export-ignore
+.editorconfig export-ignore
+GEMINI.md export-ignore
+AGENTS.md export-ignore
+lara-hris.md export-ignore

@@ -1,24 +1,71 @@
+# Logs
 *.log
-.DS_Store
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Environment & Credentials
 .env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
+.env.*
+!.env.example
+!.env.production.example
+Pass.txt
+passwords.txt
+credentials.txt
+secrets.txt
 /auth.json
+
+# Local Databases & Backups
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite*
+*.sql
+*.dump
+*.bak
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+/storage/app/backups/*
+!/storage/app/backups/.gitignore
+
+# Security Keys & Certificates
+/storage/*.key
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+
+# Dependencies & Build Output
+/vendor
 /node_modules
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
 /storage/pail
-/vendor
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+.Spotlight-V100
+.Trashes
+
+# IDEs & Editor Artifacts
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.phpactor.json
+.phpunit.cache
+.phpunit.result.cache
+
+# Vagrant / Homestead
 Homestead.json
 Homestead.yaml
-Thumbs.db

@@ -97,3 +97,4 @@ Pada portal karyawan (`/portal`) yang menggunakan `->topNavigation()`, navigasi 
 3. Pada komponen `role-indicator.blade.php`, gunakan `@media (max-width: 1320px)` untuk menyembunyikan label nama cabang pada layar menengah/laptop, sehingga tersisa ruang yang cukup lega bagi menu user profile.
 4. Pada `.fi-dropdown-header span`, gunakan `white-space: normal !important; word-break: break-word !important;` agar nama akun panjang seperti `Super Administrator BPR Banda Raya` tidak terpotong elipsis.
 5. Notification toast container (`.fi-no`) **wajib** memiliki `z-index: 999999 !important;` dan offset `top: 4.75rem !important;` agar tidak tertutup atau bertabrakan dengan bilah navigasi atas (topbar).
+
