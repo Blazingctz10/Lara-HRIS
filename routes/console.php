@@ -8,6 +8,11 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('hris:standardize-passwords', function () {
+    if (app()->isProduction()) {
+        $this->error('[SEC001] Perintah ini DILARANG dijalankan di lingkungan PRODUCTION demi keamanan data perbankan.');
+        return 1;
+    }
+
     $this->info('Memulai standarisasi seluruh kata sandi akun sistem BPR Banda Raya...');
 
     $defaultPassword = \Illuminate\Support\Facades\Hash::make('password');
