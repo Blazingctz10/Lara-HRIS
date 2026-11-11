@@ -38,6 +38,13 @@ class LeaveRequestObserver
         } catch (\Throwable $e) {
             Log::warning('Gagal kirim notifikasi pengajuan cuti baru: ' . $e->getMessage());
         }
+
+        // Jika dibuat langsung dengan status disetujui (misal dari backoffice admin / seeder)
+        $finalStatuses = ['Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris', 'Approved_HR'];
+        if (in_array($leaveRequest->status, $finalStatuses)) {
+            $year = Carbon::parse($leaveRequest->start_date)->year;
+            $this->applyApprovalDeduction($leaveRequest, $year);
+        }
     }
 
     /**
@@ -97,62 +104,78 @@ class LeaveRequestObserver
 
             // Ketika disetujui final oleh Direksi, HRD, atau Komisaris, potong saldo cuti resmi & sinkronkan presensi
             if ($isFinalApproved && ! $wasFinalApproved) {
-                DB::transaction(function () use ($leaveRequest, $year) {
-                    $balance = EmployeeLeaveBalance::firstOrCreate(
-                        [
-                            'employee_id' => $leaveRequest->employee_id,
-                            'leave_type_id' => $leaveRequest->leave_type_id,
-                            'year' => $year,
-                        ],
-                        [
-                            'initial_quota' => $leaveRequest->leaveType->default_days ?? 12,
-                            'used_quota' => 0,
-                            'remaining_quota' => $leaveRequest->leaveType->default_days ?? 12,
-                        ]
-                    );
-
-                    $balance->used_quota += $leaveRequest->total_days;
-                    $balance->remaining_quota = max(0, $balance->initial_quota - $balance->used_quota);
-                    $balance->save();
-
-                    // Sinkronisasi otomatis ke log kehadiran (status = Excused)
-                    $startDate = Carbon::parse($leaveRequest->start_date);
-                    $endDate = Carbon::parse($leaveRequest->end_date);
-                    for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
-                        if (! $d->isSunday()) {
-                            \App\Models\Attendance::updateOrCreate(
-                                [
-                                    'employee_id' => $leaveRequest->employee_id,
-                                    'date' => $d->toDateString(),
-                                ],
-                                [
-                                    'status' => 'Excused',
-                                    'notes' => '[Cuti Resmi: ' . ($leaveRequest->leaveType?->name ?? 'Cuti') . '] ' . $leaveRequest->reason,
-                                ]
-                            );
-                        }
-                    }
-
-                    Log::info("Leave balance deducted and attendance synced for employee {$leaveRequest->employee_id}: {$leaveRequest->total_days} days. Remaining: {$balance->remaining_quota}");
-                });
+                $this->applyApprovalDeduction($leaveRequest, $year);
             }
 
             // Jika status yang sudah disetujui dibatalkan/ditolak, kembalikan kuota saldo cuti
             if ($wasFinalApproved && ! $isFinalApproved) {
-                DB::transaction(function () use ($leaveRequest, $year) {
-                    $balance = EmployeeLeaveBalance::where([
-                        'employee_id' => $leaveRequest->employee_id,
-                        'leave_type_id' => $leaveRequest->leave_type_id,
-                        'year' => $year,
-                    ])->first();
-
-                    if ($balance) {
-                        $balance->used_quota = max(0, $balance->used_quota - $leaveRequest->total_days);
-                        $balance->remaining_quota = min($balance->initial_quota, $balance->initial_quota - $balance->used_quota);
-                        $balance->save();
-                    }
-                });
+                $this->revertApprovalDeduction($leaveRequest, $year);
             }
         }
+    }
+
+    /**
+     * Terapkan pengurangan kuota saldo cuti dan sinkronkan absensi dengan status Excused
+     */
+    protected function applyApprovalDeduction(LeaveRequest $leaveRequest, int $year): void
+    {
+        DB::transaction(function () use ($leaveRequest, $year) {
+            $balance = EmployeeLeaveBalance::firstOrCreate(
+                [
+                    'employee_id' => $leaveRequest->employee_id,
+                    'leave_type_id' => $leaveRequest->leave_type_id,
+                    'year' => $year,
+                ],
+                [
+                    'initial_quota' => $leaveRequest->leaveType->default_days ?? 12,
+                    'used_quota' => 0,
+                    'remaining_quota' => $leaveRequest->leaveType->default_days ?? 12,
+                ]
+            );
+
+            $balance->used_quota += $leaveRequest->total_days;
+            $balance->remaining_quota = max(0, $balance->initial_quota - $balance->used_quota);
+            $balance->save();
+
+            // Sinkronisasi otomatis ke log kehadiran (status = Excused)
+            $startDate = Carbon::parse($leaveRequest->start_date);
+            $endDate = Carbon::parse($leaveRequest->end_date);
+            for ($d = $startDate->copy(); $d->lte($endDate); $d->addDay()) {
+                if (! $d->isSunday()) {
+                    \App\Models\Attendance::updateOrCreate(
+                        [
+                            'employee_id' => $leaveRequest->employee_id,
+                            'date' => $d->toDateString(),
+                        ],
+                        [
+                            'status' => 'Excused',
+                            'notes' => '[Cuti Resmi: ' . ($leaveRequest->leaveType?->name ?? 'Cuti') . '] ' . $leaveRequest->reason,
+                        ]
+                    );
+                }
+            }
+
+            Log::info("Leave balance deducted and attendance synced for employee {$leaveRequest->employee_id}: {$leaveRequest->total_days} days. Remaining: {$balance->remaining_quota}");
+        });
+    }
+
+    /**
+     * Kembalikan kuota saldo cuti jika persetujuan dibatalkan atau di-reject
+     */
+    protected function revertApprovalDeduction(LeaveRequest $leaveRequest, int $year): void
+    {
+        DB::transaction(function () use ($leaveRequest, $year) {
+            $balance = EmployeeLeaveBalance::where([
+                'employee_id' => $leaveRequest->employee_id,
+                'leave_type_id' => $leaveRequest->leave_type_id,
+                'year' => $year,
+            ])->first();
+
+            if ($balance) {
+                $balance->used_quota = max(0, $balance->used_quota - $leaveRequest->total_days);
+                $balance->remaining_quota = min($balance->initial_quota, $balance->initial_quota - $balance->used_quota);
+                $balance->save();
+            }
+        });
     }
 }

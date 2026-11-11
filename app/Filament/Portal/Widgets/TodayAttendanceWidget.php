@@ -120,8 +120,16 @@ class TodayAttendanceWidget extends Widget
         if (! $employee) {
             return [
                 'annual_remaining' => 0,
+                'annual_used' => 0,
+                'annual_initial' => 12,
+                'sick_remaining' => 0,
+                'sick_used' => 0,
+                'sick_initial' => 14,
                 'block_remaining' => 0,
+                'total_used' => 0,
                 'pending_count' => 0,
+                'recent_leave' => null,
+                'balances' => collect(),
             ];
         }
 
@@ -131,16 +139,32 @@ class TodayAttendanceWidget extends Widget
             ->get();
 
         $annual = $balances->firstWhere('leaveType.code', 'ANNUAL');
+        $sick = $balances->firstWhere('leaveType.code', 'SICK');
         $block = $balances->firstWhere('leaveType.code', 'BLOCK_LEAVE');
 
         $pendingCount = \App\Models\LeaveRequest::where('employee_id', $employee->id)
             ->where('status', 'Pending')
             ->count();
 
+        $totalUsed = (int) $balances->sum('used_quota');
+
+        $recentLeave = \App\Models\LeaveRequest::with('leaveType')
+            ->where('employee_id', $employee->id)
+            ->latest('start_date')
+            ->first();
+
         return [
             'annual_remaining' => $annual->remaining_quota ?? 12,
+            'annual_used' => $annual->used_quota ?? 0,
+            'annual_initial' => $annual->initial_quota ?? 12,
+            'sick_remaining' => $sick->remaining_quota ?? 14,
+            'sick_used' => $sick->used_quota ?? 0,
+            'sick_initial' => $sick->initial_quota ?? 14,
             'block_remaining' => $block->remaining_quota ?? 5,
+            'total_used' => $totalUsed,
             'pending_count' => $pendingCount,
+            'recent_leave' => $recentLeave,
+            'balances' => $balances,
         ];
     }
 
