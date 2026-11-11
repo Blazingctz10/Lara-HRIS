@@ -206,6 +206,24 @@
             color: #0E6838;
         }
 
+        .m3-doc-icon svg {
+            width: 20px !important;
+            height: 20px !important;
+            flex-shrink: 0;
+        }
+
+        .m3-btn-pdf svg {
+            width: 14px !important;
+            height: 14px !important;
+            flex-shrink: 0;
+        }
+
+        .m3-btn-icon svg {
+            width: 16px !important;
+            height: 16px !important;
+            flex-shrink: 0;
+        }
+
         :is(.dark) .m3-doc-icon {
             background: rgba(74, 222, 128, 0.12);
             color: #4ade80;

@@ -22,11 +22,10 @@ class Dashboard extends BaseDashboard
         return [
             PortalShortcutWidget::class,
             TodayAttendanceWidget::class,
-            MyLeaveBalanceWidget::class,
-            MyLeaveHistoryWidget::class,
+            AnnouncementsWidget::class,
             MyReimbursementStatsWidget::class,
             MyRecentReimbursementsWidget::class,
-            AnnouncementsWidget::class,
+            MyLeaveHistoryWidget::class,
         ];
     }
 }

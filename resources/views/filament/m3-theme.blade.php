@@ -921,7 +921,7 @@ body.fi-body {
     background: #FFFFFF !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-    padding: 1.25rem 1.5rem !important;
+    padding: 1.05rem 1.3rem !important;
     transition: all 0.2s ease !important;
 }
 
@@ -933,25 +933,25 @@ body.fi-body {
 
 .fi-wi-stats-overview-stat:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     border-color: var(--glass-border-strong) !important;
 }
 
 .fi-wi-stats-overview-stat-label {
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
     font-weight: 700 !important;
     color: var(--glass-text-muted) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.6px !important;
+    letter-spacing: 0.5px !important;
 }
 
 .fi-wi-stats-overview-stat-value {
     font-family: var(--glass-font-display) !important;
     font-weight: 800 !important;
-    font-size: 1.95rem !important;
-    letter-spacing: -0.025em !important;
+    font-size: 1.55rem !important;
+    letter-spacing: -0.02em !important;
     color: var(--glass-text-main) !important;
-    margin-top: 0.4rem !important;
+    margin-top: 0.25rem !important;
 }
 
 .fi-section-header {
@@ -1125,8 +1125,8 @@ body.fi-body {
 }
 
 .fi-ta-cell {
-    padding: 1rem 1.15rem !important;
-    font-size: 0.875rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.835rem !important;
     color: var(--glass-text-main) !important;
 }
 
