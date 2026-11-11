@@ -104,7 +104,7 @@ Artisan::command('hris:backup {--type=full : Tipe arsip cadangan (full|db)}', fu
             $filename = $backupService->createDatabaseBackup();
             $this->info("✓ Cadangan basis data berhasil diamankan: {$filename}");
         } else {
-            $filename = $backupService->createFullBackup('Sistem Terjadwal (Automated Scheduler)');
+            $filename = $backupService->createFullBackup('Sistem Terjadwal (Perintah CLI)');
             $this->info("✓ Cadangan arsip lengkap (DB + Dokumen + Snapshot JSON) berhasil dibuat: {$filename}");
         }
     } catch (\Throwable $e) {
@@ -115,8 +115,30 @@ Artisan::command('hris:backup {--type=full : Tipe arsip cadangan (full|db)}', fu
     return 0;
 })->purpose('Pencadangan otomatis database dan lampiran dokumen resmi HRIS');
 
-\Illuminate\Support\Facades\Schedule::command('hris:backup --type=full')
-    ->dailyAt('02:00')
-    ->withoutOverlapping()
-    ->appendOutputTo(storage_path('logs/backup.log'));
+\Illuminate\Support\Facades\Schedule::call(function (\App\Services\BackupService $backupService) {
+    $settings = $backupService->getSettings();
+    if (! ($settings['auto_backup_enabled'] ?? false)) {
+        return;
+    }
+
+    $currentTime = now()->format('H:i');
+    $scheduledTime = $settings['schedule_time'] ?? '02:00';
+
+    if ($currentTime !== $scheduledTime) {
+        return;
+    }
+
+    $frequency = $settings['frequency'] ?? 'daily';
+    if ($frequency === 'weekdays' && now()->isSunday()) {
+        return;
+    }
+    if ($frequency === 'weekly' && now()->dayOfWeek !== 0) {
+        return;
+    }
+
+    $backupService->executeScheduledBackup("Scheduler Otomatis ({$scheduledTime} WIB)");
+})->everyMinute()
+  ->name('hris:auto-backup-runner')
+  ->withoutOverlapping()
+  ->appendOutputTo(storage_path('logs/backup.log'));
 

@@ -25,6 +25,22 @@ class BackupData extends Page
 
     protected BackupService $backupService;
 
+    public bool $auto_backup_enabled = true;
+    public string $schedule_time = '02:00';
+    public string $frequency = 'daily';
+    public string $backup_type = 'full';
+    public int $retention_count = 20;
+
+    public function mount(): void
+    {
+        $settings = app(BackupService::class)->getSettings();
+        $this->auto_backup_enabled = (bool) ($settings['auto_backup_enabled'] ?? true);
+        $this->schedule_time = (string) ($settings['schedule_time'] ?? '02:00');
+        $this->frequency = (string) ($settings['frequency'] ?? 'daily');
+        $this->backup_type = (string) ($settings['backup_type'] ?? 'full');
+        $this->retention_count = (int) ($settings['retention_count'] ?? 20);
+    }
+
     public function boot(): void
     {
         $this->backupService = app(BackupService::class);
@@ -82,6 +98,73 @@ class BackupData extends Page
             ->action(function () {
                 $this->createFullBackup();
             });
+    }
+
+    public function runScheduledBackupNowAction(): Action
+    {
+        return Action::make('runScheduledBackupNow')
+            ->label('Uji Jadwal Sekarang')
+            ->icon('heroicon-o-play')
+            ->color('warning')
+            ->size('sm')
+            ->requiresConfirmation()
+            ->modalHeading('Uji Eksekusi Jadwal Cadangan Otomatis')
+            ->modalDescription('Sistem akan mengeksekusi pencadangan saat ini juga sesuai konfigurasi jadwal aktif untuk memverifikasi fungsionalitas dan retensi berkas.')
+            ->modalSubmitActionLabel('Jalankan Sekarang')
+            ->modalCancelActionLabel('Batal')
+            ->action(fn () => $this->runScheduledBackupNow());
+    }
+
+    public function runScheduledBackupNow(): void
+    {
+        try {
+            $creator = 'Uji Coba Jadwal (' . auth()->user()->name . ')';
+            $filename = app(BackupService::class)->executeScheduledBackup($creator);
+
+            Notification::make()
+                ->title('Pengujian Jadwal Backup Berhasil')
+                ->body("Arsip '{$filename}' berhasil digenerate dan diverifikasi.")
+                ->success()
+                ->send();
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Pengujian Gagal')
+                ->body('Terjadi galat: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function saveScheduleSettings(): void
+    {
+        app(BackupService::class)->saveSettings([
+            'auto_backup_enabled' => (bool) $this->auto_backup_enabled,
+            'schedule_time' => (string) $this->schedule_time,
+            'frequency' => (string) $this->frequency,
+            'backup_type' => (string) $this->backup_type,
+            'retention_count' => (int) $this->retention_count,
+        ]);
+
+        Notification::make()
+            ->title('Jadwal Cadangan Otomatis Berhasil Disimpan')
+            ->body("Sistem akan melakukan cadangan otomatis setiap pukul {$this->schedule_time} WIB ({$this->getFrequencyLabel()}).")
+            ->success()
+            ->send();
+    }
+
+    public function getFrequencyLabel(): string
+    {
+        return match ($this->frequency) {
+            'daily' => 'Setiap Hari',
+            'weekdays' => 'Senin - Sabtu (Hari Kerja BPR)',
+            'weekly' => 'Mingguan (Hari Minggu)',
+            default => 'Setiap Hari',
+        };
+    }
+
+    public function getScheduleSettings(): array
+    {
+        return app(BackupService::class)->getSettings();
     }
 
     public function deleteBackupAction(): Action

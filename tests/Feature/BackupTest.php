@@ -102,4 +102,44 @@ class BackupTest extends TestCase
 
         File::delete($dummyPath);
     }
+
+    public function test_admin_can_save_auto_backup_schedule_settings(): void
+    {
+        $admin = User::where('role', 'super_admin')->first();
+
+        Livewire::actingAs($admin)
+            ->test(BackupData::class)
+            ->set('auto_backup_enabled', true)
+            ->set('schedule_time', '23:30')
+            ->set('frequency', 'weekdays')
+            ->set('backup_type', 'db')
+            ->set('retention_count', 30)
+            ->call('saveScheduleSettings')
+            ->assertHasNoErrors();
+
+        $settings = app(\App\Services\BackupService::class)->getSettings();
+        $this->assertTrue($settings['auto_backup_enabled']);
+        $this->assertEquals('23:30', $settings['schedule_time']);
+        $this->assertEquals('weekdays', $settings['frequency']);
+        $this->assertEquals('db', $settings['backup_type']);
+        $this->assertEquals(30, $settings['retention_count']);
+    }
+
+    public function test_scheduled_backup_executes_successfully(): void
+    {
+        $service = app(\App\Services\BackupService::class);
+        $filename = $service->executeScheduledBackup('Test Automated Runner');
+
+        $this->assertNotEmpty($filename);
+        $path = $service->getBackupDir() . DIRECTORY_SEPARATOR . $filename;
+        $this->assertFileExists($path);
+
+        $settings = $service->getSettings();
+        $this->assertEquals('Sukses', $settings['last_run_status']);
+        $this->assertEquals($filename, $settings['last_run_file']);
+
+        if (File::exists($path)) {
+            File::delete($path);
+        }
+    }
 }

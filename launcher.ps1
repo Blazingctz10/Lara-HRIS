@@ -139,6 +139,7 @@ try {
 }
 
 $serverProc = $null
+$scheduleProc = $null
 
 if ($serverAlreadyRunning) {
     Write-Host "  -> Server Core HRIS SUDAH AKTIF dan siap digunakan di port $ServerPort (PID: $currentPid)" -ForegroundColor Green
@@ -189,6 +190,23 @@ if ($serverAlreadyRunning) {
     Start-Sleep -Seconds 1
     $currentPid = $serverProc.Id
     Write-Host "  -> Server berhasil diluncurkan (PID: $currentPid)!" -ForegroundColor Green
+
+    # Meluncurkan Layanan Scheduler Otomatis (Auto-Backup & Background Worker)
+    try {
+        $schedInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $schedInfo.FileName = $phpBinary
+        $schedInfo.Arguments = "artisan schedule:work"
+        $schedInfo.WorkingDirectory = $HrisPath
+        $schedInfo.RedirectStandardOutput = $true
+        $schedInfo.RedirectStandardError = $true
+        $schedInfo.UseShellExecute = $false
+        $schedInfo.CreateNoWindow = $true
+
+        $scheduleProc = New-Object System.Diagnostics.Process
+        $scheduleProc.StartInfo = $schedInfo
+        $scheduleProc.Start() | Out-Null
+        Write-Host "  -> Background Scheduler aktif (Otomatisasi Backup Sesuai Jadwal Jam BPR)!" -ForegroundColor Green
+    } catch {}
 }
 
 function Print-Dashboard {
@@ -212,6 +230,7 @@ function Print-Dashboard {
     Write-Host "  [O] Optimasi Performa Tinggi (Kompilasi Cache Config, Route, View, Icons)"
     Write-Host "  [C] Bersihkan Seluruh Cache (Reset Cache Aplikasi Saat Update Kode)"
     Write-Host "  [B] Buat Cadangan Database Instan (Backup Snapshot database.sqlite)"
+    Write-Host "  [S] Pengecekan Jadwal Backup Otomatis (php artisan schedule:run)"
     Write-Host "  [M] Sinkronisasi Migrasi Database (php artisan migrate)"
     Write-Host "  [T] Jalankan Uji Otomatis Sistem (php artisan test - 50 Tests)"
     Write-Host "  [L] Tampilkan 20 Log Aktivitas Server Terakhir"
@@ -227,7 +246,7 @@ try {
 
     # Infinite Loop Murni Tanpa Auto-Close / Timeout
     while ($true) {
-        Write-Host "`n  Pilih menu [1-4, O, C, B, M, T, L, R, 5]: " -NoNewline -ForegroundColor White
+        Write-Host "`n  Pilih menu [1-4, O, C, B, S, M, T, L, R, 5]: " -NoNewline -ForegroundColor White
         $choice = Read-Host
 
         if ([string]::IsNullOrWhiteSpace($choice)) {
@@ -288,6 +307,13 @@ try {
                 Write-Host "  [SUKSES] Cadangan database berhasil disimpan di:" -ForegroundColor Green
                 Write-Host "  -> $destBackup ($([math]::Round($backupSize, 2)) KB)" -ForegroundColor Cyan
                 Write-Host "  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
+                Read-Host
+                Print-Dashboard
+            }
+            "S" {
+                Write-Host "`n  [SCHEDULER] Menjalankan pengecekan tugas terjadwal (artisan schedule:run)..." -ForegroundColor Yellow
+                & $phpBinary artisan schedule:run
+                Write-Host "`n  Tekan Enter untuk kembali ke dashboard..." -ForegroundColor Gray
                 Read-Host
                 Print-Dashboard
             }
@@ -359,6 +385,14 @@ finally {
     Write-Host "`n==========================================================================================" -ForegroundColor Yellow
     Write-Host "  MENGHENTIKAN LAYANAN SERVER PT BPR BANDA RAYA..." -ForegroundColor Yellow
     Write-Host "==========================================================================================" -ForegroundColor Yellow
+
+    if ($scheduleProc -and -not $scheduleProc.HasExited) {
+        Write-Host "  [0/2] Menutup background scheduler otomatis..." -ForegroundColor Gray
+        try {
+            $scheduleProc.Kill()
+            $scheduleProc.WaitForExit(1000)
+        } catch {}
+    }
 
     if ($serverProc -and -not $serverProc.HasExited) {
         Write-Host "  [1/2] Menutup proses server bawaan (PID: $($serverProc.Id))..." -ForegroundColor Gray

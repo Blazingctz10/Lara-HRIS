@@ -130,6 +130,83 @@
         :is(.dark) .m3-backup-table tr:hover td {
             background-color: var(--m3-surface-container-high, #203026);
         }
+
+        .m3-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+        }
+
+        .m3-select-input {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--m3-outline-variant, #b6cac0);
+            background-color: var(--m3-surface-container, #f0f5f2);
+            color: var(--m3-on-surface, #0f1e14);
+            padding: 0.65rem 0.85rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .m3-select-input:focus {
+            outline: none;
+            border-color: #0E6838;
+            box-shadow: 0 0 0 3px rgba(14, 104, 56, 0.2);
+        }
+
+        :is(.dark) .m3-select-input {
+            background-color: #19261E;
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #FFFFFF;
+        }
+
+        :is(.dark) .m3-select-input:focus {
+            border-color: #4ADE80;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+        }
+
+        .m3-helper {
+            display: block;
+            font-size: 0.725rem;
+            opacity: 0.65;
+            margin-top: 0.35rem;
+        }
+
+        .m3-save-schedule-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #0E6838;
+            color: #FFFFFF;
+            font-size: 0.875rem;
+            font-weight: 700;
+            padding: 0.65rem 1.4rem;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(14, 104, 56, 0.25);
+            transition: all 0.15s ease;
+        }
+
+        .m3-save-schedule-btn:hover {
+            background-color: #0a4f2b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 104, 56, 0.35);
+        }
+
+        :is(.dark) .m3-save-schedule-btn {
+            background-color: #4ADE80;
+            color: #0D1410;
+        }
+
+        :is(.dark) .m3-save-schedule-btn:hover {
+            background-color: #38c96e;
+        }
     </style>
 
     <!-- Overview Stat Cards -->
@@ -208,6 +285,114 @@
                 {{ $this->createFullBackupAction }}
             </div>
         </div>
+    </div>
+
+    <!-- Enterprise Auto-Backup Scheduler Section -->
+    <div class="m3-action-panel">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div class="m3-stat-icon-wrapper" style="background: rgba(14, 104, 56, 0.15); color: #0E6838;">
+                    <x-heroicon-o-clock class="w-6 h-6" />
+                </div>
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em;">
+                        Jadwal Pencadangan Otomatis (Auto-Backup Scheduler)
+                    </h3>
+                    <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.15rem;">
+                        Pencadangan rutin otomatis di latar belakang tanpa intervensi manual (Kepatuhan POJK & DRP Bank)
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                @if($auto_backup_enabled)
+                    <span class="m3-badge-pill" style="background: rgba(74, 222, 128, 0.18); color: #0E6838;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
+                        Jadwal Aktif: {{ $schedule_time }} WIB ({{ $this->getFrequencyLabel() }})
+                    </span>
+                @else
+                    <span class="m3-badge-pill" style="background: rgba(239, 68, 68, 0.15); color: #dc2626;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+                        Jadwal Dinonaktifkan
+                    </span>
+                @endif
+                {{ $this->runScheduledBackupNowAction }}
+            </div>
+        </div>
+
+        <form wire:submit.prevent="saveScheduleSettings">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+                <!-- 1. Status Toggle -->
+                <div>
+                    <label class="m3-label" for="auto_backup_enabled">Status Otomatis</label>
+                    <select wire:model.defer="auto_backup_enabled" id="auto_backup_enabled" class="m3-select-input">
+                        <option value="1">Aktifkan Cadangan Otomatis</option>
+                        <option value="0">Nonaktifkan</option>
+                    </select>
+                    <span class="m3-helper">Eksekusi rutin sesuai jadwal</span>
+                </div>
+
+                <!-- 2. Jam Eksekusi -->
+                <div>
+                    <label class="m3-label" for="schedule_time">Waktu Eksekusi (WIB)</label>
+                    <input type="time" wire:model.defer="schedule_time" id="schedule_time" class="m3-select-input" required />
+                    <span class="m3-helper">Rekomendasi: 02:00 dini hari</span>
+                </div>
+
+                <!-- 3. Frekuensi -->
+                <div>
+                    <label class="m3-label" for="frequency">Frekuensi Pelaksanaan</label>
+                    <select wire:model.defer="frequency" id="frequency" class="m3-select-input">
+                        <option value="daily">Setiap Hari (Rekomendasi)</option>
+                        <option value="weekdays">Senin - Sabtu (Hari Kerja BPR)</option>
+                        <option value="weekly">Mingguan (Hari Minggu)</option>
+                    </select>
+                    <span class="m3-helper">Pola perulangan cadangan</span>
+                </div>
+
+                <!-- 4. Format Cadangan -->
+                <div>
+                    <label class="m3-label" for="backup_type">Format Arsip</label>
+                    <select wire:model.defer="backup_type" id="backup_type" class="m3-select-input">
+                        <option value="full">Arsip Lengkap ZIP (DB + Berkas + JSON)</option>
+                        <option value="db">Basis Data Saja (.sqlite)</option>
+                    </select>
+                    <span class="m3-helper">ZIP mencakup seluruh foto & SK</span>
+                </div>
+
+                <!-- 5. Retensi Berkas -->
+                <div>
+                    <label class="m3-label" for="retention_count">Retensi / Batas Arsip</label>
+                    <select wire:model.defer="retention_count" id="retention_count" class="m3-select-input">
+                        <option value="10">Simpan 10 Arsip Terbaru</option>
+                        <option value="20">Simpan 20 Arsip Terbaru</option>
+                        <option value="30">Simpan 30 Arsip Terbaru</option>
+                        <option value="50">Simpan 50 Arsip Terbaru</option>
+                    </select>
+                    <span class="m3-helper">Mencegah hard disk server penuh</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding-top: 1.25rem; border-top: 1px dashed var(--m3-outline-variant, #b6cac0);">
+                <div style="font-size: 0.825rem; opacity: 0.85;">
+                    @php $schedData = $this->getScheduleSettings(); @endphp
+                    @if(!empty($schedData['last_run_at']))
+                        <strong>Eksekusi Terakhir:</strong> {{ $schedData['last_run_at'] }}
+                        &bull; Status: <span style="font-weight: 700; color: {{ ($schedData['last_run_status'] ?? '') === 'Sukses' ? '#16a34a' : '#ea580c' }};">{{ $schedData['last_run_status'] ?? '-' }}</span>
+                        @if(!empty($schedData['last_run_file']))
+                            &bull; <code>{{ $schedData['last_run_file'] }}</code>
+                        @endif
+                    @else
+                        <em>Jadwal siap berjalan sesuai waktu yang dikonfigurasikan.</em>
+                    @endif
+                </div>
+
+                <button type="submit" class="m3-save-schedule-btn">
+                    <x-heroicon-m-check class="w-4 h-4" />
+                    Simpan Pengaturan Jadwal
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- Table of Available Archives -->

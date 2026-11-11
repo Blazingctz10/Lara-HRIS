@@ -240,6 +240,79 @@ class BackupService
         return $deletedCount;
     }
 
+    public function getSettingsFilePath(): string
+    {
+        return storage_path('app/backup_settings.json');
+    }
+
+    public function getSettings(): array
+    {
+        $path = $this->getSettingsFilePath();
+        $defaults = [
+            'auto_backup_enabled' => true,
+            'schedule_time' => '02:00',
+            'frequency' => 'daily', // 'daily', 'weekdays', 'weekly'
+            'backup_type' => 'full', // 'full', 'db'
+            'retention_count' => 20,
+            'last_run_at' => null,
+            'last_run_status' => null,
+            'last_run_file' => null,
+        ];
+
+        if (File::exists($path)) {
+            $data = json_decode(File::get($path), true);
+            if (is_array($data)) {
+                return array_merge($defaults, $data);
+            }
+        }
+
+        return $defaults;
+    }
+
+    public function saveSettings(array $settings): bool
+    {
+        $current = $this->getSettings();
+        $merged = array_merge($current, $settings);
+        $dir = dirname($this->getSettingsFilePath());
+        if (! File::exists($dir)) {
+            File::makeDirectory($dir, 0755, true);
+        }
+        return (bool) File::put($this->getSettingsFilePath(), json_encode($merged, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    public function executeScheduledBackup(string $triggerSource = 'Sistem Terjadwal Otomatis'): string
+    {
+        $settings = $this->getSettings();
+        $type = $settings['backup_type'] ?? 'full';
+        $retention = (int) ($settings['retention_count'] ?? 20);
+
+        try {
+            if ($type === 'db') {
+                $filename = $this->createDatabaseBackup();
+            } else {
+                $filename = $this->createFullBackup($triggerSource);
+            }
+
+            $this->pruneOldBackups($retention);
+
+            $this->saveSettings([
+                'last_run_at' => now()->translatedFormat('d M Y, H:i:s') . ' WIB',
+                'last_run_status' => 'Sukses',
+                'last_run_file' => $filename,
+            ]);
+
+            return $filename;
+        } catch (\Throwable $e) {
+            $this->saveSettings([
+                'last_run_at' => now()->translatedFormat('d M Y, H:i:s') . ' WIB',
+                'last_run_status' => 'Gagal: ' . $e->getMessage(),
+                'last_run_file' => null,
+            ]);
+
+            throw $e;
+        }
+    }
+
     public function exportAllModelsToJson(): array
     {
         return [
