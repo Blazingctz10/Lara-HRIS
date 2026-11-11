@@ -42,7 +42,7 @@ class PayrollCalculationService
         $approvedOvertimes = Overtime::where('employee_id', $employee->id)
             ->whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
-            ->whereIn('status', ['Approved_HR', 'Approved_Pincab', 'Paid'])
+            ->whereIn('status', ['Approved_HR', 'Approved', 'Approved_Pincab', 'Paid'])
             ->get();
 
         $totalOvertimeHours = (int) $approvedOvertimes->sum('duration_hours');

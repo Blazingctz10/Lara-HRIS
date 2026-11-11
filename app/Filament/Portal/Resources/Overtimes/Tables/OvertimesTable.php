@@ -46,15 +46,13 @@ class OvertimesTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Pending' => 'warning',
-                        'Approved_Pincab' => 'info',
-                        'Approved_HR' => 'success',
+                        'Approved_HR', 'Approved', 'Approved_Pincab' => 'success',
                         'Rejected' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'Pending' => 'Menunggu Persetujuan Pemimpin Cabang',
-                        'Approved_Pincab' => 'Disetujui Pemimpin Cabang',
-                        'Approved_HR' => 'Disetujui SDM Kantor Pusat',
+                        'Pending' => 'Menunggu Persetujuan HR',
+                        'Approved_HR', 'Approved', 'Approved_Pincab' => 'Disetujui HR',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),

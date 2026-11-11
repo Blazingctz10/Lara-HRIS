@@ -19,7 +19,7 @@ class OvertimeResource extends Resource
 {
     protected static ?string $model = Overtime::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-fire';
 
     protected static string|UnitEnum|null $navigationGroup = 'Presensi & Kehadiran';
 
@@ -38,7 +38,7 @@ class OvertimeResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'branch_manager']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
     }
 
     public static function canCreate(): bool

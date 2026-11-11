@@ -60,57 +60,28 @@ class OvertimesTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Pending' => 'warning',
-                        'Approved_Pincab' => 'info',
-                        'Approved_HR' => 'success',
+                        'Approved_HR', 'Approved', 'Approved_Pincab' => 'success',
                         'Rejected' => 'danger',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Pending' => 'Menunggu Persetujuan HR',
+                        'Approved_HR', 'Approved', 'Approved_Pincab' => 'Disetujui HR',
+                        'Rejected' => 'Ditolak',
+                        default => $state,
                     }),
             ])
             ->recordActions([
-                Action::make('approve_pincab')
-                    ->label('Setujui (Pemimpin Cabang)')
-                    ->icon('heroicon-m-check')
-                    ->color('info')
-                    ->button()
-                    ->visible(fn (Overtime $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
-                    ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Lembur (Pemimpin Cabang)')
-                    ->modalDescription(fn (Overtime $record) => "Setujui surat perintah kerja lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam?")
-                    ->modalSubmitActionLabel('Ya, Setujui Lembur')
-                    ->modalCancelActionLabel('Batal')
-                    ->modalIcon('heroicon-o-check-circle')
-                    ->action(function (Overtime $record) {
-                        $record->update([
-                            'status' => 'Approved_Pincab',
-                            'approved_by' => auth()->id(),
-                        ]);
-
-                        Notification::make()
-                            ->title('Lembur Disetujui Pemimpin Cabang')
-                            ->body("Pengajuan lembur {$record->employee->full_name} berhasil disetujui.")
-                            ->success()
-                            ->send();
-
-                        if ($record->employee?->user) {
-                            Notification::make()
-                                ->title('Pengajuan Lembur Disetujui')
-                                ->body("Pengajuan lembur Anda untuk tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " ({$record->duration_hours} jam) disetujui Pemimpin Cabang.")
-                                ->icon('heroicon-o-check-circle')
-                                ->iconColor('info')
-                                ->sendToDatabase($record->employee->user);
-                        }
-                    }),
-
-                Action::make('approve_hr')
-                    ->label('Setujui (SDM Kantor Pusat)')
+                Action::make('approve')
+                    ->label('Setujui Lembur')
                     ->icon('heroicon-m-check-badge')
                     ->color('success')
                     ->button()
-                    ->visible(fn (Overtime $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
+                    ->visible(fn (Overtime $record) => $record->status === 'Pending' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Final Lembur (SDM Kantor Pusat)')
-                    ->modalDescription(fn (Overtime $record) => "Setujui dan verifikasi lembur pegawai {$record->employee->full_name} selama {$record->duration_hours} jam untuk perhitungan insentif/uang lembur pada periode payroll?")
-                    ->modalSubmitActionLabel('Ya, Setujui Pengajuan')
+                    ->modalHeading('Konfirmasi Persetujuan Lembur (SDM / HR)')
+                    ->modalDescription(fn (Overtime $record) => "Setujui surat perintah tugas lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam untuk perhitungan kompensasi payroll?")
+                    ->modalSubmitActionLabel('Ya, Setujui Lembur')
                     ->modalCancelActionLabel('Batal')
                     ->modalIcon('heroicon-o-check-badge')
                     ->action(function (Overtime $record) {
@@ -120,17 +91,57 @@ class OvertimesTable
                         ]);
 
                         Notification::make()
-                            ->title('Lembur Disetujui HR HO')
-                            ->body("Pengajuan lembur {$record->employee->full_name} telah diverifikasi dan disetujui HR HO.")
+                            ->title('Lembur Disetujui HR')
+                            ->body("Pengajuan lembur {$record->employee->full_name} berhasil disetujui.")
                             ->success()
                             ->send();
 
                         if ($record->employee?->user) {
                             Notification::make()
-                                ->title('Lembur Disetujui Final HR HO')
-                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " disetujui HR Pusat dan masuk ke komponen payroll.")
+                                ->title('Pengajuan Lembur Disetujui HR')
+                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " ({$record->duration_hours} jam) telah disetujui HR dan masuk ke komponen payroll.")
                                 ->icon('heroicon-o-check-badge')
                                 ->iconColor('success')
+                                ->sendToDatabase($record->employee->user);
+                        }
+                    }),
+
+                Action::make('reject')
+                    ->label('Tolak')
+                    ->icon('heroicon-m-x-circle')
+                    ->color('danger')
+                    ->button()
+                    ->outlined()
+                    ->visible(fn (Overtime $record) => $record->status === 'Pending' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
+                    ->form([
+                        \Filament\Forms\Components\Textarea::make('rejection_note')
+                            ->label('Alasan Penolakan')
+                            ->placeholder('Jelaskan alasan penolakan pengajuan lembur ini...')
+                            ->required(),
+                    ])
+                    ->modalHeading('Tolak Pengajuan Lembur')
+                    ->modalSubmitActionLabel('Tolak Pengajuan')
+                    ->modalCancelActionLabel('Batal')
+                    ->modalIcon('heroicon-o-x-circle')
+                    ->action(function (Overtime $record, array $data) {
+                        $record->update([
+                            'status' => 'Rejected',
+                            'approved_by' => auth()->id(),
+                            'rejection_note' => $data['rejection_note'] ?? null,
+                        ]);
+
+                        Notification::make()
+                            ->title('Pengajuan Lembur Ditolak')
+                            ->body("Pengajuan lembur {$record->employee->full_name} telah ditolak.")
+                            ->danger()
+                            ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Pengajuan Lembur Ditolak HR')
+                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " tidak disetujui HR: " . ($data['rejection_note'] ?? 'Tidak memenuhi syarat.'))
+                                ->icon('heroicon-o-x-circle')
+                                ->iconColor('danger')
                                 ->sendToDatabase($record->employee->user);
                         }
                     }),
