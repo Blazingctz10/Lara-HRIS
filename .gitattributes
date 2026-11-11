@@ -17,3 +17,5 @@ phpunit.xml export-ignore
 GEMINI.md export-ignore
 AGENTS.md export-ignore
 lara-hris.md export-ignore
+*.bat export-ignore
+*.ps1 export-ignore
