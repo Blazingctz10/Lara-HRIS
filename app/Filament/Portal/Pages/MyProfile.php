@@ -64,7 +64,7 @@ class MyProfile extends Page implements HasForms
             'emergency_contact' => ($employee?->emergency_contact_name ?? '-') . ' (' . ($employee?->emergency_contact_relation ?? '-') . ') - ' . ($employee?->emergency_contact_phone ?? '-'),
 
             // Data Pribadi & Kontak (Dapat Diperbarui Mandiri)
-            'photo_url' => $employee?->photo_url,
+            'photo_url' => $employee?->photo_url ?? $user?->avatar_url,
             'phone' => $employee?->phone ?? '',
             'address' => $employee?->address ?? '',
             'bank_account_number' => $employee?->bank_account_number ?? '',
@@ -316,9 +316,15 @@ class MyProfile extends Page implements HasForms
         $user = auth()->user();
         $employee = $user?->employee;
 
+        if (array_key_exists('photo_url', $data)) {
+            $user?->update(['avatar_url' => $data['photo_url']]);
+            if ($employee) {
+                $employee->update(['photo_url' => $data['photo_url']]);
+            }
+        }
+
         if ($employee) {
             $employee->update([
-                'photo_url' => $data['photo_url'] ?? $employee->photo_url,
                 'phone' => $data['phone'] ?? $employee->phone,
                 'address' => $data['address'] ?? $employee->address,
                 'bank_account_number' => $data['bank_account_number'] ?? $employee->bank_account_number,

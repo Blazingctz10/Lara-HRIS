@@ -21,6 +21,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'email',
         'password',
         'role',
+        'avatar_url',
         'branch_id',
     ];
 
@@ -88,8 +89,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
      */
     public function getFilamentAvatarUrl(): ?string
     {
-        if ($this->employee?->photo_url && Storage::disk('public')->exists($this->employee->photo_url)) {
-            return Storage::disk('public')->url($this->employee->photo_url);
+        $photo = $this->avatar_url ?? $this->employee?->photo_url;
+
+        if ($photo && Storage::disk('public')->exists($photo)) {
+            return Storage::disk('public')->url($photo);
         }
 
         return static::generateInitialsAvatarSvg($this->name);

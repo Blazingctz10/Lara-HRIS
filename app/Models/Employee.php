@@ -228,8 +228,10 @@ class Employee extends Model
      */
     public function getAvatarUrlAttribute(): string
     {
-        if ($this->photo_url && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->photo_url)) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo_url);
+        $photo = $this->photo_url ?? $this->user?->avatar_url;
+
+        if ($photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($photo)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($photo);
         }
 
         return \App\Models\User::generateInitialsAvatarSvg($this->full_name);
