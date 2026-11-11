@@ -65,3 +65,4 @@ class CompliancePolicyResource extends Resource
         ];
     }
 }
+

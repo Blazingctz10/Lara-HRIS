@@ -90,3 +90,4 @@ class CompliancePolicyTest extends TestCase
         $this->assertNotContains($archived->id, $visiblePolicies);
     }
 }
+

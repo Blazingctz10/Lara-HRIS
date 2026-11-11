@@ -100,3 +100,4 @@ class CompliancePoliciesTable
             ->emptyStateIcon('heroicon-o-shield-check');
     }
 }
+

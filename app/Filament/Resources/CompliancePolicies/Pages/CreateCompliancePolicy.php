@@ -16,3 +16,4 @@ class CreateCompliancePolicy extends CreateRecord
         return $data;
     }
 }
+
