@@ -135,6 +135,20 @@ class PayrollsTable
                             ->body("Slip gaji {$record->employee?->full_name} periode {$record->period_label} kini aktif dan dapat dilihat oleh yang bersangkutan.")
                             ->success()
                             ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Slip Gaji Resmi Diterbitkan')
+                                ->body("Slip gaji Anda untuk periode {$record->period_label} telah diterbitkan dan dapat diunduh di portal.")
+                                ->icon('heroicon-o-banknotes')
+                                ->iconColor('success')
+                                ->actions([
+                                    \Filament\Notifications\Actions\Action::make('view')
+                                        ->label('Buka Slip Gaji')
+                                        ->url('/portal/payrolls'),
+                                ])
+                                ->sendToDatabase($record->employee->user);
+                        }
                     }),
 
                 EditAction::make()

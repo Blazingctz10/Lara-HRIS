@@ -90,6 +90,15 @@ class OvertimesTable
                             ->body("Pengajuan lembur {$record->employee->full_name} berhasil disetujui.")
                             ->success()
                             ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Pengajuan Lembur Disetujui')
+                                ->body("Pengajuan lembur Anda untuk tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " ({$record->duration_hours} jam) disetujui Pemimpin Cabang.")
+                                ->icon('heroicon-o-check-circle')
+                                ->iconColor('info')
+                                ->sendToDatabase($record->employee->user);
+                        }
                     }),
 
                 Action::make('approve_hr')
@@ -115,6 +124,15 @@ class OvertimesTable
                             ->body("Pengajuan lembur {$record->employee->full_name} telah diverifikasi dan disetujui HR HO.")
                             ->success()
                             ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Lembur Disetujui Final HR HO')
+                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " disetujui HR Pusat dan masuk ke komponen payroll.")
+                                ->icon('heroicon-o-check-badge')
+                                ->iconColor('success')
+                                ->sendToDatabase($record->employee->user);
+                        }
                     }),
 
                 EditAction::make()

@@ -105,6 +105,15 @@ class ReimbursementsTable
                             ->body("Klaim Rp " . number_format($record->amount, 0, ',', '.') . " untuk pegawai {$record->employee->full_name} telah disetujui Pemimpin Cabang.")
                             ->success()
                             ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Reimbursement Disetujui')
+                                ->body("Klaim '{$record->title}' sebesar Rp " . number_format($record->amount, 0, ',', '.') . " telah disetujui Pemimpin Cabang.")
+                                ->icon('heroicon-o-check-circle')
+                                ->iconColor('success')
+                                ->sendToDatabase($record->employee->user);
+                        }
                     }),
 
                 Action::make('mark_paid')
@@ -131,6 +140,15 @@ class ReimbursementsTable
                             ->body("Klaim {$record->employee->full_name} telah ditandai lunas/transfer.")
                             ->success()
                             ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Dana Reimbursement Dicairkan')
+                                ->body("Klaim '{$record->title}' sebesar Rp " . number_format($record->amount, 0, ',', '.') . " telah dicairkan/ditransfer.")
+                                ->icon('heroicon-o-banknotes')
+                                ->iconColor('success')
+                                ->sendToDatabase($record->employee->user);
+                        }
                     }),
 
                 EditAction::make()
