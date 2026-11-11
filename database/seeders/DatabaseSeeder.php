@@ -1138,5 +1138,65 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+        // Seeding Dokumen Resmi Kebijakan Kepatuhan & Regulasi Bank (Compliance Policies)
+        $superAdminUser = User::where('role', 'super_admin')->first();
+        $adminId = $superAdminUser?->id;
+
+        \App\Models\CompliancePolicy::firstOrCreate(
+            ['document_number' => 'SK.DIR/001/BPR-BR/2026'],
+            [
+                'title' => 'Pedoman Penerapan Program Anti Pencucian Uang & Pencegahan Pendanaan Terorisme (APU-PPT)',
+                'category' => 'apu_ppt',
+                'summary' => 'Kewajiban Customer Due Diligence (CDD), Enhanced Due Diligence (EDD), pelaporan Transaksi Keuangan Mencurigakan (LTKM) ke PPATK, serta prinsip Know Your Customer (KYC) bagi seluruh frontliner bank.',
+                'attachment_path' => 'compliance-policies/sample-kebijakan-bpr.pdf',
+                'effective_date' => '2026-01-02',
+                'target_audience' => 'all',
+                'status' => 'active',
+                'created_by' => $adminId,
+            ]
+        );
+
+        \App\Models\CompliancePolicy::firstOrCreate(
+            ['document_number' => 'SK.DIR/005/BPR-BR/2026'],
+            [
+                'title' => 'Kode Etik Karyawan, Benturan Kepentingan & Kebijakan Anti-Fraud',
+                'category' => 'code_of_conduct',
+                'summary' => 'Panduan integritas kerja, larangan penerimaan gratifikasi/suap, pengelolaan benturan kepentingan, serta mekanisme pelaporan pelanggaran (Whistleblowing System / WBS).',
+                'attachment_path' => 'compliance-policies/sample-kebijakan-bpr.pdf',
+                'effective_date' => '2026-01-15',
+                'target_audience' => 'all',
+                'status' => 'active',
+                'created_by' => $adminId,
+            ]
+        );
+
+        \App\Models\CompliancePolicy::firstOrCreate(
+            ['document_number' => 'SOP.OPS/012/BPR-BR/2026'],
+            [
+                'title' => 'Standar Operasional Prosedur Layanan Kas, Khazanah & Transaksi Teller Cabang',
+                'category' => 'sop_operation',
+                'summary' => 'SOP prosedur batas limit kas teller (cash limit), prosedur pembukaan khazanah dual-control, penanganan selisih kas, dan rekonsiliasi kas harian sebelum tutup buku.',
+                'attachment_path' => 'compliance-policies/sample-kebijakan-bpr.pdf',
+                'effective_date' => '2026-02-01',
+                'target_audience' => 'branch_ops',
+                'status' => 'active',
+                'created_by' => $adminId,
+            ]
+        );
+
+        \App\Models\CompliancePolicy::firstOrCreate(
+            ['document_number' => 'PP.DIR/002/BPR-BR/2026'],
+            [
+                'title' => 'Peraturan Perusahaan & Pedoman Disiplin Kerja PT BPR Banda Raya',
+                'category' => 'company_regulation',
+                'summary' => 'Hak dan kewajiban pegawai, waktu kerja operasional, ketentuan cuti tahunan, prosedur izin/dispensasi, dan ketentuan sanksi surat peringatan (SP).',
+                'attachment_path' => 'compliance-policies/sample-kebijakan-bpr.pdf',
+                'effective_date' => '2026-01-01',
+                'target_audience' => 'all',
+                'status' => 'active',
+                'created_by' => $adminId,
+            ]
+        );
     }
 }

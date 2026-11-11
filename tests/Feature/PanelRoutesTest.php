@@ -37,6 +37,7 @@ class PanelRoutesTest extends TestCase
             '/admin/warning-letters',
             '/admin/backup-data',
             '/admin/job-applicants',
+            '/admin/compliance-policies',
             '/admin/import-data',
             '/admin/users',
         ];
@@ -84,6 +85,7 @@ class PanelRoutesTest extends TestCase
         $this->get('/admin/positions')->assertStatus(200);
         $this->get('/admin/departments')->assertStatus(200);
         $this->get('/admin/branches')->assertStatus(200);
+        $this->get('/admin/compliance-policies')->assertStatus(200);
 
         // Direksi CANNOT CREATE employees or master data (Must be 403 Forbidden)
         $this->get('/admin/employees/create')->assertStatus(403);
@@ -95,6 +97,7 @@ class PanelRoutesTest extends TestCase
         $this->get('/admin/warning-letters/create')->assertStatus(403);
         $this->get('/admin/career-movements/create')->assertStatus(403);
         $this->get('/admin/job-applicants/create')->assertStatus(403);
+        $this->get('/admin/compliance-policies/create')->assertStatus(403);
     }
 
     public function test_all_portal_resources_render_successfully(): void
@@ -108,6 +111,7 @@ class PanelRoutesTest extends TestCase
             '/portal/leave-requests',
             '/portal/reimbursements',
             '/portal/overtimes',
+            '/portal/compliance-policies',
             '/portal/my-profile',
         ];
 

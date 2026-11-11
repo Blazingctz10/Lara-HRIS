@@ -58,6 +58,8 @@ class ComprehensiveResourceTest extends TestCase
             \App\Filament\Resources\WarningLetters\Pages\CreateWarningLetter::class,
             \App\Filament\Resources\JobApplicants\Pages\ListJobApplicants::class,
             \App\Filament\Resources\JobApplicants\Pages\CreateJobApplicant::class,
+            \App\Filament\Resources\CompliancePolicies\Pages\ListCompliancePolicies::class,
+            \App\Filament\Resources\CompliancePolicies\Pages\CreateCompliancePolicy::class,
             \App\Filament\Resources\Users\Pages\ListUsers::class,
             \App\Filament\Resources\Users\Pages\CreateUser::class,
         ];
@@ -81,6 +83,7 @@ class ComprehensiveResourceTest extends TestCase
             \App\Filament\Portal\Resources\Reimbursements\Pages\CreateReimbursement::class,
             \App\Filament\Portal\Resources\Overtimes\Pages\ListOvertimes::class,
             \App\Filament\Portal\Resources\Overtimes\Pages\CreateOvertime::class,
+            \App\Filament\Portal\Resources\CompliancePolicies\Pages\ListCompliancePolicies::class,
         ];
 
         foreach ($portalPages as $pageClass) {

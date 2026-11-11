@@ -68,6 +68,7 @@ class BackupService
                 'career_movements' => CareerMovement::count(),
                 'attendance_dispensations' => AttendanceDispensation::count(),
                 'announcements' => Announcement::count(),
+                'compliance_policies' => \App\Models\CompliancePolicy::count(),
                 'branches' => Branch::count(),
                 'departments' => Department::count() + Position::count(),
                 'job_applicants' => JobApplicant::count(),
@@ -355,6 +356,7 @@ class BackupService
             ],
             'system_announcements' => [
                 'announcements' => Announcement::all(),
+                'compliance_policies' => \App\Models\CompliancePolicy::all(),
                 'recent_login_logs' => LoginLog::latest()->limit(500)->get(),
             ],
         ];
