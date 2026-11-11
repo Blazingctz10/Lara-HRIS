@@ -224,6 +224,18 @@ class Employee extends Model
     }
 
     /**
+     * Dapatkan URL foto profil pegawai (Lokal & Zero Latency).
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->photo_url && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->photo_url)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo_url);
+        }
+
+        return \App\Models\User::generateInitialsAvatarSvg($this->full_name);
+    }
+
+    /**
      * Branch Scoping: restricts data for Branch Managers to their branch
      */
     public function scopeAccessibleBy(Builder $query, ?User $user = null): Builder

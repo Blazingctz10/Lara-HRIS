@@ -235,9 +235,13 @@
             <div class="m3-profile-identity-group">
                 <a href="{{ url('/portal/my-profile') }}" title="Lihat & Perbarui Profil Pegawai" style="text-decoration: none; flex-shrink: 0;">
                     <img
-                        src="{{ $employee?->photo_url ? \Illuminate\Support\Facades\Storage::url($employee->photo_url) : asset('images/default-avatar.svg') }}"
+                        src="{{ $employee ? $employee->avatar_url : (auth()->user()?->getFilamentAvatarUrl() ?? asset('images/default-avatar.svg')) }}"
                         alt="{{ $employee?->full_name ?? auth()->user()->name }}"
                         class="m3-profile-avatar-simple"
+                        loading="eager"
+                        decoding="async"
+                        width="82"
+                        height="82"
                     />
                 </a>
 

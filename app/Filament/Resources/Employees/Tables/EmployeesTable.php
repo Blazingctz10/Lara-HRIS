@@ -37,7 +37,7 @@ class EmployeesTable
                 ImageColumn::make('photo_url')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->full_name) . '&color=4338ca&background=e0e7ff'),
+                    ->defaultImageUrl(fn ($record) => $record->avatar_url),
 
                 TextColumn::make('nip')
                     ->label('NIP')

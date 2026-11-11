@@ -48,6 +48,7 @@ class PortalPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->lazyLoadedDatabaseNotifications()
             ->databaseNotificationsPolling('120s')
+            ->defaultAvatarProvider(\App\Support\BprAvatarProvider::class)
             ->font('Plus Jakarta Sans', provider: \Filament\FontProviders\LocalFontProvider::class)
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('20rem')
