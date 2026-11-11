@@ -10,61 +10,84 @@ class WeeklyAttendanceChartWidget extends ChartWidget
 {
     protected static ?int $sort = 2;
 
-    protected ?string $heading = 'Tren Presensi Kerja Mingguan (Hadir & Tepat Waktu)';
+    protected ?string $heading = 'Rekapitulasi Presensi Bulanan';
+
+    protected ?string $maxHeight = '280px';
 
     protected int|string|array $columnSpan = [
         'default' => 'full',
         'lg' => 1,
     ];
 
+    public function getDescription(): ?string
+    {
+        return 'Rekap total kehadiran, cuti resmi, dan keterlambatan per periode penarikan data';
+    }
+
     public static function canView(): bool
     {
         return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
     }
 
+    protected function getFilters(): ?array
+    {
+        return [
+            '6' => '6 Bulan Terakhir',
+            '12' => '12 Bulan Terakhir',
+        ];
+    }
+
     protected function getData(): array
     {
-        $days = [];
+        $months = [];
         $presentCounts = [];
-        $onTimeCounts = [];
+        $excusedCounts = [];
+        $lateCounts = [];
 
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $days[] = $date->translatedFormat('D, d M');
+        $limitMonths = (int) ($this->filter ?? 6);
 
-            $dayAttendance = Attendance::accessibleBy()
-                ->whereDate('date', $date)
+        for ($i = $limitMonths - 1; $i >= 0; $i--) {
+            $monthDate = Carbon::today()->startOfMonth()->subMonths($i);
+            $monthEnd = $monthDate->copy()->endOfMonth();
+            $months[] = $monthDate->translatedFormat('M Y');
+
+            $records = Attendance::accessibleBy()
+                ->whereDate('date', '>=', $monthDate->toDateString())
+                ->whereDate('date', '<=', $monthEnd->toDateString())
                 ->get();
 
-            $presentCounts[] = $dayAttendance->count();
-            $onTimeCounts[] = $dayAttendance->where('clock_in', '<=', '08:00:00')->count();
+            $presentCounts[] = $records->where('status', 'Present')->count();
+            $excusedCounts[] = $records->where('status', 'Excused')->count();
+            $lateCounts[] = $records->where('status', 'Late')->count();
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Total Pegawai Hadir',
+                    'label' => 'Hadir Tepat Waktu',
                     'data' => $presentCounts,
-                    'borderColor' => '#0E6838', // BPR Green
-                    'backgroundColor' => 'rgba(14, 104, 56, 0.15)',
-                    'fill' => true,
-                    'tension' => 0.3,
+                    'backgroundColor' => '#0E6838', // BPR Forest Green
+                    'borderRadius' => 6,
                 ],
                 [
-                    'label' => 'Tepat Waktu (< 08:00)',
-                    'data' => $onTimeCounts,
-                    'borderColor' => '#F37A20', // BPR Orange
-                    'backgroundColor' => 'rgba(243, 122, 32, 0.15)',
-                    'fill' => true,
-                    'tension' => 0.3,
+                    'label' => 'Cuti Resmi & Izin',
+                    'data' => $excusedCounts,
+                    'backgroundColor' => '#FDB813', // BPR Golden Ribbon
+                    'borderRadius' => 6,
+                ],
+                [
+                    'label' => 'Terlambat (Denda)',
+                    'data' => $lateCounts,
+                    'backgroundColor' => '#EA580C', // BPR Warm Orange
+                    'borderRadius' => 6,
                 ],
             ],
-            'labels' => $days,
+            'labels' => $months,
         ];
     }
 
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 }
