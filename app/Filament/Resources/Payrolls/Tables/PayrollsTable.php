@@ -143,7 +143,7 @@ class PayrollsTable
                                 ->icon('heroicon-o-banknotes')
                                 ->iconColor('success')
                                 ->actions([
-                                    \Filament\Notifications\Actions\Action::make('view')
+                                    \Filament\Actions\Action::make('view')
                                         ->label('Buka Slip Gaji')
                                         ->url('/portal/payrolls'),
                                 ])

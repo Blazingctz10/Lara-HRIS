@@ -40,7 +40,7 @@ class CreateReimbursement extends CreateRecord
                     ->icon('heroicon-o-receipt-percent')
                     ->iconColor('warning')
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view')
+                        \Filament\Actions\Action::make('view')
                             ->label('Lihat Klaim')
                             ->url('/admin/reimbursements'),
                     ])

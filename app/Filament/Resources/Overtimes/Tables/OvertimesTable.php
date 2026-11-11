@@ -55,6 +55,15 @@ class OvertimesTable
                     ->limit(35)
                     ->tooltip(fn (Overtime $record) => $record->reason),
 
+                TextColumn::make('estimated_compensation')
+                    ->label('Estimasi Uang Lembur')
+                    ->formatStateUsing(fn (Overtime $record): string => 'Rp ' . number_format($record->estimated_compensation, 0, ',', '.'))
+                    ->badge()
+                    ->color('success')
+                    ->weight('bold')
+                    ->description(fn (Overtime $record): string => $record->duration_hours . ' Jam @ Rp ' . number_format($record->hourly_rate * 1.5, 0, ',', '.') . '/jam')
+                    ->sortable(false),
+
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -80,7 +89,7 @@ class OvertimesTable
                     ->visible(fn (Overtime $record) => $record->status === 'Pending' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Persetujuan Lembur (SDM / HR)')
-                    ->modalDescription(fn (Overtime $record) => "Setujui surat perintah tugas lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam untuk perhitungan kompensasi payroll?")
+                    ->modalDescription(fn (Overtime $record) => "Setujui surat tugas lembur pegawai {$record->employee->full_name} untuk tanggal " . \Carbon\Carbon::parse($record->date)->translatedFormat('d F Y') . " selama {$record->duration_hours} jam? Estimasi uang lembur sebesar Rp " . number_format($record->estimated_compensation, 0, ',', '.') . " akan otomatis masuk ke slip gaji payroll.")
                     ->modalSubmitActionLabel('Ya, Setujui Lembur')
                     ->modalCancelActionLabel('Batal')
                     ->modalIcon('heroicon-o-check-badge')
@@ -90,18 +99,25 @@ class OvertimesTable
                             'approved_by' => auth()->id(),
                         ]);
 
+                        $amount = 'Rp ' . number_format($record->estimated_compensation, 0, ',', '.');
+
                         Notification::make()
                             ->title('Lembur Disetujui HR')
-                            ->body("Pengajuan lembur {$record->employee->full_name} berhasil disetujui.")
+                            ->body("Pengajuan lembur {$record->employee->full_name} ({$amount}) berhasil disetujui.")
                             ->success()
                             ->send();
 
                         if ($record->employee?->user) {
                             Notification::make()
                                 ->title('Pengajuan Lembur Disetujui HR')
-                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " ({$record->duration_hours} jam) telah disetujui HR dan masuk ke komponen payroll.")
+                                ->body("Pengajuan lembur tanggal " . \Carbon\Carbon::parse($record->date)->format('d/m/Y') . " ({$record->duration_hours} jam) telah disetujui HR dengan estimasi uang lembur {$amount} yang akan masuk ke slip gaji periode berjalan.")
                                 ->icon('heroicon-o-check-badge')
                                 ->iconColor('success')
+                                ->actions([
+                                    \Filament\Actions\Action::make('view')
+                                        ->label('Buka Riwayat Lembur')
+                                        ->url('/portal/overtimes'),
+                                ])
                                 ->sendToDatabase($record->employee->user);
                         }
                     }),

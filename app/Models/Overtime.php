@@ -65,4 +65,21 @@ class Overtime extends Model
         // Fail-safe: Non-admin users without an employee profile cannot see any overtimes
         return $query->whereRaw('1 = 0');
     }
+
+    /**
+     * Hitung tarif upah lembur per jam berdasar standar Depnaker (1/173 x Gaji Pokok)
+     */
+    public function getHourlyRateAttribute(): float
+    {
+        $basicSalary = (float) ($this->employee?->position?->min_salary ?? 4500000);
+        return round($basicSalary / 173, 2);
+    }
+
+    /**
+     * Hitung estimasi total uang kompensasi lembur
+     */
+    public function getEstimatedCompensationAttribute(): float
+    {
+        return round((float) $this->duration_hours * $this->hourly_rate * 1.5, 0);
+    }
 }

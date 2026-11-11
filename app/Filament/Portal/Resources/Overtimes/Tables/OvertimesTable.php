@@ -41,6 +41,14 @@ class OvertimesTable
                     ->limit(35)
                     ->tooltip(fn (Overtime $record) => $record->reason),
 
+                TextColumn::make('estimated_compensation')
+                    ->label('Estimasi Uang Lembur')
+                    ->formatStateUsing(fn (Overtime $record): string => 'Rp ' . number_format($record->estimated_compensation, 0, ',', '.'))
+                    ->badge()
+                    ->color('success')
+                    ->weight('bold')
+                    ->description(fn (Overtime $record): string => $record->duration_hours . ' Jam @ Rp ' . number_format($record->hourly_rate * 1.5, 0, ',', '.') . '/jam'),
+
                 TextColumn::make('status')
                     ->label('Status Approval')
                     ->badge()

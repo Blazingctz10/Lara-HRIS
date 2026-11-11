@@ -38,7 +38,7 @@ class CreateOvertime extends CreateRecord
                     ->icon('heroicon-o-fire')
                     ->iconColor('warning')
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view')
+                        \Filament\Actions\Action::make('view')
                             ->label('Lihat Pengajuan')
                             ->url('/admin/overtimes'),
                     ])
