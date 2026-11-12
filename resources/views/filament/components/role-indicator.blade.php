@@ -54,6 +54,15 @@
     };
 
     $canAccessAdmin = in_array($role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi', 'compliance']);
+    // Label tombol pengalih ke panel admin sesuai role
+    $adminPanelLabel = match($role) {
+        'super_admin' => 'Panel IT Admin',
+        'direksi' => 'Panel Direksi',
+        'compliance' => 'Panel Kepatuhan',
+        'branch_manager' => 'Panel Pincab',
+        'hr_admin' => 'Panel HRD',
+        default => 'Panel Manajemen',
+    };
 @endphp
 
 <style>
@@ -118,17 +127,17 @@
                 gap: 0.35rem;
                 padding: 0.3rem 0.75rem;
                 border-radius: 9999px;
-                background: rgba(234, 88, 12, 0.12);
-                color: #ea580c;
-                border: 1px solid rgba(234, 88, 12, 0.25);
+                background: {{ $roleConfig['bg'] }};
+                color: {{ $roleConfig['color'] }};
+                border: 1px solid {{ $roleConfig['border'] }};
                 font-size: 0.725rem;
                 font-weight: 700;
                 text-decoration: none;
                 transition: all 0.2s ease;
                 white-space: nowrap;
                 flex-shrink: 0;
-            " onmouseover="this.style.background='#ea580c'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(234, 88, 12, 0.12)'; this.style.color='#ea580c';">
-                <span>Panel HRD</span>
+            " onmouseover="this.style.background='{{ $roleConfig['color'] }}'; this.style.color='#ffffff';" onmouseout="this.style.background='{{ $roleConfig['bg'] }}'; this.style.color='{{ $roleConfig['color'] }}';">
+                <span>{{ $adminPanelLabel }}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 12px; height: 12px;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                 </svg>
