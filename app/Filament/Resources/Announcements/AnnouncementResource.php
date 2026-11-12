@@ -38,27 +38,27 @@ class AnnouncementResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'branch_manager']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'branch_manager', 'compliance']);
     }
 
     public static function canCreate(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'compliance']);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'compliance']);
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'compliance']);
     }
 
     public static function canDeleteAny(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'compliance']);
     }
 
     public static function form(Schema $schema): Schema

@@ -135,7 +135,79 @@ class BankStatsOverview extends BaseWidget
             ];
         }
 
-        // 4. GENERAL / DEFAULT OVERVIEW
+        // 4. PETUGAS KEPATUHAN / COMPLIANCE
+        if ($user && $user->role === 'compliance') {
+            $policyCount = \App\Models\CompliancePolicy::count();
+            $ojkPolicyCount = \App\Models\CompliancePolicy::where('category', 'apu_ppt')->count();
+            $sopPolicyCount = \App\Models\CompliancePolicy::where('category', 'sop_operation')->count();
+            $activeAnnouncements = \App\Models\Announcement::where('is_active', true)->count();
+
+            return [
+                Stat::make('Katalog Kebijakan & SOP', "{$policyCount} Regulasi")
+                    ->description('Pedoman aktif berlaku bank')
+                    ->descriptionIcon('heroicon-m-shield-check')
+                    ->color('success')
+                    ->url('/admin/compliance-policies'),
+
+                Stat::make('Regulasi APU & PPT (OJK)', "{$ojkPolicyCount} Dokumen")
+                    ->description('Kepatuhan anti pencucian uang')
+                    ->descriptionIcon('heroicon-m-scale')
+                    ->color('danger')
+                    ->url('/admin/compliance-policies'),
+
+                Stat::make('SOP Operasional & Kas', "{$sopPolicyCount} Prosedur")
+                    ->description('Standar operasional cabang & teller')
+                    ->descriptionIcon('heroicon-m-banknotes')
+                    ->color('primary')
+                    ->url('/admin/compliance-policies'),
+
+                Stat::make('Surat Edaran Aktif', "{$activeAnnouncements} Memo")
+                    ->description('Edaran & pengumuman internal bank')
+                    ->descriptionIcon('heroicon-m-megaphone')
+                    ->color('warning')
+                    ->url('/admin/announcements'),
+
+                Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
+                    ->description('Kantor Pusat & Kantor Cabang')
+                    ->descriptionIcon('heroicon-m-building-office-2')
+                    ->color('gray'),
+            ];
+        }
+
+        // 5. PEMIMPIN CABANG (Branch Manager)
+        if ($user && $user->role === 'branch_manager') {
+            $userBranchId = $user->branch_id ?? $user->employee?->branch_id;
+            $branchEmployeesCount = Employee::where('branch_id', $userBranchId)->where('status', 'Active')->count();
+            $branchAttendanceToday = Attendance::where('branch_id', $userBranchId)->whereDate('date', now())->count();
+            $branchPendingLeaves = LeaveRequest::accessibleBy()->where('status', 'Pending')->count();
+            $branchPendingClaims = Reimbursement::accessibleBy()->where('status', 'Pending')->count();
+
+            return [
+                Stat::make('Pegawai Cabang Aktif', "{$branchEmployeesCount} Pegawai")
+                    ->description($user->branch?->name ?? 'Cabang Penempatan')
+                    ->descriptionIcon('heroicon-m-user-group')
+                    ->color('primary'),
+
+                Stat::make('Presensi Cabang Hari Ini', "{$branchAttendanceToday} Hadir")
+                    ->description('Kehadiran staf kantor cabang')
+                    ->descriptionIcon('heroicon-m-clock')
+                    ->color('success'),
+
+                Stat::make('Persetujuan Cuti Cabang', "{$branchPendingLeaves} Berkas")
+                    ->description($branchPendingLeaves > 0 ? 'Menunggu review Pincab' : 'Tidak ada cuti pending')
+                    ->descriptionIcon('heroicon-m-document-text')
+                    ->color($branchPendingLeaves > 0 ? 'warning' : 'gray')
+                    ->url('/admin/leave-requests'),
+
+                Stat::make('Klaim Reimbursement Cabang', "{$branchPendingClaims} Berkas")
+                    ->description($branchPendingClaims > 0 ? 'Menunggu persetujuan Pincab' : 'Semua klaim diproses')
+                    ->descriptionIcon('heroicon-m-receipt-percent')
+                    ->color($branchPendingClaims > 0 ? 'warning' : 'gray')
+                    ->url('/admin/reimbursements'),
+            ];
+        }
+
+        // 6. GENERAL / DEFAULT OVERVIEW
         $pendingLeaves = LeaveRequest::whereIn('status', ['Pending', 'Approved_HR'])->count();
 
         return [
