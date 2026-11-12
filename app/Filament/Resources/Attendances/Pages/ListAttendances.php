@@ -18,11 +18,46 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Filament\Schemas\Components\Tabs\Tab;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ListAttendances extends ListRecords
 {
     protected static string $resource = AttendanceResource::class;
+
+    public function getTabs(): array
+    {
+        return [
+            'active' => Tab::make('Pegawai Aktif')
+                ->icon('heroicon-o-check-circle')
+                ->badge(Attendance::accessibleBy()->whereHas('employee', fn ($q) => $q->where('status', 'Active'))->count())
+                ->badgeColor('success')
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->where('status', 'Active'))),
+
+            'today' => Tab::make('Hari Ini')
+                ->icon('heroicon-o-calendar-days')
+                ->badge(Attendance::accessibleBy()->whereDate('date', now())->count())
+                ->badgeColor('info')
+                ->modifyQueryUsing(fn ($query) => $query->whereDate('date', now())),
+
+            'late' => Tab::make('Terlambat & Denda')
+                ->icon('heroicon-o-exclamation-triangle')
+                ->badge(Attendance::accessibleBy()->where(fn ($q) => $q->where('status', 'Late')->orWhere('late_minutes', '>', 0))->count())
+                ->badgeColor('warning')
+                ->modifyQueryUsing(fn ($query) => $query->where(fn ($q) => $q->where('status', 'Late')->orWhere('late_minutes', '>', 0))),
+
+            'resigned' => Tab::make('Alumni / Resign')
+                ->icon('heroicon-o-user-minus')
+                ->badge(Attendance::accessibleBy()->whereHas('employee', fn ($q) => $q->where('status', 'Resigned'))->count())
+                ->badgeColor('danger')
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->where('status', 'Resigned'))),
+
+            'all' => Tab::make('Semua Log')
+                ->icon('heroicon-o-clock')
+                ->badge(Attendance::accessibleBy()->count())
+                ->badgeColor('primary'),
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
