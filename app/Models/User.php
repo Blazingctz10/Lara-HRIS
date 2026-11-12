@@ -54,7 +54,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi', 'compliance']);
         }
 
         if ($panel->getId() === 'portal') {
@@ -82,6 +82,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function isBranchManager(): bool
     {
         return $this->role === 'branch_manager';
+    }
+
+    public function isCompliance(): bool
+    {
+        return in_array($this->role, ['compliance', 'super_admin']);
     }
 
     /**

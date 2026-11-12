@@ -470,7 +470,7 @@ class DatabaseSeeder extends Seeder
                 'nik' => '2171012307940008',
                 'name' => 'Hendra Pratama',
                 'email' => 'hendra.risk@bprbandaraya.com',
-                'role' => 'employee',
+                'role' => 'compliance',
                 'branch' => $ho,
                 'department' => $deptRisk,
                 'position' => $posRiskOfficer,

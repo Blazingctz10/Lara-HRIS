@@ -70,6 +70,13 @@ class PanelRoutesTest extends TestCase
             $response = $this->get('/admin/users');
             $this->assertEquals(403, $response->getStatusCode(), "Pincab should not access /admin/users");
         }
+
+        $compliance = User::where('role', 'compliance')->first();
+        if ($compliance) {
+            $this->actingAs($compliance);
+            $response = $this->get('/admin/users');
+            $this->assertEquals(403, $response->getStatusCode(), "Compliance Officer should not access /admin/users");
+        }
     }
 
     public function test_direksi_has_read_only_access_and_cannot_create_or_edit_employees_and_master_data(): void

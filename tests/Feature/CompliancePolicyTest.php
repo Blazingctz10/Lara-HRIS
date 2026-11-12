@@ -32,6 +32,19 @@ class CompliancePolicyTest extends TestCase
         $this->get('/admin/compliance-policies/create')->assertStatus(403);
     }
 
+    public function test_compliance_officer_can_view_and_create_policies(): void
+    {
+        $complianceUser = User::where('role', 'compliance')->first();
+        if (!$complianceUser) {
+            $complianceUser = User::factory()->create(['role' => 'compliance']);
+        }
+        $this->actingAs($complianceUser);
+
+        $this->get('/admin/compliance-policies')->assertStatus(200);
+        $this->get('/admin/compliance-policies/create')->assertStatus(200);
+        $this->get('/admin/users')->assertStatus(403);
+    }
+
     public function test_employee_can_view_compliance_catalog_in_portal(): void
     {
         $employee = User::where('role', 'employee')->first();

@@ -20,7 +20,7 @@ class BankStatsOverview extends BaseWidget
 
     public static function canView(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi', 'compliance']);
     }
 
     protected function getStats(): array

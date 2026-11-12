@@ -184,6 +184,29 @@
                     @endif
                 </a>
 
+            @elseif($role === 'compliance')
+                {{-- Petugas Kepatuhan / Compliance Shortcuts --}}
+                <a href="{{ url('/admin/compliance-policies') }}" title="Kelola Kebijakan Kepatuhan & SOP Bank" class="m3-shortcut-chip m3-chip-emerald">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                    </svg>
+                    <span>Kebijakan Kepatuhan</span>
+                </a>
+
+                <a href="{{ url('/admin/compliance-policies/create') }}" title="Unggah Kebijakan / SOP Baru" class="m3-shortcut-chip m3-chip-emerald">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 13px; height: 13px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span>Tambah Kebijakan / SOP</span>
+                </a>
+
+                <a href="{{ url('/admin/announcements') }}" title="Papan Pengumuman & Surat Edaran" class="m3-shortcut-chip m3-chip-neutral">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.75 3c-1.47 0-2.882.265-4.185.75M19.175 4.125l.417.834a3.75 3.75 0 0 1 0 3.352l-.417.834" />
+                    </svg>
+                    <span>Surat Edaran</span>
+                </a>
+
             @elseif($role === 'direksi')
                 {{-- Direksi Executive Shortcuts --}}
                 <a href="{{ url('/admin/leave-requests') }}" title="Otorisasi Final Cuti oleh Direksi" class="m3-shortcut-chip m3-chip-emerald">
