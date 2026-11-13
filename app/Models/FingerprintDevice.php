@@ -52,10 +52,15 @@ class FingerprintDevice extends Model
             return $query;
         }
 
-        if ($user->isBranchManager() && $user->branch_id) {
-            return $query->where('branch_id', $user->branch_id);
+        if ($user->isBranchManager()) {
+            $branchId = $user->branch_id ?? $user->employee?->branch_id;
+            if (! $branchId) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query->where('branch_id', $branchId);
         }
 
-        return $query;
+        return $query->whereRaw('1 = 0');
     }
 }
