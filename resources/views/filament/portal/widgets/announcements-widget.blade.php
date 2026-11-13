@@ -11,6 +11,14 @@
             padding: 1.25rem 1.5rem !important;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
             margin-bottom: 1rem !important;
+            content-visibility: auto;
+            contain-intrinsic-size: auto 320px;
+        }
+
+        @supports not (content-visibility: auto) {
+            .m3-memo-card {
+                contain: layout style paint;
+            }
         }
 
         :is(.dark) .m3-memo-card {
@@ -222,9 +230,28 @@
             background: rgba(14, 104, 56, 0.15);
         }
 
+        .m3-attach-btn:focus-visible {
+            outline: 3px solid #0E6838;
+            outline-offset: 2px;
+        }
+
         :is(.dark) .m3-attach-btn {
             color: #4ADE80 !important;
             background: rgba(74, 222, 128, 0.12);
+        }
+
+        :is(.dark) .m3-attach-btn:focus-visible {
+            outline-color: #4ADE80;
+        }
+
+        @media (forced-colors: active) {
+            .m3-memo-card,
+            .m3-attach-btn {
+                border: 1px solid ButtonBorder !important;
+            }
+            .m3-attach-btn:focus-visible {
+                outline: 3px solid Highlight;
+            }
         }
 
         @media (max-width: 640px) {

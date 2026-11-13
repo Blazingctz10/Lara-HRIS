@@ -242,40 +242,155 @@
             color: #ffffff;
         }
 
+        .m3-hero-action-btn:focus-visible,
+        .m3-metric-item:focus-visible,
+        .m3-leave-modal-close:focus-visible,
+        .m3-leave-modal-primary:focus-visible,
+        .m3-leave-modal-secondary:focus-visible {
+            outline: 3px solid #FACC15;
+            outline-offset: 3px;
+        }
+
         .m3-hero-action-btn svg {
             width: 15px !important;
             height: 15px !important;
             flex-shrink: 0;
         }
 
-        /* Modal Saldo Cuti Bersih */
-        .m3-leave-modal-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(4px);
-            padding: 1rem;
-        }
-
-        .m3-leave-modal-box {
+        /* Modal Saldo Cuti Native <dialog> */
+        dialog.m3-leave-dialog {
+            margin: auto;
+            padding: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 28px !important;
             background: #ffffff;
             color: #0f1e14;
-            border-radius: 28px !important;
-            width: 100%;
+            width: calc(100% - 2rem);
             max-width: 540px;
             box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid #e2e8f0;
             overflow: hidden;
         }
 
-        :is(.dark) .m3-leave-modal-box {
+        dialog.m3-leave-dialog::backdrop {
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+        }
+
+        :is(.dark) dialog.m3-leave-dialog {
             background: #141E18;
             color: #f1f5f9;
             border-color: rgba(74, 222, 128, 0.2);
+        }
+
+        .m3-leave-modal-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: #0E6838;
+        }
+        :is(.dark) .m3-leave-modal-icon {
+            color: #4ADE80;
+        }
+
+        .m3-leave-modal-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            min-height: 36px;
+            border-radius: 9999px;
+            background: transparent;
+            border: 1px solid transparent;
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.75;
+            transition: background-color 0.15s ease, opacity 0.15s ease;
+        }
+        .m3-leave-modal-close:hover {
+            opacity: 1;
+            background: rgba(148, 163, 184, 0.14);
+        }
+
+        .m3-leave-modal-remaining {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0E6838;
+        }
+        :is(.dark) .m3-leave-modal-remaining {
+            color: #4ADE80;
+        }
+
+        .m3-leave-modal-used-highlight {
+            font-weight: 700;
+            color: #EA580C;
+        }
+        :is(.dark) .m3-leave-modal-used-highlight {
+            color: #FB923C;
+        }
+
+        .m3-leave-modal-recent {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            background: rgba(14, 104, 56, 0.08);
+            border: 1px dashed rgba(14, 104, 56, 0.3);
+        }
+        :is(.dark) .m3-leave-modal-recent {
+            background: rgba(74, 222, 128, 0.08);
+            border-color: rgba(74, 222, 128, 0.28);
+        }
+
+        .m3-leave-modal-recent-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #0E6838;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        :is(.dark) .m3-leave-modal-recent-label {
+            color: #4ADE80;
+        }
+
+        .m3-leave-modal-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1.1rem;
+            min-height: 36px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #0E6838;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .m3-leave-modal-secondary {
+            padding: 0.5rem 1.1rem;
+            min-height: 36px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            cursor: pointer;
+            color: inherit;
+        }
+
+        @media (forced-colors: active) {
+            .m3-att-banner,
+            dialog.m3-leave-dialog,
+            .m3-leave-modal-row,
+            .m3-hero-action-btn {
+                border: 1px solid ButtonBorder !important;
+            }
+            .m3-hero-action-btn:focus-visible,
+            .m3-metric-item:focus-visible,
+            .m3-leave-modal-close:focus-visible {
+                outline: 3px solid Highlight;
+            }
         }
 
         .m3-leave-modal-row {
@@ -340,11 +455,11 @@
             </div>
 
             {{-- Bagian Kanan: Metrik Sisa Cuti & Aksi --}}
-            <div class="m3-metrics-strip" x-data="{ openBalancesModal: false }">
+            <div class="m3-metrics-strip" x-data>
                 <!-- Metrik 1: Sisa Cuti Tahunan -->
-                <a href="{{ url('/portal/leave-requests') }}" class="m3-metric-item" title="Sisa hak cuti tahunan {{ now()->year }}">
+                <a href="{{ url('/portal/leave-requests') }}" class="m3-metric-item">
                     <div class="m3-metric-tag">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 9v7.5" />
                         </svg>
                         <span>Cuti Tahunan</span>
@@ -355,18 +470,18 @@
                     </div>
                     <div class="m3-metric-sub">
                         <span>{{ $leaveSummary['annual_used'] > 0 ? $leaveSummary['annual_used'] . ' Hari Terpakai' : 'Tersedia Penuh' }}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
                     </div>
                 </a>
 
-                <div class="m3-metric-divider"></div>
+                <div class="m3-metric-divider" aria-hidden="true"></div>
 
                 @if($leaveSummary['sick_used'] > 0)
-                    <a href="{{ url('/portal/leave-requests') }}" class="m3-metric-item" title="Sisa hak cuti sakit dengan surat dokter">
+                    <a href="{{ url('/portal/leave-requests') }}" class="m3-metric-item">
                         <div class="m3-metric-tag" style="color: #fca5a5;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#f87171">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#f87171">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                             </svg>
                             <span>Cuti Sakit</span>
@@ -377,15 +492,15 @@
                         </div>
                         <div class="m3-metric-sub" style="color: #fecaca;">
                             <span>{{ $leaveSummary['sick_used'] }} Hari Terpakai</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
                     </a>
                 @else
-                    <a href="{{ url('/portal/leave-requests/create') }}" class="m3-metric-item" title="Mandatori 5 hari kerja berurutan OJK">
+                    <a href="{{ url('/portal/leave-requests/create') }}" class="m3-metric-item">
                         <div class="m3-metric-tag">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#FACC15">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#FACC15">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
                             </svg>
                             <span>Block Leave OJK</span>
@@ -396,143 +511,139 @@
                         </div>
                         <div class="m3-metric-sub">
                             <span>Kewajiban OJK</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
                     </a>
                 @endif
 
-                <div class="m3-metric-divider"></div>
+                <div class="m3-metric-divider" aria-hidden="true"></div>
 
                 <!-- Tombol Aksi -->
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                     <button
                         type="button"
-                        @click="openBalancesModal = true"
+                        @click="$refs.balancesDialog.showModal()"
                         class="m3-hero-action-btn m3-hero-action-btn-ghost"
-                        title="Buka rincian lengkap seluruh saldo cuti Anda"
+                        aria-haspopup="dialog"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
                         <span>Semua Saldo Cuti</span>
                     </button>
 
-                    <a href="{{ url('/portal/attendances') }}" class="m3-hero-action-btn" title="Lihat Rekap dan Riwayat Presensi Bulanan">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
+                    <a href="{{ url('/portal/attendances') }}" class="m3-hero-action-btn">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                         <span>Riwayat Presensi</span>
                     </a>
                 </div>
 
-                <!-- Modal Rincian Lengkap Saldo Cuti Pegawai -->
-                <div
-                    x-show="openBalancesModal"
-                    x-cloak
-                    class="m3-leave-modal-backdrop"
-                    @keydown.escape.window="openBalancesModal = false"
+                <!-- Modal Rincian Lengkap Saldo Cuti Pegawai (Native <dialog>) -->
+                <dialog
+                    x-ref="balancesDialog"
+                    aria-labelledby="m3-balances-dialog-title"
+                    class="m3-leave-dialog"
+                    @click="if ($event.target === $el) $refs.balancesDialog.close()"
                 >
-                    <div
-                        @click.outside="openBalancesModal = false"
-                        class="m3-leave-modal-box"
-                    >
-                        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(148, 163, 184, 0.15); display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0E6838" style="width: 20px; height: 20px; flex-shrink: 0;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                                    </svg>
-                                    Rincian Saldo Cuti ({{ now()->year }})
-                                </h3>
-                                <p style="font-size: 0.775rem; margin: 0.15rem 0 0 0; opacity: 0.7;">
-                                    {{ $employee?->full_name ?? auth()->user()->name }} &bull; NIP: {{ $employee?->nip ?? '-' }}
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                @click="openBalancesModal = false"
-                                style="background: none; border: none; font-size: 1.35rem; cursor: pointer; color: inherit; opacity: 0.6; padding: 0.25rem;"
-                            >
-                                &times;
-                            </button>
-                        </div>
-
-                        <div style="padding: 1.15rem 1.5rem; max-height: 60vh; overflow-y: auto;">
-                            @if(isset($leaveSummary['balances']) && $leaveSummary['balances']->isNotEmpty())
-                                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                    @foreach($leaveSummary['balances'] as $bal)
-                                        <div class="m3-leave-modal-row">
-                                            <div>
-                                                <div style="font-weight: 700; font-size: 0.875rem;">
-                                                    {{ $bal->leaveType?->name ?? 'Cuti' }}
-                                                </div>
-                                                <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 0.1rem;">
-                                                    Kuota Awal: {{ $bal->initial_quota }} hari &bull; Terpakai: <span style="font-weight: 700; color: {{ $bal->used_quota > 0 ? '#EA580C' : 'inherit' }}">{{ $bal->used_quota }} hari</span>
-                                                </div>
-                                            </div>
-                                            <div style="text-align: right;">
-                                                <div style="font-size: 1.05rem; font-weight: 800; color: #0E6838;">
-                                                    {{ $bal->remaining_quota }} <span style="font-size: 0.75rem; font-weight: 600;">Hari</span>
-                                                </div>
-                                                <div style="font-size: 0.68rem; opacity: 0.65;">Sisa Kuota</div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p style="text-align: center; opacity: 0.7; font-size: 0.85rem; padding: 1.25rem 0;">
-                                    Belum ada kuota saldo cuti tercatat untuk tahun ini.
-                                </p>
-                            @endif
-
-                            @if($leaveSummary['recent_leave'])
-                                <div style="margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 12px; background: rgba(14, 104, 56, 0.08); border: 1px dashed rgba(14, 104, 56, 0.3);">
-                                    <div style="font-size: 0.72rem; font-weight: 700; color: #0E6838; text-transform: uppercase; letter-spacing: 0.05em;">
-                                        Permohonan Cuti Terakhir
-                                    </div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
-                                        <div style="font-size: 0.825rem; font-weight: 600;">
-                                            {{ $leaveSummary['recent_leave']->leaveType?->name }} ({{ $leaveSummary['recent_leave']->total_days }} Hari)
-                                        </div>
-                                        <span style="display: inline-flex; align-items: center; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; background: #0E6838; color: #ffffff;">
-                                            {{ match($leaveSummary['recent_leave']->status) {
-                                                'Approved_Direksi' => 'Disetujui Direksi',
-                                                'Approved_HR', 'Approved_HRD' => 'Disetujui HRD',
-                                                'Approved_Komisaris' => 'Disetujui Komisaris',
-                                                'Rejected' => 'Ditolak',
-                                                default => $leaveSummary['recent_leave']->status
-                                            } }}
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 0.725rem; opacity: 0.75; margin-top: 0.15rem;">
-                                        Periode: {{ \Carbon\Carbon::parse($leaveSummary['recent_leave']->start_date)->format('d M Y') }} s.d. {{ \Carbon\Carbon::parse($leaveSummary['recent_leave']->end_date)->format('d M Y') }}
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div style="padding: 0.9rem 1.5rem; border-top: 1px solid rgba(148, 163, 184, 0.15); display: flex; justify-content: flex-end; gap: 0.6rem;">
-                            <a
-                                href="{{ url('/portal/leave-requests/create') }}"
-                                style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 1.1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; background: #0E6838; color: #ffffff; text-decoration: none;"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(148, 163, 184, 0.15); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                        <div>
+                            <h2 id="m3-balances-dialog-title" style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="m3-leave-modal-icon">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                                 </svg>
-                                Ajukan Cuti Baru
-                            </a>
-                            <button
-                                type="button"
-                                @click="openBalancesModal = false"
-                                style="padding: 0.5rem 1.1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; background: transparent; border: 1px solid rgba(148, 163, 184, 0.3); cursor: pointer; color: inherit;"
-                            >
-                                Tutup
-                            </button>
+                                <span>Rincian Saldo Cuti ({{ now()->year }})</span>
+                            </h2>
+                            <p style="font-size: 0.775rem; margin: 0.15rem 0 0 0; opacity: 0.78;">
+                                {{ $employee?->full_name ?? auth()->user()->name }} &bull; NIP: {{ $employee?->nip ?? '-' }}
+                            </p>
                         </div>
+                        <button
+                            type="button"
+                            @click="$refs.balancesDialog.close()"
+                            aria-label="Tutup modal saldo cuti"
+                            class="m3-leave-modal-close"
+                        >
+                            &times;
+                        </button>
                     </div>
-                </div>
+
+                    <div style="padding: 1.15rem 1.5rem; max-height: 60vh; overflow-y: auto;">
+                        @if(isset($leaveSummary['balances']) && $leaveSummary['balances']->isNotEmpty())
+                            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                @foreach($leaveSummary['balances'] as $bal)
+                                    <div class="m3-leave-modal-row">
+                                        <div>
+                                            <div style="font-weight: 700; font-size: 0.875rem;">
+                                                {{ $bal->leaveType?->name ?? 'Cuti' }}
+                                            </div>
+                                            <div style="font-size: 0.75rem; opacity: 0.78; margin-top: 0.1rem;">
+                                                Kuota Awal: {{ $bal->initial_quota }} hari &bull; Terpakai: <span class="{{ $bal->used_quota > 0 ? 'm3-leave-modal-used-highlight' : '' }}" style="{{ $bal->used_quota > 0 ? '' : 'font-weight: 700;' }}">{{ $bal->used_quota }} hari</span>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div class="m3-leave-modal-remaining">
+                                                {{ $bal->remaining_quota }} <span style="font-size: 0.75rem; font-weight: 600;">Hari</span>
+                                            </div>
+                                            <div style="font-size: 0.68rem; opacity: 0.72;">Sisa Kuota</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p style="text-align: center; opacity: 0.75; font-size: 0.85rem; padding: 1.25rem 0;">
+                                Belum ada kuota saldo cuti tercatat untuk tahun ini.
+                            </p>
+                        @endif
+
+                        @if($leaveSummary['recent_leave'])
+                            <div class="m3-leave-modal-recent">
+                                <div class="m3-leave-modal-recent-label">
+                                    Permohonan Cuti Terakhir
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem; gap: 0.5rem;">
+                                    <div style="font-size: 0.825rem; font-weight: 600;">
+                                        {{ $leaveSummary['recent_leave']->leaveType?->name }} ({{ $leaveSummary['recent_leave']->total_days }} Hari)
+                                    </div>
+                                    <span style="display: inline-flex; align-items: center; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; background: #0E6838; color: #ffffff;">
+                                        {{ match($leaveSummary['recent_leave']->status) {
+                                            'Approved_Direksi' => 'Disetujui Direksi',
+                                            'Approved_HR', 'Approved_HRD' => 'Disetujui HRD',
+                                            'Approved_Komisaris' => 'Disetujui Komisaris',
+                                            'Rejected' => 'Ditolak',
+                                            default => $leaveSummary['recent_leave']->status
+                                        } }}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.725rem; opacity: 0.78; margin-top: 0.15rem;">
+                                    Periode: {{ \Carbon\Carbon::parse($leaveSummary['recent_leave']->start_date)->format('d M Y') }} s.d. {{ \Carbon\Carbon::parse($leaveSummary['recent_leave']->end_date)->format('d M Y') }}
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div style="padding: 0.9rem 1.5rem; border-top: 1px solid rgba(148, 163, 184, 0.15); display: flex; justify-content: flex-end; gap: 0.6rem;">
+                        <a
+                            href="{{ url('/portal/leave-requests/create') }}"
+                            class="m3-leave-modal-primary"
+                        >
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            <span>Ajukan Cuti Baru</span>
+                        </a>
+                        <button
+                            type="button"
+                            @click="$refs.balancesDialog.close()"
+                            class="m3-leave-modal-secondary"
+                        >
+                            Tutup
+                        </button>
+                    </div>
+                </dialog>
             </div>
         </div>
     </div>

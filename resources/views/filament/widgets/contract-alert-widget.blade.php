@@ -12,6 +12,14 @@
             box-shadow: 0 2px 8px -2px rgba(14, 104, 56, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
             margin-bottom: 1.5rem !important;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            content-visibility: auto;
+            contain-intrinsic-size: auto 320px;
+        }
+
+        @supports not (content-visibility: auto) {
+            .m3-contract-card {
+                contain: layout style paint;
+            }
         }
 
         :is(.dark) .m3-contract-card {
@@ -152,6 +160,23 @@
             background: #4ade80;
             color: #003a19;
         }
+        .m3-eval-btn:focus-visible {
+            outline: 3px solid #0E6838;
+            outline-offset: 2px;
+        }
+        :is(.dark) .m3-eval-btn:focus-visible {
+            outline-color: #4ADE80;
+        }
+        @media (forced-colors: active) {
+            .m3-contract-card,
+            .m3-contract-item,
+            .m3-eval-btn {
+                border: 1px solid ButtonBorder !important;
+            }
+            .m3-eval-btn:focus-visible {
+                outline: 3px solid Highlight;
+            }
+        }
         .m3-contract-emp-title {
             font-size: 0.95rem;
             font-weight: 800;
@@ -188,7 +213,7 @@
         <div class="m3-contract-header">
             <div class="m3-contract-head-left">
                 <div class="m3-contract-icon-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="m3-contract-svg">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="m3-contract-svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                 </div>
@@ -208,7 +233,7 @@
 
         @if($expiringEmployees->isEmpty())
             <div style="text-align: center; padding: 1.75rem; color: #526156; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" class="dark:text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="#10b981" style="width: 18px; height: 18px;">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="#10b981" style="width: 18px; height: 18px;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
                 <span>Tidak ada kontrak kerja (PKWT) atau masa percobaan pegawai yang akan berakhir dalam 60 hari ke depan.</span>
@@ -232,7 +257,7 @@
                                     {{ $emp->full_name }}
                                 </span>
                                 <span style="font-size: 0.725rem; background: rgba(14, 104, 56, 0.12); color: #0E6838; padding: 0.15rem 0.6rem; border-radius: 9999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;" class="dark:bg-emerald-950 dark:text-emerald-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 12px; height: 12px;">
+                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 12px; height: 12px;">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                                     </svg>
                                     <span>{{ $emp->branch?->name }}</span>
