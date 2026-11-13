@@ -252,4 +252,42 @@ class SecurityTest extends TestCase
         $responseCv = $this->get(route('admin.download-template.employee-bpr-cv'));
         $responseCv->assertStatus(200);
     }
+
+    public function test_resigned_or_terminated_employee_cannot_login_and_gets_auth002(): void
+    {
+        $employeeUser = User::whereHas('employee', fn ($q) => $q->where('status', 'Active'))->first();
+        $this->assertNotNull($employeeUser);
+
+        $employeeUser->employee->update(['status' => 'Resigned']);
+
+        $response = $this->post('/login', [
+            'email' => $employeeUser->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertStringContainsString('[AUTH002]', session('errors')->first('email'));
+        $this->assertGuest();
+
+        $this->assertDatabaseHas('login_logs', [
+            'user_id' => $employeeUser->id,
+            'status' => 'Failed',
+        ]);
+    }
+
+    public function test_resigned_employee_session_cannot_access_panels(): void
+    {
+        $employeeUser = User::where('role', 'employee')
+            ->whereHas('employee', fn ($q) => $q->where('status', 'Active'))
+            ->first();
+        $this->assertNotNull($employeeUser);
+
+        $employeeUser->employee->update(['status' => 'Terminated']);
+        $employeeUser->refresh();
+
+        $this->actingAs($employeeUser);
+
+        $this->get('/portal')->assertStatus(403);
+        $this->get('/admin')->assertStatus(403);
+    }
 }

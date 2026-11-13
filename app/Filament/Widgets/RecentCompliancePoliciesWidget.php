@@ -74,3 +74,4 @@ class RecentCompliancePoliciesWidget extends BaseWidget
             ]);
     }
 }
+

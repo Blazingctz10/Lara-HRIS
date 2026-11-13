@@ -374,23 +374,105 @@
     line-height: 1.5;
   }
 
-  /* Error Alert Banner */
+  /* Error Alert Banner (M3 Expressive Glass) */
   .alert-box {
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.35);
-    color: #ef4444;
-    padding: 0.85rem 1rem;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.06));
+    border: 1px solid rgba(239, 68, 68, 0.32);
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+    padding: 0.9rem 1rem;
     border-radius: 16px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-bottom: 1.35rem;
     display: flex;
-    align-items: center;
-    gap: 0.65rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+    box-shadow: 0 8px 24px -6px rgba(220, 38, 38, 0.16);
+    animation: alertSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
   }
 
   :root[data-theme="dark"] .alert-box {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(127, 29, 29, 0.25));
+    border-color: rgba(248, 113, 113, 0.35);
+    border-left-color: #f87171;
+    color: #fecaca;
+    box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.45);
+  }
+
+  .alert-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(220, 38, 38, 0.14);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  :root[data-theme="dark"] .alert-icon-wrap {
+    background: rgba(248, 113, 113, 0.2);
     color: #fca5a5;
+  }
+
+  .alert-content {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.45;
+  }
+
+  .alert-code-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+    background: #dc2626;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+  }
+
+  :root[data-theme="dark"] .alert-code-pill {
+    background: rgba(248, 113, 113, 0.28);
+    color: #fecaca;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+  }
+
+  .alert-close-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    opacity: 0.65;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .alert-close-btn:hover {
+    opacity: 1;
+    background: rgba(220, 38, 38, 0.12);
+  }
+
+  .m3-input.input-error {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.14) !important;
+  }
+
+  @keyframes alertSlideIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   /* Form Input Groups */
@@ -716,17 +798,35 @@
           <p>Masuk ke portal HRIS untuk mengelola administrasi kepegawaian dan layanan mandiri staf.</p>
         </div>
 
-        <!-- Error Notification -->
-        @if ($errors->any())
-          <div class="alert-box" role="alert">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 20px; height: 20px; flex-shrink: 0;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-            </svg>
-            <span>{{ $errors->first() }}</span>
-          </div>
-        @endif
+        <!-- Error Notification (Server-side & Custom Client-side) -->
+        @php
+          $firstError = $errors->first();
+          $errorCode = null;
+          $errorText = $firstError;
+          if ($firstError && preg_match('/^\[([A-Z0-9]+)\]\s*(.+)$/s', $firstError, $matches)) {
+              $errorCode = $matches[1];
+              $errorText = $matches[2];
+          }
+        @endphp
 
-        <form method="POST" action="/login">
+        <div id="loginAlertBox" class="alert-box" role="alert" style="{{ $errors->any() ? '' : 'display: none;' }}">
+          <div class="alert-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px; height: 18px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+          </div>
+          <div class="alert-content">
+            <div id="loginAlertCode" class="alert-code-pill" style="{{ $errorCode ? '' : 'display: none;' }}">{{ $errorCode }}</div>
+            <div id="loginAlertText">{{ $errorText }}</div>
+          </div>
+          <button type="button" class="alert-close-btn" onclick="dismissLoginAlert()" aria-label="Tutup peringatan">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 16px; height: 16px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="loginForm" method="POST" action="/login" novalidate>
           @csrf
 
           {{-- Anti-Bot Honeypot Trap --}}
@@ -939,6 +1039,77 @@
   </style>
 
   <script>
+    function showLoginAlert(code, message) {
+      const box = document.getElementById('loginAlertBox');
+      const codeEl = document.getElementById('loginAlertCode');
+      const textEl = document.getElementById('loginAlertText');
+      if (!box || !textEl) return;
+
+      if (code && codeEl) {
+        codeEl.textContent = code;
+        codeEl.style.display = 'inline-flex';
+      } else if (codeEl) {
+        codeEl.style.display = 'none';
+      }
+      textEl.textContent = message;
+      box.style.display = 'flex';
+      box.style.animation = 'none';
+      box.offsetHeight;
+      box.style.animation = 'alertSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+
+    function dismissLoginAlert() {
+      const box = document.getElementById('loginAlertBox');
+      if (box) box.style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const passInput = document.getElementById('pass');
+
+      if (emailInput) {
+        emailInput.addEventListener('input', () => emailInput.classList.remove('input-error'));
+      }
+      if (passInput) {
+        passInput.addEventListener('input', () => passInput.classList.remove('input-error'));
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener('submit', function (e) {
+          const emailVal = emailInput ? emailInput.value.trim() : '';
+          const passVal = passInput ? passInput.value : '';
+
+          if (emailInput) emailInput.classList.remove('input-error');
+          if (passInput) passInput.classList.remove('input-error');
+
+          if (!emailVal) {
+            e.preventDefault();
+            emailInput?.classList.add('input-error');
+            emailInput?.focus();
+            showLoginAlert('VAL001', 'Alamat email kantor wajib diisi sebelum masuk ke sistem.');
+            return;
+          }
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            e.preventDefault();
+            emailInput?.classList.add('input-error');
+            emailInput?.focus();
+            showLoginAlert('VAL001', 'Format alamat email kantor tidak valid (contoh: nama@bprbandaraya.com).');
+            return;
+          }
+
+          if (!passVal) {
+            e.preventDefault();
+            passInput?.classList.add('input-error');
+            passInput?.focus();
+            showLoginAlert('VAL001', 'Kata sandi akun wajib diisi sebelum masuk ke sistem.');
+            return;
+          }
+        });
+      }
+    });
+
     function openForgotModal() {
       const modal = document.getElementById('forgotPasswordModal');
       if (modal) modal.style.display = 'flex';

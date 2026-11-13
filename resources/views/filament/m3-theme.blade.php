@@ -1899,19 +1899,48 @@ textarea::placeholder {
 
 .fi-no-notification {
     pointer-events: auto !important;
-    border-radius: 16px !important;
-    background: #FFFFFF !important;
-    border: 1px solid rgba(14, 104, 56, 0.2) !important;
-    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    padding: 1.15rem 1.4rem !important;
-    max-width: 420px !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    border: 1px solid rgba(14, 104, 56, 0.22) !important;
+    border-left-width: 4px !important;
+    border-left-color: #0E6838 !important;
+    box-shadow: 0 18px 40px -8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    padding: 1.1rem 1.35rem !important;
+    max-width: 430px !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
+.fi-no-notification:has(.fi-color-danger) {
+    border-color: rgba(220, 38, 38, 0.28) !important;
+    border-left-color: #DC2626 !important;
+    background: linear-gradient(135deg, rgba(254, 242, 242, 0.97), rgba(255, 255, 255, 0.97)) !important;
+}
+
+.fi-no-notification:has(.fi-color-warning) {
+    border-color: rgba(234, 88, 12, 0.28) !important;
+    border-left-color: #EA580C !important;
+    background: linear-gradient(135deg, rgba(255, 247, 237, 0.97), rgba(255, 255, 255, 0.97)) !important;
+}
+
 :is(.dark) .fi-no-notification {
-    background: #0D1612 !important;
+    background: rgba(13, 22, 18, 0.94) !important;
     border-color: rgba(74, 222, 128, 0.25) !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+    border-left-color: #4ADE80 !important;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.65) !important;
+}
+
+:is(.dark) .fi-no-notification:has(.fi-color-danger) {
+    border-color: rgba(248, 113, 113, 0.35) !important;
+    border-left-color: #F87171 !important;
+    background: linear-gradient(135deg, rgba(45, 16, 16, 0.95), rgba(18, 14, 14, 0.96)) !important;
+}
+
+:is(.dark) .fi-no-notification:has(.fi-color-warning) {
+    border-color: rgba(251, 146, 60, 0.35) !important;
+    border-left-color: #FB923C !important;
+    background: linear-gradient(135deg, rgba(42, 24, 10, 0.95), rgba(18, 15, 12, 0.96)) !important;
 }
 
 .fi-no-notification-title {

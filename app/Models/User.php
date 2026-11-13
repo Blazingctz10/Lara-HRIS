@@ -53,12 +53,18 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        $this->loadMissing('employee');
+
+        if ($this->employee && in_array($this->employee->status, ['Resigned', 'Terminated'], true)) {
+            return false;
+        }
+
         if ($panel->getId() === 'admin') {
             return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi', 'compliance']);
         }
 
         if ($panel->getId() === 'portal') {
-            return true; // Semua role / karyawan dapat mengakses portal ESS
+            return true; // Semua role / karyawan aktif dapat mengakses portal ESS
         }
 
         return false;

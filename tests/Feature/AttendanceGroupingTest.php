@@ -33,3 +33,4 @@ class AttendanceGroupingTest extends TestCase
             ->assertSee('Semua Log');
     }
 }
+

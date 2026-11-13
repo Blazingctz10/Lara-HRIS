@@ -89,10 +89,43 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+            $user->loadMissing('employee');
+
+            // Blokir akses jika pegawai berstatus Resigned atau Terminated (AUTH002)
+            if ($user->employee && in_array($user->employee->status, ['Resigned', 'Terminated'], true)) {
+                $empStatus = $user->employee->status;
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                Log::warning('Security: Inactive/resigned employee login blocked', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'employee_status' => $empStatus,
+                    'ip' => $request->ip(),
+                ]);
+
+                LoginLog::create([
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'status' => 'Failed',
+                    'failure_reason' => "[AUTH002] Akun non-aktif (Status Pegawai: {$empStatus})",
+                    'login_at' => now(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'email' => __('[AUTH002] Akun pegawai Anda berstatus non-aktif (:status) dan tidak lagi memiliki akses ke sistem HRIS PT BPR Banda Raya.', [
+                        'status' => $empStatus === 'Resigned' ? 'Mengundurkan Diri / Resign' : 'Diberhentikan',
+                    ]),
+                ]);
+            }
+
             RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
 
-            $user = Auth::user();
             Log::info('Security: User authenticated successfully', [
                 'user_id' => $user->id,
                 'email' => $user->email,
