@@ -1374,6 +1374,31 @@ textarea::placeholder {
     gap: 0.35rem !important;
 }
 
+/* Compact Corner Indicator Badges on Icon Buttons (Filter, Columns, Notification Bell) */
+.fi-icon-btn .fi-badge,
+.fi-icon-btn-badge-ctn .fi-badge {
+    padding: 0.06rem 0.32rem !important;
+    font-size: 0.62rem !important;
+    line-height: 1.1 !important;
+    min-width: 1.05rem !important;
+    min-height: 1.05rem !important;
+    justify-content: center !important;
+    border-width: 1.5px !important;
+    border-color: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16) !important;
+    gap: 0 !important;
+}
+
+:is(.dark) .fi-icon-btn .fi-badge,
+:is(.dark) .fi-icon-btn-badge-ctn .fi-badge {
+    border-color: #141E18 !important;
+}
+
+.fi-icon-btn-badge-ctn {
+    top: -0.25rem !important;
+    inset-inline-end: -0.25rem !important;
+}
+
 /* Light mode badges */
 .fi-badge.fi-color-success {
     background: #D1FAE5 !important;
