@@ -142,3 +142,35 @@ Artisan::command('hris:backup {--type=full : Tipe arsip cadangan (full|db)}', fu
   ->withoutOverlapping()
   ->appendOutputTo(storage_path('logs/backup.log'));
 
+// Failsafe Pembersihan & Pembatasan Ukuran Log Otomatis (Setiap Hari Pukul 02:30 WIB)
+\Illuminate\Support\Facades\Schedule::call(function () {
+    // 1. Bersihkan audit login_logs yang lebih tua dari 180 hari (6 bulan)
+    \App\Models\LoginLog::where('login_at', '<', now()->subDays(180))->delete();
+
+    // 2. Failsafe ukuran file log: jika ada file log > 50 MB, pangkas agar menyisakan 2 MB terakhir
+    $logDir = storage_path('logs');
+    if (is_dir($logDir)) {
+        $maxBytes = 50 * 1024 * 1024; // 50 MB
+        $keepBytes = 2 * 1024 * 1024; // 2 MB
+        foreach (glob($logDir . DIRECTORY_SEPARATOR . '*.log') ?: [] as $filePath) {
+            if (! is_file($filePath) || ! is_readable($filePath) || ! is_writable($filePath)) {
+                continue;
+            }
+            $size = @filesize($filePath);
+            if ($size !== false && $size > $maxBytes) {
+                $handle = @fopen($filePath, 'rb');
+                if ($handle) {
+                    @fseek($handle, -$keepBytes, SEEK_END);
+                    $tail = @fread($handle, $keepBytes);
+                    @fclose($handle);
+                    if ($tail !== false) {
+                        @file_put_contents($filePath, "[AUTO-TRIMMED: Log melebihi 50MB untuk menjaga ruang disk server]\n" . $tail, LOCK_EX);
+                    }
+                }
+            }
+        }
+    }
+})->dailyAt('02:30')
+  ->name('hris:log-failsafe-prune')
+  ->withoutOverlapping();
+
