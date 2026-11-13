@@ -19,7 +19,7 @@ class AnnouncementResource extends Resource
 {
     protected static ?string $model = Announcement::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bell-alert';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static string|UnitEnum|null $navigationGroup = 'Komunikasi Internal';
 
@@ -48,12 +48,32 @@ class AnnouncementResource extends Resource
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'compliance']);
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if (in_array($user->role, ['super_admin', 'hr_admin', 'compliance'], true)) {
+            return true;
+        }
+
+        return $user->role === 'direksi' && (int) $record->author_id === (int) $user->id;
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'compliance']);
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if (in_array($user->role, ['super_admin', 'hr_admin', 'compliance'], true)) {
+            return true;
+        }
+
+        return $user->role === 'direksi' && (int) $record->author_id === (int) $user->id;
     }
 
     public static function canDeleteAny(): bool

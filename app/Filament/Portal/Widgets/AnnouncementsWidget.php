@@ -15,7 +15,7 @@ class AnnouncementsWidget extends Widget
 
     public function getAnnouncements()
     {
-        return Announcement::accessibleBy()
+        return Announcement::publishedForUser()
             ->orderByRaw("CASE WHEN priority = 'urgent' THEN 1 WHEN priority = 'important' THEN 2 ELSE 3 END")
             ->orderBy('published_at', 'desc')
             ->take(5)

@@ -277,9 +277,15 @@
                     </p>
                 </div>
             </div>
-            <span class="m3-memo-count-pill">
-                {{ $announcements->count() }} Memo Aktif
-            </span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="m3-memo-count-pill">
+                    {{ $announcements->count() }} Memo Aktif
+                </span>
+                <a href="{{ url('/portal/announcements') }}" class="m3-attach-btn">
+                    <span>Lihat Semua</span>
+                    <x-heroicon-o-arrow-right aria-hidden="true" />
+                </a>
+            </div>
         </div>
 
         @if($announcements->isEmpty())
@@ -319,15 +325,15 @@
 
                             <!-- Content -->
                             <div class="m3-item-body">
-                                {!! strip_tags($item->content, '<p><br><b><strong><i><em><u><ul><ol><li><a>') !!}
+                                {!! \App\Models\Announcement::sanitizeContent($item->content) !!}
                             </div>
                         </div>
 
                         <!-- Attachment Action -->
                         @if($item->attachment_url)
                             <div style="margin-top: 0.25rem;">
-                                <a href="{{ asset('storage/' . $item->attachment_url) }}" target="_blank" class="m3-attach-btn">
-                                    <x-heroicon-o-arrow-down-tray />
+                                <a href="{{ asset('storage/' . $item->attachment_url) }}" target="_blank" rel="noopener noreferrer" class="m3-attach-btn">
+                                    <x-heroicon-o-arrow-down-tray aria-hidden="true" />
                                     <span>Lampiran PDF</span>
                                 </a>
                             </div>

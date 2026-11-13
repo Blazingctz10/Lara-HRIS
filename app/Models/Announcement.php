@@ -54,7 +54,7 @@ class Announcement extends Model
             return $query;
         }
 
-        if ($user->isHrAdmin()) {
+        if ($user->isHrAdmin() || $user->isCompliance()) {
             return $query;
         }
 
@@ -65,19 +65,46 @@ class Announcement extends Model
             });
         }
 
-        // Employee
-        $branchId = $user->branch_id ?? $user->employee?->branch_id;
-        return $query->where('is_active', true)
-            ->where('published_at', '<=', now())
-            ->where(function ($q) {
+        return $this->scopePublishedForUser($query, $user);
+    }
+
+    /**
+     * Scope for active, published, non-expired announcements for portal display
+     */
+    public function scopePublishedForUser(Builder $query, ?User $user = null): Builder
+    {
+        $user = $user ?? auth()->user();
+        $today = today()->toDateString();
+        $branchId = $user?->branch_id ?? $user?->employee?->branch_id;
+
+        $query->where('is_active', true)
+            ->whereDate('published_at', '<=', $today)
+            ->where(function ($q) use ($today) {
                 $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>=', now());
-            })
-            ->where(function ($q) use ($branchId) {
-                $q->whereNull('branch_id');
-                if ($branchId) {
-                    $q->orWhere('branch_id', $branchId);
-                }
+                    ->orWhereDate('expires_at', '>=', $today);
             });
+
+        if ($user && ($user->isHrAdmin() || $user->isCompliance())) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($branchId) {
+            $q->whereNull('branch_id');
+            if ($branchId) {
+                $q->orWhere('branch_id', $branchId);
+            }
+        });
+    }
+
+    /**
+     * Sanitize rich-text announcement HTML while stripping unsafe attributes/protocols.
+     */
+    public static function sanitizeContent(?string $html): string
+    {
+        $clean = strip_tags((string) $html, '<p><br><b><strong><i><em><u><ul><ol><li><a>');
+        $clean = preg_replace('/\s+on[a-z]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $clean) ?? $clean;
+        $clean = preg_replace('/href\s*=\s*(?:"|\')\s*(?:javascript|data|vbscript):[^"\']*(?:"|\')/i', 'href="#"', $clean) ?? $clean;
+
+        return $clean;
     }
 }

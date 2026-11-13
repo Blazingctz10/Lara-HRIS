@@ -84,6 +84,7 @@ class AnnouncementForm
 
                         FileUpload::make('attachment_url')
                             ->label('Lampiran Dokumen PDF / Surat Edaran')
+                            ->disk('public')
                             ->directory('announcements/attachments')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
                             ->maxSize(5120)
