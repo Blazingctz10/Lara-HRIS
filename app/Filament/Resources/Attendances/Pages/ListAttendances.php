@@ -27,34 +27,46 @@ class ListAttendances extends ListRecords
 
     public function getTabs(): array
     {
+        $today = today()->toDateString();
+        $counts = Attendance::accessibleBy()
+            ->join('employees', 'employees.id', '=', 'attendances.employee_id')
+            ->selectRaw("
+                COUNT(*) as all_count,
+                SUM(CASE WHEN employees.status IN ('Active', 'On Leave') THEN 1 ELSE 0 END) as active_count,
+                SUM(CASE WHEN DATE(attendances.date) = ? THEN 1 ELSE 0 END) as today_count,
+                SUM(CASE WHEN attendances.status = 'Late' OR attendances.late_minutes > 0 THEN 1 ELSE 0 END) as late_count,
+                SUM(CASE WHEN employees.status IN ('Resigned', 'Terminated') THEN 1 ELSE 0 END) as resigned_count
+            ", [$today])
+            ->first();
+
         return [
             'active' => Tab::make('Pegawai Aktif')
                 ->icon('heroicon-o-check-circle')
-                ->badge(Attendance::accessibleBy()->whereHas('employee', fn ($q) => $q->where('status', 'Active'))->count())
+                ->badge((int) ($counts->active_count ?? 0))
                 ->badgeColor('success')
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->where('status', 'Active'))),
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->whereIn('status', ['Active', 'On Leave']))),
 
             'today' => Tab::make('Hari Ini')
                 ->icon('heroicon-o-calendar-days')
-                ->badge(Attendance::accessibleBy()->whereDate('date', now())->count())
+                ->badge((int) ($counts->today_count ?? 0))
                 ->badgeColor('info')
-                ->modifyQueryUsing(fn ($query) => $query->whereDate('date', now())),
+                ->modifyQueryUsing(fn ($query) => $query->whereDate('date', $today)),
 
             'late' => Tab::make('Terlambat & Denda')
                 ->icon('heroicon-o-exclamation-triangle')
-                ->badge(Attendance::accessibleBy()->where(fn ($q) => $q->where('status', 'Late')->orWhere('late_minutes', '>', 0))->count())
+                ->badge((int) ($counts->late_count ?? 0))
                 ->badgeColor('warning')
                 ->modifyQueryUsing(fn ($query) => $query->where(fn ($q) => $q->where('status', 'Late')->orWhere('late_minutes', '>', 0))),
 
             'resigned' => Tab::make('Alumni / Resign')
                 ->icon('heroicon-o-user-minus')
-                ->badge(Attendance::accessibleBy()->whereHas('employee', fn ($q) => $q->where('status', 'Resigned'))->count())
+                ->badge((int) ($counts->resigned_count ?? 0))
                 ->badgeColor('danger')
-                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->where('status', 'Resigned'))),
+                ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->whereIn('status', ['Resigned', 'Terminated']))),
 
             'all' => Tab::make('Semua Log')
                 ->icon('heroicon-o-clock')
-                ->badge(Attendance::accessibleBy()->count())
+                ->badge((int) ($counts->all_count ?? 0))
                 ->badgeColor('primary'),
         ];
     }
@@ -109,10 +121,10 @@ class ListAttendances extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->action(function (): StreamedResponse {
-                    $attendances = Attendance::accessibleBy()
+                    $baseQuery = Attendance::accessibleBy()
                         ->with(['employee.branch', 'employee.department'])
-                        ->orderBy('date', 'desc')
-                        ->get();
+                        ->orderBy('date', 'desc');
+                    $totalCount = (clone $baseQuery)->count();
 
                     $filename = 'Rekap_Log_Presensi_BPR_' . date('Ymd_His') . '.xls';
                     $headers = [
@@ -123,7 +135,7 @@ class ListAttendances extends ListRecords
                         'Expires' => '0',
                     ];
 
-                    $callback = function () use ($attendances) {
+                    $callback = function () use ($baseQuery, $totalCount) {
                         $streamHandle = fopen('php://output', 'w');
                         fputs($streamHandle, "\xEF\xBB\xBF");
 
@@ -176,7 +188,7 @@ class ListAttendances extends ListRecords
 <table>
   <tr><td colspan="12" class="title-main">PT BPR BANDA RAYA</td></tr>
   <tr><td colspan="12" class="subtitle">REKAPITULASI LOG PRESENSI & KEHADIRAN STAF</td></tr>
-  <tr><td colspan="12" class="meta">Waktu Cetak: ' . now()->format('d/m/Y H:i:s') . ' WIB | Total Transaksi: ' . count($attendances) . ' Data</td></tr>
+  <tr><td colspan="12" class="meta">Waktu Cetak: ' . now()->format('d/m/Y H:i:s') . ' WIB | Total Transaksi: ' . $totalCount . ' Data</td></tr>
   <tr><td colspan="12">&nbsp;</td></tr>
   <thead>
     <tr>
@@ -199,7 +211,7 @@ class ListAttendances extends ListRecords
                         fputs($streamHandle, $html);
 
                         $no = 1;
-                        foreach ($attendances as $row) {
+                        foreach ($baseQuery->cursor() as $row) {
                             $isLateDisp = str_contains($row->notes ?? '', 'Dispensasi Telat');
                             $sumber = 'Tarik Berkas Mesin';
                             if (str_contains($row->notes ?? '', 'Cuti Resmi') || str_contains($row->notes ?? '', 'Cuti')) {
@@ -304,22 +316,26 @@ class ListAttendances extends ListRecords
                         ->label('Filter Kantor Unit Kerja')
                         ->options(fn () => Branch::orderBy('name')->pluck('name', 'id')->toArray())
                         ->placeholder('Semua Unit Kerja BPR Banda Raya')
+                        ->visible(fn () => ! auth()->user()?->isBranchManager())
                         ->nullable(),
                     Select::make('action_type')
                         ->label('Aksi Laporan')
                         ->options([
-                            'preview' => '👁️ Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
-                            'excel' => '📥 Langsung Unduh Berkas Excel Resmi (.xls)',
-                            'csv' => '📄 Langsung Unduh Berkas Teks (.csv)',
+                            'preview' => 'Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
+                            'excel' => 'Langsung Unduh Berkas Excel Resmi (.xls)',
+                            'csv' => 'Langsung Unduh Berkas Teks (.csv)',
                         ])
                         ->default('preview')
                         ->required(),
                 ])
                 ->modalSubmitActionLabel('Lanjutkan')
                 ->action(function (array $data) {
+                    $user = auth()->user();
                     $year = (int) ($data['year'] ?? now()->year);
                     $month = (int) ($data['month'] ?? now()->month);
-                    $branchId = ! empty($data['branch_id']) ? (int) $data['branch_id'] : null;
+                    $branchId = $user?->isBranchManager()
+                        ? (($user->branch_id ?? $user->employee?->branch_id) ?: 0)
+                        : (! empty($data['branch_id']) ? (int) $data['branch_id'] : null);
                     $actionType = $data['action_type'] ?? 'preview';
 
                     if ($actionType === 'excel') {

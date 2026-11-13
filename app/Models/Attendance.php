@@ -106,8 +106,12 @@ class Attendance extends Model
 
         if ($user->isBranchManager()) {
             $branchId = $user->branch_id ?? $user->employee?->branch_id;
+            if (! $branchId) {
+                return $query->whereRaw('1 = 0');
+            }
+
             return $query->whereHas('employee', function ($q) use ($branchId) {
-                $q->where('branch_id', $branchId ?: 0);
+                $q->where('branch_id', $branchId);
             });
         }
 

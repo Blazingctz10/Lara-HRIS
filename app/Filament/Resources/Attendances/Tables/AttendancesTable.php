@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Attendances\Tables;
 
 use App\Models\Attendance;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -12,6 +13,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 
 class AttendancesTable
 {
@@ -153,12 +155,12 @@ class AttendancesTable
                     })
                     ->icon(function ($record) {
                         if (str_contains($record->notes ?? '', 'Dispensasi Telat')) {
-                            return 'heroicon-m-clock';
+                            return 'heroicon-o-clock';
                         }
                         if (str_contains($record->notes ?? '', 'Cuti')) {
-                            return 'heroicon-m-document-check';
+                            return 'heroicon-o-document-check';
                         }
-                        return $record->status === 'Excused' ? 'heroicon-m-clipboard-document-list' : 'heroicon-m-finger-print';
+                        return $record->status === 'Excused' ? 'heroicon-o-clipboard-document-list' : 'heroicon-o-finger-print';
                     })
                     ->wrap(),
             ])
@@ -173,12 +175,45 @@ class AttendancesTable
                     ]),
                 SelectFilter::make('branch')
                     ->relationship('employee.branch', 'name')
-                    ->label('Unit Kantor Cabang'),
+                    ->label('Unit Kantor Cabang')
+                    ->visible(fn () => ! auth()->user()?->isBranchManager()),
                 Filter::make('today')
                     ->label('Hari Ini Saja')
                     ->query(fn (Builder $query): Builder => $query->whereDate('date', now())),
             ])
             ->recordActions([
+                Action::make('detail')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (Attendance $record) => 'Rincian Presensi — ' . ($record->employee?->full_name ?? 'Pegawai'))
+                    ->modalDescription(fn (Attendance $record) => ($record->date ? \Carbon\Carbon::parse($record->date)->translatedFormat('l, d F Y') : '-') . ' • ' . ($record->employee?->branch?->name ?? 'BPR Banda Raya'))
+                    ->modalContent(function (Attendance $record) {
+                        $inTime = $record->clock_in ? \Carbon\Carbon::parse($record->clock_in)->format('H:i') : '--:--';
+                        $outTime = $record->clock_out ? \Carbon\Carbon::parse($record->clock_out)->format('H:i') : '--:--';
+                        $penalty = $record->penalty_amount > 0
+                            ? 'Rp ' . number_format((float) $record->penalty_amount, 0, ',', '.')
+                            : 'Rp 0';
+
+                        $html = '<div style="line-height: 1.65; font-size: 0.9rem;">';
+                        $html .= '<p><strong>NIP / Jabatan:</strong> ' . e($record->employee?->nip ?? '-') . ' &bull; ' . e($record->employee?->position?->name ?? '-') . '</p>';
+                        $html .= '<p><strong>Jam Masuk / Pulang:</strong> ' . e($inTime) . ' / ' . e($outTime) . '</p>';
+                        $html .= '<p><strong>Status:</strong> ' . e($record->status) . ' &bull; <strong>Terlambat:</strong> ' . (int) $record->late_minutes . ' menit &bull; <strong>Denda:</strong> ' . e($penalty) . '</p>';
+                        $html .= '<div style="margin-top: 0.85rem; padding: 0.85rem 1rem; border-radius: 14px; background: rgba(14, 104, 56, 0.06);">';
+                        $html .= '<strong>Catatan:</strong><br>' . nl2br(e($record->notes ?: 'Tidak ada catatan tambahan.'));
+                        $html .= '</div>';
+
+                        if ($record->proof_photo) {
+                            $photoUrl = e(asset('storage/' . $record->proof_photo));
+                            $html .= '<p style="margin-top: 0.85rem;"><a href="' . $photoUrl . '" target="_blank" rel="noopener noreferrer" style="font-weight: 700; text-decoration: underline;">Lihat Foto Bukti Presensi</a></p>';
+                        }
+                        $html .= '</div>';
+
+                        return new HtmlString($html);
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
+
                 EditAction::make()
                     ->button()
                     ->outlined()

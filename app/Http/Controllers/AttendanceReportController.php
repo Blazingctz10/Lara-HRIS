@@ -60,7 +60,12 @@ class AttendanceReportController extends Controller
         $periodName = $periodDate->translatedFormat('F Y');
 
         $user = auth()->user();
-        $branches = Branch::orderBy('name')->get();
+        if ($user?->isBranchManager()) {
+            $branchId = ($user->branch_id ?? $user->employee?->branch_id) ?: 0;
+            $branches = Branch::where('id', $branchId)->get();
+        } else {
+            $branches = Branch::orderBy('name')->get();
+        }
 
         $employeeQuery = Employee::accessibleBy()
             ->with(['branch', 'department', 'position'])
