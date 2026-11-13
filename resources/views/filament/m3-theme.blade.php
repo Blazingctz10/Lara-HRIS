@@ -1558,11 +1558,38 @@ textarea::placeholder {
 
 .fi-tabs-item.fi-active .fi-tabs-item-label,
 .fi-tabs-item[aria-selected="true"] .fi-tabs-item-label,
-.fi-sc-tabs-tablist button.fi-active span,
-.fi-sc-tabs-tablist button[aria-selected="true"] span {
+.fi-sc-tabs-tablist button.fi-active > span:not(.fi-badge),
+.fi-sc-tabs-tablist button[aria-selected="true"] > span:not(.fi-badge) {
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
     font-weight: 700 !important;
+}
+
+/* Active Tab Badge (Light Mode): Crisp White Pill with Deep Forest Green Text */
+.fi-tabs-item.fi-active .fi-badge,
+.fi-tabs-item[aria-selected="true"] .fi-badge,
+.fi-sc-tabs-tablist button.fi-active .fi-badge,
+.fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge {
+    background: #FFFFFF !important;
+    border-color: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14) !important;
+}
+
+.fi-tabs-item.fi-active .fi-badge,
+.fi-tabs-item.fi-active .fi-badge span,
+.fi-tabs-item.fi-active .fi-badge .fi-badge-label,
+.fi-tabs-item.fi-active .fi-badge .fi-badge-label-ctn,
+.fi-tabs-item[aria-selected="true"] .fi-badge,
+.fi-tabs-item[aria-selected="true"] .fi-badge span,
+.fi-tabs-item[aria-selected="true"] .fi-badge .fi-badge-label,
+.fi-tabs-item[aria-selected="true"] .fi-badge .fi-badge-label-ctn,
+.fi-sc-tabs-tablist button.fi-active .fi-badge,
+.fi-sc-tabs-tablist button.fi-active .fi-badge span,
+.fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge,
+.fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge span {
+    color: #0E6838 !important;
+    -webkit-text-fill-color: #0E6838 !important;
+    font-weight: 800 !important;
 }
 
 /* Active Tab Icon: Pure Crisp White */
@@ -1593,11 +1620,38 @@ textarea::placeholder {
 
 :is(.dark) .fi-tabs-item.fi-active .fi-tabs-item-label,
 :is(.dark) .fi-tabs-item[aria-selected="true"] .fi-tabs-item-label,
-:is(.dark) .fi-sc-tabs-tablist button.fi-active span,
-:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] span {
+:is(.dark) .fi-sc-tabs-tablist button.fi-active > span:not(.fi-badge),
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] > span:not(.fi-badge) {
     color: #34D399 !important;
     -webkit-text-fill-color: #34D399 !important;
     font-weight: 700 !important;
+}
+
+/* Active Tab Badge (Dark Mode) */
+:is(.dark) .fi-tabs-item.fi-active .fi-badge,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-badge,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active .fi-badge,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge {
+    background: #A7F3D0 !important;
+    border-color: #34D399 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+:is(.dark) .fi-tabs-item.fi-active .fi-badge,
+:is(.dark) .fi-tabs-item.fi-active .fi-badge span,
+:is(.dark) .fi-tabs-item.fi-active .fi-badge .fi-badge-label,
+:is(.dark) .fi-tabs-item.fi-active .fi-badge .fi-badge-label-ctn,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-badge,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-badge span,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-badge .fi-badge-label,
+:is(.dark) .fi-tabs-item[aria-selected="true"] .fi-badge .fi-badge-label-ctn,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active .fi-badge,
+:is(.dark) .fi-sc-tabs-tablist button.fi-active .fi-badge span,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge,
+:is(.dark) .fi-sc-tabs-tablist button[aria-selected="true"] .fi-badge span {
+    color: #064E3B !important;
+    -webkit-text-fill-color: #064E3B !important;
+    font-weight: 800 !important;
 }
 
 :is(.dark) .fi-tabs-item.fi-active svg,
