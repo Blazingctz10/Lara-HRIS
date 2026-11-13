@@ -2,6 +2,7 @@
 
 @section('title', '404 Tidak Ditemukan')
 @section('code', 'SYS404')
+@section('variant', 'warning')
 
 @section('icon')
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">

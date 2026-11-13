@@ -6,60 +6,96 @@
     <title>@yield('title') &bull; Core HRIS PT BPR Banda Raya</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
 
+    <script>
+        (function () {
+            try {
+                const saved = localStorage.getItem('theme') || localStorage.getItem('hris_theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = saved ? saved === 'dark' : prefersDark;
+                document.documentElement.classList.toggle('dark', isDark);
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --m3-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            --m3-font-display: 'Plus Jakarta Sans', var(--m3-font-sans);
             --m3-font-mono: 'JetBrains Mono', monospace;
 
-            --bg: #E8EFEA;
-            --surface: #FFFFFF;
-            --surface-container: #DFEAE2;
-            --surface-container-high: #D6E3D9;
+            --bg: #EEF4F0;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-container: #F2F7F4;
             --on-surface: #0F1E14;
-            --on-surface-variant: #33473B;
-            --outline: #5E7365;
-            --outline-variant: #B6CAC0;
+            --on-surface-variant: #475B4E;
+            --outline: #9FB5A7;
+            --outline-variant: rgba(14, 104, 56, 0.14);
 
             --primary: #0E6838;
-            --primary-container: #CCE8D7;
-            --on-primary-container: #03361B;
-            
-            --error: #DC2626;
-            --error-container: #FEE2E2;
-            --on-error-container: #7F1D1D;
+            --primary-btn-text: #FFFFFF;
+            --primary-glow: rgba(14, 104, 56, 0.25);
 
-            --amber: #D97706;
-            --amber-container: #FEF3C7;
-            --on-amber-container: #78350F;
+            --badge-bg: #FEE2E2;
+            --badge-text: #991B1B;
+            --badge-border: #FECACA;
+            --icon-bg: rgba(220, 38, 38, 0.1);
+            --icon-color: #DC2626;
         }
 
         .dark {
-            --bg: #0D1410;
-            --surface: #111A14;
-            --surface-container: #19261E;
-            --surface-container-high: #203026;
-            --on-surface: #E2E8E4;
-            --on-surface-variant: #9EABA3;
-            --outline: #7A8980;
-            --outline-variant: rgba(255, 255, 255, 0.1);
+            --bg: #0A110D;
+            --surface: rgba(17, 26, 20, 0.9);
+            --surface-container: rgba(25, 38, 30, 0.85);
+            --on-surface: #ECFDF5;
+            --on-surface-variant: #9EB3A6;
+            --outline: #4B6355;
+            --outline-variant: rgba(255, 255, 255, 0.09);
 
             --primary: #4ADE80;
-            --primary-container: #0B4F27;
-            --on-primary-container: #BBF7D0;
+            --primary-btn-text: #052E16;
+            --primary-glow: rgba(74, 222, 128, 0.24);
 
-            --error: #F87171;
-            --error-container: #7F1D1D;
-            --on-error-container: #FECACA;
+            --badge-bg: rgba(127, 29, 29, 0.55);
+            --badge-text: #FECACA;
+            --badge-border: rgba(248, 113, 113, 0.35);
+            --icon-bg: rgba(239, 68, 68, 0.16);
+            --icon-color: #F87171;
+        }
 
-            --amber: #FBBF24;
-            --amber-container: #78350F;
-            --on-amber-container: #FDE68A;
+        /* Variant: Warning (404, 419, 429) */
+        [data-variant="warning"] {
+            --badge-bg: #FEF3C7;
+            --badge-text: #92400E;
+            --badge-border: #FDE68A;
+            --icon-bg: rgba(234, 88, 12, 0.12);
+            --icon-color: #EA580C;
+        }
+        .dark [data-variant="warning"] {
+            --badge-bg: rgba(120, 53, 15, 0.55);
+            --badge-text: #FDE68A;
+            --badge-border: rgba(251, 191, 36, 0.35);
+            --icon-bg: rgba(251, 146, 60, 0.16);
+            --icon-color: #FB923C;
+        }
+
+        /* Variant: Maintenance (503) */
+        [data-variant="maintenance"] {
+            --badge-bg: #CCFBF1;
+            --badge-text: #0F766E;
+            --badge-border: #99F6E4;
+            --icon-bg: rgba(14, 104, 56, 0.12);
+            --icon-color: #0E6838;
+        }
+        .dark [data-variant="maintenance"] {
+            --badge-bg: rgba(6, 78, 59, 0.6);
+            --badge-text: #A7F3D0;
+            --badge-border: rgba(52, 211, 153, 0.35);
+            --icon-bg: rgba(74, 222, 128, 0.16);
+            --icon-color: #4ADE80;
         }
 
         * {
@@ -71,6 +107,9 @@
         body {
             font-family: var(--m3-font-sans);
             background-color: var(--bg);
+            background-image:
+                radial-gradient(at 15% 15%, rgba(14, 104, 56, 0.14) 0px, transparent 50%),
+                radial-gradient(at 85% 85%, rgba(234, 88, 12, 0.08) 0px, transparent 50%);
             color: var(--on-surface);
             min-height: 100vh;
             display: flex;
@@ -78,84 +117,111 @@
             justify-content: center;
             padding: 1.5rem;
             line-height: 1.5;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.25s ease;
         }
 
         .m3-error-card {
-            background-color: var(--surface);
+            background: var(--surface);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid var(--outline-variant);
             border-radius: 28px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(14, 104, 56, 0.08);
-            max-width: 680px;
+            box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(14, 104, 56, 0.08);
+            max-width: 640px;
             width: 100%;
             padding: 2.25rem;
             position: relative;
             overflow: hidden;
+            animation: cardAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .m3-topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 1.85rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--outline-variant);
         }
 
         .m3-logo-img {
-            height: 38px;
+            height: 34px;
             width: auto;
-            object-fit: contain;
+            display: block;
         }
 
+        .m3-logo-dark { display: none; }
+        .dark .m3-logo-dark { display: block; }
+        .dark .m3-logo-light { display: none; }
+
         .m3-code-pill {
-            font-family: var(--m3-font-mono);
-            font-size: 0.8rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            padding: 0.35rem 0.85rem;
-            border-radius: 9999px;
-            background-color: var(--error-container);
-            color: var(--on-error-container);
-            border: 1px solid rgba(220, 38, 38, 0.25);
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            border: 1px solid var(--badge-border);
+            font-family: var(--m3-font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .m3-header-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.15rem;
+            margin-bottom: 1.1rem;
         }
 
         .m3-content-icon {
             width: 52px;
             height: 52px;
             border-radius: 16px;
-            background-color: var(--error-container);
-            color: var(--error);
+            background: var(--icon-bg);
+            color: var(--icon-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.25rem;
+            flex-shrink: 0;
         }
 
         .m3-heading {
-            font-family: var(--m3-font-display);
-            font-size: 1.65rem;
-            font-weight: 900;
+            font-size: 1.45rem;
+            font-weight: 800;
             letter-spacing: -0.02em;
             color: var(--on-surface);
-            margin-bottom: 0.6rem;
             line-height: 1.25;
+            margin-bottom: 0.35rem;
+        }
+
+        .m3-subtitle-meta {
+            font-size: 0.78rem;
+            color: var(--on-surface-variant);
+            font-weight: 600;
         }
 
         .m3-desc {
-            font-size: 0.95rem;
+            font-size: 0.94rem;
             color: var(--on-surface-variant);
             margin-bottom: 1.5rem;
+            line-height: 1.6;
         }
 
         .m3-action-box {
-            background-color: var(--surface-container);
+            background: var(--surface-container);
             border: 1px solid var(--outline-variant);
             border-radius: 18px;
-            padding: 1.25rem;
+            padding: 1.15rem 1.25rem;
             margin-bottom: 1.75rem;
             display: flex;
             align-items: flex-start;
@@ -165,13 +231,13 @@
         .m3-action-icon {
             color: var(--primary);
             flex-shrink: 0;
-            margin-top: 0.15rem;
+            margin-top: 0.1rem;
         }
 
         .m3-action-text {
-            font-size: 0.875rem;
+            font-size: 0.86rem;
             color: var(--on-surface);
-            line-height: 1.45;
+            line-height: 1.5;
         }
 
         .m3-buttons {
@@ -186,22 +252,17 @@
             font-size: 0.875rem;
             font-weight: 700;
             background-color: var(--primary);
-            color: #ffffff;
+            color: var(--primary-btn-text);
             border: none;
-            padding: 0.75rem 1.6rem;
+            padding: 0.75rem 1.55rem;
             border-radius: 9999px;
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 14px rgba(14, 104, 56, 0.28);
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-        }
-
-        .dark .m3-btn-primary {
-            color: #003a19;
-            box-shadow: 0 4px 16px rgba(74, 222, 128, 0.25);
+            box-shadow: 0 4px 16px var(--primary-glow);
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
         }
 
         .m3-btn-primary:hover {
@@ -216,14 +277,14 @@
             background-color: transparent;
             color: var(--on-surface);
             border: 1px solid var(--outline);
-            padding: 0.75rem 1.4rem;
+            padding: 0.75rem 1.35rem;
             border-radius: 9999px;
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
         .m3-btn-tonal:hover {
@@ -231,19 +292,32 @@
             transform: translateY(-1px);
         }
 
-        .m3-details {
-            margin-top: 1.75rem;
+        .m3-footer-note {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
             border-top: 1px solid var(--outline-variant);
-            padding-top: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--on-surface-variant);
+        }
+
+        .m3-details {
+            margin-top: 1.25rem;
+            border-top: 1px solid var(--outline-variant);
+            padding-top: 1rem;
         }
 
         .m3-details summary {
             font-family: var(--m3-font-mono);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--on-surface-variant);
             cursor: pointer;
-            padding: 0.4rem 0;
+            padding: 0.35rem 0;
             user-select: none;
         }
 
@@ -252,7 +326,7 @@
             background: #090e0b;
             color: #86efac;
             font-family: var(--m3-font-mono);
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             padding: 1rem;
             border-radius: 14px;
             overflow-x: auto;
@@ -260,13 +334,20 @@
             line-height: 1.45;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
+        @media (max-width: 540px) {
+            .m3-error-card { padding: 1.5rem; border-radius: 22px; }
+            .m3-header-row { flex-direction: column; gap: 0.85rem; }
+            .m3-heading { font-size: 1.25rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="m3-error-card">
+    <div class="m3-error-card" data-variant="@yield('variant', 'danger')">
         <div class="m3-topbar">
             <div>
-                <img src="{{ asset('images/logo-horizontal-dark.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img">
+                <img src="{{ asset('images/logo-horizontal-dark.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img m3-logo-dark">
+                <img src="{{ asset('images/logo-horizontal-light.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img m3-logo-light">
             </div>
             <div>
                 <span class="m3-code-pill">
@@ -278,11 +359,16 @@
             </div>
         </div>
 
-        <div class="m3-content-icon">
-            @yield('icon')
+        <div class="m3-header-row">
+            <div class="m3-content-icon">
+                @yield('icon')
+            </div>
+            <div>
+                <h1 class="m3-heading">@yield('heading', 'Terjadi Kendala pada Sistem')</h1>
+                <div class="m3-subtitle-meta">Core HRIS &bull; PT BPR Banda Raya</div>
+            </div>
         </div>
 
-        <h1 class="m3-heading">@yield('heading', 'Terjadi Kendala pada Sistem')</h1>
         <p class="m3-desc">@yield('description')</p>
 
         <div class="m3-action-box">
@@ -304,7 +390,7 @@
                 </svg>
                 <span>Kembali ke Beranda</span>
             </a>
-            <button onclick="window.location.reload()" class="m3-btn-tonal">
+            <button type="button" onclick="window.location.reload()" class="m3-btn-tonal">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
@@ -320,6 +406,11 @@
                 </div>
             </details>
         @endif
+
+        <div class="m3-footer-note">
+            <span>Waktu Sistem: {{ now()->format('d M Y, H:i') }} WIB</span>
+            <span>Divisi IT &bull; PT BPR Banda Raya</span>
+        </div>
     </div>
 </body>
 </html>
