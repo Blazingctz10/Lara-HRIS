@@ -1,421 +1,188 @@
 <div align="center">
-  <img src="public/images/logo-horizontal-clean.png" alt="PT BPR Banda Raya" width="480">
+  <img src="public/images/logo-horizontal-clean.png" alt="PT BPR Banda Raya" width="440">
   <br><br>
-  <h1>Core HRIS & Employee Self-Service (ESS) Portal</h1>
+  <h1>Lara-HRIS — Core HRIS & Employee Self-Service (ESS)</h1>
   <p><strong>Sistem Informasi Manajemen Sumber Daya Manusia Terpadu PT Bank Perekonomian Rakyat Banda Raya</strong></p>
 
-  [![Laravel 11](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-  [![Filament v3](https://img.shields.io/badge/Filament-v3.x-FDAE4B?style=for-the-badge&logo=filament&logoColor=black)](https://filamentphp.com)
+  [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+  [![Filament v5](https://img.shields.io/badge/Filament-v5.x-FDAE4B?style=for-the-badge&logo=filament&logoColor=black)](https://filamentphp.com)
   [![PHP 8.2+](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
-  [![Design](https://img.shields.io/badge/Design-Material_3_Expressive-0E6838?style=for-the-badge)](https://m3.material.io)
-  [![Tests](https://img.shields.io/badge/Tests-23%20Passed%20(141%20assertions)-success?style=for-the-badge&logo=checkmarx&logoColor=white)](tests/)
+  [![Design](https://img.shields.io/badge/UI-Material_3_Expressive-0E6838?style=for-the-badge)](https://m3.material.io)
+  [![Tests](https://img.shields.io/badge/Tests-95%20Passed%20(564%20assertions)-16A34A?style=for-the-badge&logo=checkmarx&logoColor=white)](tests/)
 </div>
+
+<p align="center">
+  <a href="#-ringkasan-sistem">Ringkasan</a> •
+  <a href="#-arsitektur-dual-panel--rbac">Arsitektur & RBAC</a> •
+  <a href="#-modul--alur-kerja-utama">Modul & Alur Kerja</a> •
+  <a href="#-keamanan-kepatuhan--failsafe">Keamanan & Failsafe</a> •
+  <a href="#-panduan-instalasi--menjalankan-sistem">Instalasi</a> •
+  <a href="#-pengujian-otomatis">Pengujian</a>
+</p>
 
 ---
 
 ## 📌 Ringkasan Sistem
 
-**Core HRIS PT BPR Banda Raya** adalah platform enterprise terpadu untuk tata kelola siklus hidup kepegawaian (*employee lifecycle*), presensi pintar berbasis radius geofencing GPS, persetujuan cuti berjenjang, manajemen pergerakan karir & promosi, penegakan disiplin (Surat Peringatan), klaim reimbursement, serta manajemen arsip cadangan data sistem.
+**Lara-HRIS** adalah platform *Human Resource Information System* (HRIS) internal **PT BPR Banda Raya** yang mengelola seluruh siklus hidup kepegawaian (*employee lifecycle*) dalam satu arsitektur **Dual-Panel**:
 
-Aplikasi dirancang dengan arsitektur **Dual-Panel (Backoffice HR & Portal Mandiri Karyawan)** dan mengadopsi standar **Material 3 Expressive Tonal Container**:
-- 🌲 **Deep Emerald Green (`#0E6838`)** — Identitas korporat perbankan yang stabil, aman, dan berintegritas.
-- 🍃 **Warm Sage-Mint (`#E8EFEA` / `#DFEAE2`)** — Ergonomi visual mode terang tanpa silau (*zero eye strain*) dengan rasio kontras tinggi.
-- 🌑 **Slate-Emerald (`#0D1410` / `#141E18`)** — Mode gelap sejuk yang nyaman untuk mata saat bertugas malam.
-- 📙 **Warm Orange (`#EA580C`)** & 🎗️ **Golden Amber (`#CA8A04`)** — Aksen indikator status operasional dan apresiasi kinerja.
+- **Backoffice HR & Eksekutif (`/admin`)** untuk manajemen data induk pegawai, jaringan cabang, persetujuan cuti & lembur, penggajian (*payroll*), mutasi karir, surat peringatan, rekrutmen IMAP, kepatuhan kebijakan, pencadangan data, serta pemantauan log sistem IT.
+- **Employee Self-Service Portal (`/portal`)** untuk presensi GPS Geofencing harian, pengajuan cuti/lembur/reimbursement, akses slip gaji pribadi, katalog kebijakan kepatuhan, dan pembaruan profil kontak mandiri.
+
+Antarmuka mengadopsi sistem desain **Material 3 Expressive** dengan dukungan penuh **Light & Dark Mode** beridentitas korporat perbankan:
+- **Primary (Forest Green):** `#0E6838` (Light) / `#4ADE80` (Dark)
+- **Secondary (Warm Orange):** `#EA580C` (Light) / `#FB923C` (Dark)
+- **Tertiary (Golden Ribbon):** `#CA8A04` (Light) / `#FACC15` (Dark)
 
 ---
 
-## 🏛️ Arsitektur Dual-Panel & Hak Akses
+## 🏛️ Arsitektur Dual-Panel & RBAC
 
 ```mermaid
 graph TD
-    User([Pengguna Masuk]) --> Login[Halaman Masuk Terpadu]
-    Login --> AuthCheck{Pemeriksaan Peran / Role}
-    
-    AuthCheck -->|super_admin| AdminPanel[Panel Backoffice HRD /admin]
-    AuthCheck -->|hr_admin| AdminPanel
-    AuthCheck -->|branch_manager| AdminScoped[Panel Backoffice Scoped Cabang /admin]
-    AuthCheck -->|employee| PortalPanel[Portal Mandiri Pegawai ESS /portal]
-    
-    PortalPanel -.->|Akses Ditolak 403| AdminPanel
+    User([Pengguna]) --> Login[Login Terpadu /login]
+    Login --> StatusCheck{Status Pegawai Aktif?}
+    StatusCheck -->|Resigned / Terminated| Blocked[Ditolak AUTH002]
+    StatusCheck -->|Aktif| RoleCheck{Pemeriksaan Peran}
+
+    RoleCheck -->|super_admin| AdminFull[Panel /admin — Akses Penuh + IT System & Backup]
+    RoleCheck -->|hr_admin| AdminHR[Panel /admin — Manajemen HR & Payroll Nasional]
+    RoleCheck -->|branch_manager| AdminBranch[Panel /admin — Scoped Cabang Penempatan]
+    RoleCheck -->|direksi| AdminExec[Panel /admin — Read-Only Eksekutif & Approval]
+    RoleCheck -->|compliance_officer| AdminComp[Panel /admin — Kebijakan & Kepatuhan]
+    RoleCheck -->|employee| PortalESS[Portal ESS /portal — Layanan Mandiri Pegawai]
+
+    PortalESS -.->|Akses /admin Ditolak 403| AdminFull
 ```
 
-| Panel | Rute URL | Akses Peran | Cakupan Fungsional |
-| :--- | :--- | :--- | :--- |
-| **Backoffice HR Panel** | `/admin` | Super Admin, HR Officer, Pimpinan Cabang (Pincab) | Tata kelola master cabang, departemen, jabatan, master pegawai, persetujuan cuti & klaim, surat peringatan, mutasi kerja, mesin fingerprint, dan pencadangan data sistem. |
-| **Portal Mandiri Pegawai (ESS)** | `/portal` | Karyawan / Staf (Teller, CS, AO, Security, Umum) | Presensi GPS Geofencing harian, riwayat kehadiran, pengajuan cuti & lembur, dan pembaruan biodata kontak. |
+| Peran (`role`) | Panel | Cakupan Akses Utama |
+| :--- | :---: | :--- |
+| **`super_admin`** | `/admin` | Akses penuh seluruh modul HR, manajemen akun & role, **Backup Data (`/admin/backup-data`)**, **System Logs (`/admin/system-logs`)**, dan **Login Logs (`/admin/login-logs`)**. |
+| **`hr_admin`** | `/admin` | Tata kelola data pegawai, absensi & dispensasi, approval final cuti, payroll, mutasi karir, SP, rekrutmen IMAP, dan pusat impor data CSV. |
+| **`branch_manager`** | `/admin` | Monitoring pegawai dan persetujuan cuti/lembur tahap 1 khusus untuk kantor cabang penempatannya. |
+| **`direksi`** | `/admin` | Tinjauan eksekutif (*read-only*) data kepegawaian dan persetujuan cuti tertentu sesuai kebijakan BPR. |
+| **`compliance_officer`** | `/admin` | Pengelolaan katalog **Kebijakan & Kepatuhan (`/admin/compliance-policies`)** beserta target audiens dan status arsip. |
+| **`employee`** | `/portal` | Presensi GPS Geofencing, riwayat kehadiran, pengajuan cuti/lembur/reimbursement, unduh slip gaji berstatus dibayar, katalog kepatuhan, dan profil mandiri. |
 
 ---
 
-## 🔄 Alur Proses Bisnis Utama (Core Workflows)
+## 🔄 Modul & Alur Kerja Utama
 
-### 1. Alur Presensi Pintar & Geofencing GPS
+### 1. Presensi Pintar (GPS Geofencing, Mesin Fingerprint & Dispensasi)
+- **Presensi GPS Mandiri:** Validasi jarak koordinat pengguna terhadap titik kantor cabang penempatan menggunakan rumus *Haversine*. Presensi di luar radius ditolak otomatis dengan kode error `HR003`.
+- **Integrasi Mesin Biometrik:** Dukungan impor log kehadiran dari mesin fingerprint (format `.xls`/`.csv` Solution/ZKTeco) melalui `/admin/attendances`.
+- **Dispensasi Kehadiran:** Modul `/admin/attendance-dispensations` otomatis menyinkronkan status izin/dispensasi ke log presensi harian dan membebaskan penalti keterlambatan.
+
+### 2. Pengajuan & Persetujuan Cuti Berjenjang (*Dual-Approval*)
 ```mermaid
 sequenceDiagram
     autonumber
     actor Staf as Pegawai (ESS)
-    participant App as Portal Pegawai
-    participant Geo as GeofencingService
-    participant DB as Basis Data (Attendances)
-
-    Staf->>App: Buka Widget Presensi Hari Ini
-    App->>Staf: Minta Izin Koordinat Geolocation Browser/HP
-    Staf->>App: Koordinat GPS (Latitude, Longitude)
-    App->>Geo: Validasi Jarak ke Kantor Penempatan (Haversine Formula)
-    alt Di dalam radius kantor (Misal <= 50 meter)
-        Geo-->>App: Valid (Status: Present / Late)
-        App->>DB: Rekam Jam Masuk, Koordinat & Device Info
-        App-->>Staf: Presensi Berhasil Diterima
-    else Di luar radius kantor
-        Geo-->>App: Invalid (Jarak > 50 meter)
-        App-->>Staf: Presensi Ditolak (Di Luar Radius Kantor Cabang)
-    end
-```
-
-### 2. Alur Pengajuan & Persetujuan Cuti Berjenjang (Dual-Approval)
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Staf as Pegawai
-    participant ESS as Portal Cuti
-    actor Pincab as Pemimpin Cabang
-    actor HR as Human Resources
+    participant ESS as Portal Cuti (/portal)
+    actor Pincab as Pimpinan Cabang
+    actor HR as HR Admin
     participant Obs as LeaveRequestObserver
     participant Saldo as EmployeeLeaveBalance
 
-    Staf->>ESS: Ajukan Permohonan Cuti (Tanggal, Jenis, Alasan)
-    ESS->>ESS: Status = 'Pending'
-    Pincab->>ESS: Tinjau Pengajuan di /admin (Scoped Cabang)
-    Pincab->>ESS: Setujui Cabang (Status = 'Approved_Pincab')
-    HR->>ESS: Tinjau Final Approval di /admin (HR Nasional)
-    HR->>ESS: Setujui Final HR (Status = 'Approved_HR')
+    Staf->>ESS: Ajukan Cuti (Jenis, Tanggal, Alasan)
+    ESS->>ESS: Status = Pending
+    Pincab->>ESS: Review & Setujui Tahap 1 (Scoped Cabang)
+    HR->>ESS: Review & Setujui Final HR
     ESS->>Obs: Trigger Event Updated
-    Obs->>Saldo: Potong 'used_days' & Kurangi 'remaining_days'
-    Saldo-->>Staf: Kuota Cuti Tahunan Berkurang Otomatis
+    Obs->>Saldo: Potong kuota cuti & hitung sisa saldo otomatis
 ```
 
-### 3. Alur Pergerakan Karir (Mutasi & Promosi)
-1. HR Admin menerbitkan SK Karir melalui modul `/admin/career-movements`.
-2. Sistem menampilkan popup konfirmasi untuk mencegah kekeliruan nomor SK atau cabang penempatan.
-3. Saat disimpan, sistem secara otomatis memperbarui relasi `branch_id` dan `position_id` pada profil pegawai terkait.
+### 3. Penggajian (*Payroll*) & Klaim Operasional
+- **Batch Payroll (`/admin/payrolls`):** Kalkulasi otomatis komponen gaji pokok, tunjangan, lembur, dan potongan denda keterlambatan; pegawai hanya dapat melihat slip gaji miliknya yang berstatus dibayar di `/portal/payrolls`.
+- **Lembur & Reimbursement:** Pengajuan klaim biaya operasional dan lembur terintegrasi dari Portal ESS menuju persetujuan Backoffice HR.
 
-### 4. Alur Penegakan Disiplin (Surat Peringatan / SP)
-1. Penerbitan SP1, SP2, atau SP3 dilakukan melalui `/admin/warning-letters` dilengkapi masa berlaku otomatis (6 bulan).
-2. Surat peringatan terpantau secara transparan oleh HR Officer untuk evaluasi kontrak kerja berkala.
+### 4. Siklus Karir, Disiplin & Kepatuhan
+- **Mutasi & Promosi (`/admin/career-movements`):** Pembaruan cabang dan jabatan pegawai secara otomatis saat SK Karir diterbitkan, lengkap dengan pengelompokan riwayat per pegawai.
+- **Surat Peringatan (`/admin/warning-letters`):** Penerbitan SP1, SP2, dan SP3 dengan masa berlaku otomatis.
+- **Kebijakan & Kepatuhan (`/admin/compliance-policies`):** Distribusi dokumen kebijakan internal terarah (semua staf atau eksekutif) yang dapat diakses pegawai melalui `/portal/compliance-policies`.
 
-### 5. Alur Pencadangan & Kepatuhan Data (Backup Data)
-1. Super Admin mengakses menu `/admin/backup-data`.
-2. Memilih opsi **"Cadangkan Database Saja"** atau **"Cadangkan Arsip Lengkap (ZIP: DB + Berkas Dokumen)"**.
-3. Sistem memunculkan popup konfirmasi otorisasi perbankan.
-4. Arsip disimpan di `storage/app/backups/` dengan penamaan timestamp unik dan dapat diunduh langsung ke komputer lokal.
+### 5. Rekrutmen IMAP & Pusat Migrasi Data CSV
+- **Rekrutmen cPanel IMAP (`/admin/job-applicants`):** Penarikan otomatis email lamaran dan ekstraksi lampiran CV (PDF/DOCX) langsung dari inbox `karir@bprbandaraya.com` melalui SSL/TLS tanpa membuka webmail.
+- **Migrasi Data (`/admin/import-data`):** Impor massal data master pegawai dan log presensi dari CSV (mendukung pemisah `,` maupun `;` khas Excel Indonesia) lengkap dengan auto-create cabang/divisi/jabatan, akun `@bprbandaraya.com`, dan saldo cuti awal.
 
-### 6. Alur Rekrutmen & Integrasi Email Masuk (cPanel IMAP)
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Pelamar as Pelamar Kerja
-    participant cPanel as Mail Server cPanel (karir@bprbandaraya.com)
-    participant IMAP as ImapRecruitmentService (Port 993 SSL)
-    participant DB as Modul Rekrutmen (/admin/job-applicants)
-    actor HR as Tim HRD & Perekrutan
-
-    Pelamar->>cPanel: Kirim Surat Lamaran & Lampiran CV (PDF/DOCX)
-    HR->>DB: Klik "Tarik Email (cPanel IMAP)"
-    DB->>IMAP: Eksekusi koneksi TLS/SSL ke cPanel Webmail
-    IMAP->>cPanel: Baca INBOX, unduh email baru & file lampiran
-    IMAP->>DB: Simpan pelamar, ekstrak posisi, & arsip CV ke storage
-    DB-->>HR: Tampilkan daftar pelamar, preview CV, dan kelola status seleksi
-```
-1. **Otomatisasi Tanpa Buka Webmail**: Email pelamar yang masuk ke `karir@bprbandaraya.com` disedot langsung oleh sistem Lara-HRIS.
-2. **Ekstraksi CV & Posisi Otomatis**: Sistem secara otomatis mengekstrak berkas lampiran (PDF/DOCX) ke direktori privat `storage/app/public/recruitment_cv` dan mendeteksi posisi yang dilamar dari subjek email.
-### 7. Alur Migrasi & Impor Data Lama (Excel / CSV Migration Center)
-1. **Menu Akses**: Super Admin dan HR Admin dapat mengakses menu `/admin/import-data` (Grup *Pengaturan & Sistem*).
-2. **Template CSV Siap Unduh**:
-   * **Template Master Pegawai**: Memuat kolom lengkap (`NIP`, `NIK`, `Nama_Lengkap`, `Email`, `Nomor_Telepon`, `Jenis_Kelamin`, `Tanggal_Lahir`, `Alamat`, `Kantor_Cabang`, `Divisi`, `Jabatan`, `Status_Kerja`, `Tanggal_Masuk`, `Nomor_Rekening`, dll) beserta contoh data valid.
-   * **Template Log Presensi**: Memuat kolom (`NIP`, `Tanggal`, `Jam_Masuk`, `Jam_Keluar`, `Status`, `Catatan`) untuk memindahkan riwayat absensi dari mesin fingerprint lama (Solution, ZKTeco, dsb).
-3. **Fitur Auto-Discovery & Smart Mapping Cerdas**:
-   * **Auto-Create Organisasi**: Jika Cabang, Divisi, atau Jabatan dari file lama belum terdaftar di sistem, sistem otomatis membuatkannya.
-   * **Auto-Generate Akun Login**: Akun pengguna (`User`) langsung dibuatkan otomatis dengan domain resmi `@bprbandaraya.com` dan kata sandi default `password`.
-   * **Inisialisasi Kuota Cuti Otomatis**: Setiap pegawai baru yang diimpor langsung diberikan saldo kuota cuti tahunan (12 hari).
-   * **Dukungan Format Excel Regional**: Sistem otomatis mendeteksi pemisah koma (`,`) maupun titik koma (`;`) yang biasa dihasilkan Microsoft Excel berbahasa Indonesia.
+### 6. Pencadangan Data & IT System Logs Viewer
+- **Backup Data (`/admin/backup-data`):** Khusus `super_admin` untuk membuat cadangan database atau arsip penuh ZIP (DB + dokumen storage) dengan penyamaran path sensitif server (`••••••••`).
+- **System Logs (`/admin/system-logs`):** Khusus `super_admin` untuk memantau log error aplikasi langsung dari antarmuka web.
 
 ---
 
-## 🗄️ Diagram Relasi Basis Data (Entity Relationship Diagram - ERD)
+## 🛡️ Keamanan, Kepatuhan & Failsafe
 
-```mermaid
-erDiagram
-    BRANCHES ||--o{ EMPLOYEES : "penempatan di"
-    BRANCHES ||--o{ FINGERPRINT_DEVICES : "memiliki mesin"
-    BRANCHES ||--o{ ANNOUNCEMENTS : "target cabang"
-    
-    DEPARTMENTS ||--o{ POSITIONS : "memiliki jabatan"
-    DEPARTMENTS ||--o{ EMPLOYEES : "divisi kerja"
-    POSITIONS ||--o{ EMPLOYEES : "jabatan resmi"
-    
-    USERS ||--|| EMPLOYEES : "terhubung akun"
-    
-    EMPLOYEES ||--o{ ATTENDANCES : "catatan log"
-    EMPLOYEES ||--o{ LEAVE_REQUESTS : "mengajukan cuti"
-    EMPLOYEES ||--|| EMPLOYEE_LEAVE_BALANCES : "kuota saldo cuti"
-    EMPLOYEES ||--o{ OVERTIMES : "pengajuan lembur"
-    EMPLOYEES ||--o{ REIMBURSEMENTS : "klaim operasional"
-    EMPLOYEES ||--o{ CAREER_MOVEMENTS : "riwayat mutasi/promosi"
-    EMPLOYEES ||--o{ WARNING_LETTERS : "catatan sanksi SP"
-    
-    LEAVE_TYPES ||--o{ LEAVE_REQUESTS : "kategori cuti"
-    USERS ||--o{ LEAVE_REQUESTS : "disetujui oleh"
-
-    USERS {
-        bigint id PK
-        string name
-        string email UK
-        string password
-        enum role "super_admin, hr_admin, branch_manager, employee"
-        bigint branch_id FK
-        timestamps created_at
-    }
-
-    EMPLOYEES {
-        bigint id PK
-        bigint user_id FK
-        bigint branch_id FK
-        bigint department_id FK
-        bigint position_id FK
-        string nip UK
-        string nik UK
-        string first_name
-        string last_name
-        string phone
-        text address
-        enum employment_status "Permanent, Contract, Probation, Internship"
-        enum status "Active, On Leave, Resigned, Terminated"
-        date join_date
-        date contract_end_date
-        decimal basic_salary
-        string bank_account_number
-        string bank_account_holder
-        string npwp
-    }
-
-    BRANCHES {
-        bigint id PK
-        string name
-        string code UK
-        text address
-        decimal latitude
-        decimal longitude
-        integer radius_meters
-    }
-
-    DEPARTMENTS {
-        bigint id PK
-        string name
-        string code UK
-    }
-
-    POSITIONS {
-        bigint id PK
-        bigint department_id FK
-        string name
-        string level
-    }
-
-    ATTENDANCES {
-        bigint id PK
-        bigint employee_id FK
-        date date
-        time check_in
-        time check_out
-        decimal check_in_latitude
-        decimal check_in_longitude
-        enum status "Present, Late, Absent, On Leave"
-        enum source "GPS_Mobile, Fingerprint, Manual_HR"
-        string device_info
-    }
-
-    LEAVE_TYPES {
-        bigint id PK
-        string name
-        integer days_allocated
-        boolean is_paid
-    }
-
-    LEAVE_REQUESTS {
-        bigint id PK
-        bigint employee_id FK
-        bigint leave_type_id FK
-        date start_date
-        date end_date
-        integer total_days
-        text reason
-        enum status "Pending, Approved_Pincab, Approved_HR, Rejected"
-        bigint approved_by FK
-        text rejection_reason
-    }
-
-    EMPLOYEE_LEAVE_BALANCES {
-        bigint id PK
-        bigint employee_id FK
-        integer year
-        integer allocated_days
-        integer used_days
-        integer remaining_days
-    }
-
-    CAREER_MOVEMENTS {
-        bigint id PK
-        bigint employee_id FK
-        enum type "Mutasi Cabang, Promosi Jabatan, Pengangkatan Tetap, Demosi"
-        string sk_number
-        bigint from_branch_id FK
-        bigint to_branch_id FK
-        bigint from_position_id FK
-        bigint to_position_id FK
-        date effective_date
-        text notes
-    }
-
-    WARNING_LETTERS {
-        bigint id PK
-        bigint employee_id FK
-        string sp_number UK
-        enum level "SP1, SP2, SP3"
-        date effective_date
-        date valid_until
-        text reason
-        enum status "Active, Expired, Revoked"
-    }
-
-    ANNOUNCEMENTS {
-        bigint id PK
-        string title
-        text content
-        enum priority "normal, important, urgent"
-        bigint branch_id FK "nullable for all"
-        datetime published_at
-        datetime expires_at
-    }
-
-    JOB_APPLICANTS {
-        bigint id PK
-        string name
-        string email
-        string phone
-        string position_applied
-        string subject
-        text message
-        string cv_path
-        string cv_filename
-        string email_uid UK
-        datetime email_date
-        enum status "Baru, Screening, Interview, Diterima, Ditolak"
-        text notes
-        timestamps created_at
-    }
-```
+1. **Perlindungan Autentikasi & Sesi:**
+   - **Honeypot Trap** (`bpr_hp_verification`) untuk memblokir bot login otomatis (`SEC001`).
+   - **Rate Limiter** (maksimal 5 percobaan gagal per menit, `AUTH005`) dan rekam jejak di `/admin/login-logs`.
+   - **Blokir Otomatis Pegawai Non-Aktif:** Akun berstatus `Resigned` atau `Terminated` ditolak saat login (`AUTH002`) dan sesi aktifnya langsung dihentikan.
+2. **HTTP Security Headers & RBAC Ketat:**
+   - Header `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, dan HSTS.
+   - Kolom sensitif kepegawaian (NIP, NIK, Cabang, Status Kerja) bersifat *read-only* di Portal Pegawai.
+3. **Standardisasi Kode Error & Halaman Error Terpadu (`App\Support\HrisErrorCode`):**
+   - Seluruh error HTTP (`403`, `404`, `419`, `429`, `500`, `503`) dan exception domain memakai kode terstruktur (`DB001`–`DB005`, `AUTH001`–`AUTH005`, `SEC001`, `VAL001`, `HR001`–`HR004`, `SYS403`–`SYS500`) dengan tampilan custom tanpa dialog native browser (`alert`/`confirm`).
+4. **Redundansi & Failsafe Logging:**
+   - Channel `stack` menggabungkan `daily` (retensi 14 hari) dan `critical_archive` (`storage/logs/critical.log` khusus level `error`+, retensi 60 hari) dengan `ignore_exceptions => true` agar error penulisan log tidak menjatuhkan aplikasi.
+   - `SystemLogs` membaca maksimal **256 KB** bagian akhir file (anti-OOM) dan menyamarkan path direktori server (`••••••••••••/storage/logs`).
+   - **Scheduler Harian (`02:30` di `routes/console.php`):** Otomatis memangkas `LoginLog` > 180 hari dan memotong file `.log` yang melebihi `50 MB` agar hanya menyisakan `2 MB` terakhir.
 
 ---
 
-## 👥 Matriks Kasus Penggunaan (Use Case Matrix)
+## 🔑 Akun Demo Pengujian
 
-| Fitur / Modul | Staf Pegawai (ESS) | Pemimpin Cabang (Pincab) | HR Officer | Super Admin (IT) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Login Mandiri & Ganti Tema** | ✅ | ✅ | ✅ | ✅ |
-| **Presensi GPS Geofencing** | ✅ Mandiri | ❌ | ❌ | ❌ |
-| **Pengajuan Cuti & Lembur** | ✅ Ajukan | ❌ | ❌ | ❌ |
-| **Persetujuan Cuti Tahap 1 (Pincab)** | ❌ | ✅ Cabang Sendiri | ❌ | ❌ |
-| **Persetujuan Final Cuti (HR)** | ❌ | ❌ | ✅ Nasional | ✅ Nasional |
-| **Kelola Data Induk Pegawai** | ❌ | ❌ | ✅ Kelola | ✅ Kelola |
-| **Terbitkan SP & Mutasi Karir** | ❌ | ❌ | ✅ Terbitkan | ✅ Terbitkan |
-| **Kelola Master Cabang & Mesin** | ❌ | ❌ | ❌ | ✅ Kelola |
-| **Backup & Unduh Arsip Sistem** | ❌ | ❌ | ❌ | ✅ Khusus Super Admin |
+> **Kata sandi default seluruh akun demo:** `password`
+
+| Peran | Email Login | Panel Tujuan |
+| :--- | :--- | :---: |
+| **Super Admin (IT)** | `admin@bprbandaraya.com` | `/admin` |
+| **HR Admin** | `hrd@bprbandaraya.com` / `ratna.dewi@bprbandaraya.com` | `/admin` |
+| **Direksi** | `direksi@bprbandaraya.com` | `/admin` |
+| **Pimpinan Cabang** | `pincab.botania@bprbandaraya.com` | `/admin` |
+| **Pegawai (Teller / CS / AO)** | `teller.botania@bprbandaraya.com` / `cs.botania@bprbandaraya.com` | `/portal` |
 
 ---
 
-## 🛡️ Arsitektur Keamanan Siber (Security Hardening)
-
-Lara-HRIS telah diperkuat dengan standar perlindungan perbankan berlapis:
-
-1. **Honeypot Trap:**
-   Formulir login dilengkapi input tersembunyi `bpr_hp_verification`. Bot/scraper otomatis yang mengisi kolom ini langsung digagalkan tanpa respons error verbose.
-2. **Login Rate Limiter:**
-   Membatasi maksimal 5 percobaan login gagal berturut-turut per menit. Melindungi akun dari serangan kamus dan *brute-force dictionary attacks*.
-3. **HTTP Security Headers Lengkap:**
-   - `X-Frame-Options: SAMEORIGIN` (Mencegah serangan *Clickjacking* / pencurian klik).
-   - `X-Content-Type-Options: nosniff` (Mencegah eksploitasi interpretasi tipe berkas MIME).
-   - `X-XSS-Protection: 1; mode=block` (Mencegah serangan skrip lintas situs).
-   - `Strict-Transport-Security` (HSTS: Memaksa koneksi HTTPS terenkripsi).
-   - `Referrer-Policy: strict-origin-when-cross-origin` (Melindungi privasi rujukan URL).
-4. **Isolasi Panel & Hak Akses (RBAC):**
-   - Karyawan staf non-admin otomatis diblokir saat mencoba mengakses rute `/admin` (HTTP 403 Forbidden).
-   - Akun Super Admin langsung dialihkan (*redirect*) ke panel administrasi `/admin`.
-   - Modul pencadangan data (`/admin/backup-data`) dilindungi verifikasi eksplisit `canAccess(): bool`.
-5. **Modal Konfirmasi Berdampak Tinggi:**
-   Penyimpanan profil, perubahan rekening, persetujuan pemotongan cuti, penerbitan SP, SK mutasi, dan pencadangan database wajib melalui dialog konfirmasi persetujuan sadar pengguna (*conscious consent modal*).
-6. **Integritas Audit Trail:**
-   Kolom data formal kepegawaian (NIP, NIK, Cabang, Status Karyawan) dikunci *read-only* pada Portal Pegawai untuk menjamin integritas rekam jejak audit OJK/Bank Indonesia.
-
----
-
-## 🔑 Kredensial Pengujian (Demo Accounts)
-
-> **Kata sandi default untuk seluruh akun demo:** `password`
-
-| Peran | Nama Pegawai | Email Login | Hak Akses |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | Administrator Sistem | `admin@bprbandaraya.com` | `/admin` (Akses Penuh + Backup) |
-| **HR Officer** | Ratna Dewi, S.Psi | `ratna.dewi@bprbandaraya.com` | `/admin` (Manajemen HR Nasional) |
-| **Pincab Botania** | Hendra Kurniawan | `pincab.botania@bprbandaraya.com` | `/admin` (Khusus Cabang Botania) |
-| **Teller Botania** | Siti Rahma | `teller.botania@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
-| **CS Botania** | Budi Santoso | `cs.botania@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
-| **AO Botania** | Fajar Nugraha | `fajar.nugraha@bprbandaraya.com` | `/portal` (Portal Mandiri Pegawai) |
-
----
-
-## 🚀 Panduan Menjalankan Sistem
+## 🚀 Panduan Instalasi & Menjalankan Sistem
 
 ### 1. Prasyarat Lingkungan
-- PHP >= 8.2 (ekstensi: `pdo_sqlite`, `intl`, `mbstring`, `fileinfo`, `gd`, `zip`, `openssl`)
-- Composer >= 2.x
-- Web Browser modern (Chrome, Edge, Firefox, Safari)
+- **PHP** `>= 8.2` (ekstensi: `pdo_sqlite` / `pdo_mysql`, `intl`, `mbstring`, `fileinfo`, `gd`, `zip`, `openssl`)
+- **Composer** `>= 2.x`
+- **Node.js & NPM** (untuk build aset frontend Vite/Tailwind)
 
-### 2. Cara Menjalankan Server
-```powershell
-# Cara Praktis (Rekomendasi di Windows PowerShell):
-# Jalankan launcher.ps1 di folder utama proyek atau di dalam hris-system
-powershell -ExecutionPolicy Bypass -File .\launcher.ps1
+### 2. Setup Awal
+```bash
+cd hris-system
+composer run setup
+php artisan migrate:fresh --seed
 ```
-Menu interaktif konsol otomatis menguji dependensi PHP & database, menguji port `8000`, menyediakan fitur optimasi cache performa tinggi, dan menampilkan log realtime dengan opsi matikan server bersih `[5]`.
 
-Atau via command prompt manual:
+### 3. Menjalankan Server Pengembangan
 ```bash
 cd hris-system
 php artisan serve
 ```
-Akses di peramban: **`http://127.0.0.1:8000`**
+Atau jalankan server, queue listener, log viewer, dan Vite secara bersamaan:
+```bash
+cd hris-system
+composer run dev
+```
+Aplikasi dapat diakses melalui `http://127.0.0.1:8000` (atau domain lokal yang telah dikonfigurasi pada web server).
 
 ---
 
-## 🧪 Hasil Pengujian Otomatis (Automated Tests)
+## 🧪 Pengujian Otomatis
 
-Seluruh modul telah diuji dengan **23 Test Suites (141 Assertions)** tanpa kegagalan:
+Seluruh modul telah diverifikasi menggunakan PHPUnit (`tests/Feature` & `tests/Unit`):
 
 ```bash
+cd hris-system
+php artisan optimize:clear
 php artisan test
 ```
 
 ```text
-   PASS  Tests\Unit\ExampleTest
-   PASS  Tests\Feature\BackupTest
-   PASS  Tests\Feature\ComprehensiveResourceTest
-   PASS  Tests\Feature\ExampleTest
-   PASS  Tests\Feature\HrisTest
-   PASS  Tests\Feature\PanelRoutesTest
-   PASS  Tests\Feature\SecurityTest
-
-  Tests:    23 passed (141 assertions)
-  Duration: 100% Pass
+  Tests:    95 passed (564 assertions)
 ```
 
 ---
