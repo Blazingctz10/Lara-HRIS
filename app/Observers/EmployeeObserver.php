@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\LeaveType;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class EmployeeObserver
@@ -55,9 +56,31 @@ class EmployeeObserver
      */
     public function updated(Employee $employee): void
     {
-        // Sync branch_id with linked user account
-        if ($employee->user && $employee->wasChanged('branch_id')) {
-            $employee->user->updateQuietly(['branch_id' => $employee->branch_id]);
+        if ($employee->user) {
+            $userUpdates = [];
+
+            if ($employee->wasChanged('branch_id')) {
+                $userUpdates['branch_id'] = $employee->branch_id;
+            }
+            if ($employee->wasChanged('full_name') && filled($employee->full_name)) {
+                $userUpdates['name'] = $employee->full_name;
+            }
+            if ($employee->wasChanged('email') && filled($employee->email)) {
+                $userUpdates['email'] = $employee->email;
+            }
+
+            if ($userUpdates !== []) {
+                $employee->user->updateQuietly($userUpdates);
+            }
+        }
+
+        // Revoke active sessions immediately when an employee is marked Resigned or Terminated
+        if (
+            $employee->user_id
+            && $employee->wasChanged('status')
+            && in_array($employee->status, ['Resigned', 'Terminated'], true)
+        ) {
+            DB::table('sessions')->where('user_id', $employee->user_id)->delete();
         }
     }
 }

@@ -22,7 +22,7 @@ class PayrollCalculationService
 
         // 1. Gaji Pokok & Tunjangan Standar Berdasarkan Posisi & Grade
         $position = $employee->position;
-        $basicSalary = (float) ($position?->min_salary ?? 4500000); // Default UMK Batam jika belum diatur
+        $basicSalary = (float) ($employee->basic_salary ?? $position?->min_salary ?? 4500000); // Default UMK Batam jika belum diatur
 
         // Tunjangan Jabatan & Operasional berdasar Grade Level
         $gradeLevel = $position?->grade_level ?? 'Staff';
@@ -50,16 +50,16 @@ class PayrollCalculationService
         $hourlyRate = round($basicSalary / 173, 2);
         $overtimePay = round($totalOvertimeHours * $hourlyRate * 1.5, 2);
 
-        // 3. Hitung Reimbursement yang sudah disetujui untuk dicairkan bersama payroll
+        // 3. Hitung Reimbursement yang sudah disetujui dan belum dicairkan untuk dibayarkan bersama payroll
         $reimbursements = Reimbursement::where('employee_id', $employee->id)
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
-            ->whereIn('status', ['Approved_Pincab', 'Paid'])
+            ->where('status', 'Approved_Pincab')
             ->get();
         $reimbursementPay = (float) $reimbursements->sum('amount');
 
         // 4. Hitung Denda Keterlambatan Presensi (Late Penalty)
-        // Standar BPR: Rp 50.000 per keterlambatan tanpa dispensasi
+        // Standar BPR: gunakan kolom penalty_amount aktual (fallback Rp 50.000 per keterlambatan tanpa dispensasi)
         $attendances = Attendance::where('employee_id', $employee->id)
             ->whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
@@ -67,7 +67,7 @@ class PayrollCalculationService
             ->get();
 
         $lateCount = $attendances->count();
-        $latePenaltyDeduction = (float) $attendances->sum('late_penalty');
+        $latePenaltyDeduction = (float) $attendances->sum('penalty_amount');
         if ($latePenaltyDeduction <= 0 && $lateCount > 0) {
             $latePenaltyDeduction = $lateCount * 50000;
         }
