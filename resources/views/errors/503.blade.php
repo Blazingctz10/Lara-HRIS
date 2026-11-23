@@ -13,3 +13,4 @@
 @section('heading', 'Sistem Sedang dalam Pemeliharaan Terjadwal')
 @section('description', 'Layanan Core HRIS PT BPR Banda Raya sedang menjalani pembaruan sistem, pencadangan basis data, atau peningkatan infrastruktur keamanan.')
 @section('action', 'Mohon tunggu beberapa saat hingga pemeliharaan selesai. Klik "Muat Ulang Halaman" secara berkala atau hubungi Unit IT jika mendesak.')
+

@@ -33,3 +33,4 @@ class ErrorPagesTest extends TestCase
         $this->assertStringContainsString('SYS403', $view403);
     }
 }
+

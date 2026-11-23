@@ -13,3 +13,4 @@
 @section('heading', 'Batas Permintaan Akses Terlampaui')
 @section('description', 'Sistem mendeteksi terlalu banyak permintaan dalam waktu singkat dari perangkat Anda sebagai bagian dari perlindungan keamanan perbankan.')
 @section('action', 'Harap tunggu sekitar 1 menit sebelum mencoba kembali, lalu klik tombol "Muat Ulang Halaman".')
+

@@ -9,3 +9,4 @@ class ListAnnouncements extends ListRecords
 {
     protected static string $resource = AnnouncementResource::class;
 }
+

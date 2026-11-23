@@ -136,3 +136,4 @@ class AnnouncementTest extends TestCase
         $this->assertStringNotContainsString('javascript:', $sanitized);
     }
 }
+

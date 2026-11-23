@@ -1,9 +1,9 @@
 ---
 name: lara-hris-workflows
 description: >-
-  Panduan prosedur kerja, runbook testing, sinkronisasi model pegawai, dan pengelolaan
-  aplikasi Core HRIS PT BPR Banda Raya (Lara-HRIS). Gunakan skill ini saat menjalankan tes,
-  memperbarui data master, mengonfigurasi Git, atau membuat modul baru.
+    Panduan prosedur kerja, runbook testing, sinkronisasi model pegawai, dan pengelolaan
+    aplikasi Core HRIS PT BPR Banda Raya (Lara-HRIS). Gunakan skill ini saat menjalankan tes,
+    memperbarui data master, mengonfigurasi Git, atau membuat modul baru.
 ---
 
 # Runbook & Prosedur Kerja Lara-HRIS
@@ -48,6 +48,7 @@ php artisan test
 ```
 
 ### Checklist Pengujian yang Harus Lulus 100%:
+
 1. `Tests\Unit\ExampleTest`
 2. `Tests\Feature\ComprehensiveResourceTest` (Memvalidasi seluruh tabel & halaman admin dan portal)
 3. `Tests\Feature\HrisTest` (Relasi model, perhitungan geofencing GPS, deduction saldo cuti, scope pengumuman, dan update profil pegawai)
@@ -94,6 +95,7 @@ $errorData = HrisErrorCode::fromException($exception);
 ```
 
 Pada respon JSON API:
+
 ```json
 {
   "code": "VAL001",
@@ -108,9 +110,10 @@ Pada respon JSON API:
 ## 5. Prosedur Push ke GitHub
 
 Jika ada perubahan yang sudah teruji dan siap dipublish:
+
 1. Pastikan working tree bersih dan sudah dicommit.
 2. Jalankan perintah push di terminal pengguna:
-   ```powershell
-   cd "d:\File Magang\Codeworks\Lara-HRIS\hris-system"
-   git push origin main
-   ```
+    ```powershell
+    cd "d:\File Magang\Codeworks\Lara-HRIS\hris-system"
+    git push origin main
+    ```
