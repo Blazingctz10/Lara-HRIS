@@ -89,20 +89,20 @@
         }
 
         :is(.dark) .m3-filter-chip {
-            background: #141e18;
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
+            background: var(--bento-surface-subtle, #20252E);
+            border-color: var(--bento-border, rgba(255, 255, 255, 0.09));
+            color: var(--bento-text-secondary, #D1D5DB);
         }
 
         :is(.dark) .m3-filter-chip:hover {
-            border-color: #4ADE80;
-            color: #4ADE80;
+            border-color: var(--bento-primary, #4ADE80);
+            color: var(--bento-primary, #4ADE80);
         }
 
         :is(.dark) .m3-filter-chip.active {
-            background: #4ADE80;
-            color: #0D1410;
-            border-color: #4ADE80;
+            background: var(--bento-primary, #4ADE80);
+            color: var(--bento-on-primary, #052E16);
+            border-color: var(--bento-primary, #4ADE80);
         }
 
         .m3-search-input-wrap {
@@ -115,9 +115,9 @@
         .m3-search-field {
             width: 100%;
             border-radius: 9999px;
-            border: 1px solid var(--m3-outline-variant, #E2E8F0);
-            background: var(--m3-surface, #ffffff);
-            color: var(--m3-on-surface, #0f1e14);
+            border: 1px solid var(--bento-border-strong, #B6C9BE);
+            background: var(--bento-surface-subtle, #EFF4F1);
+            color: var(--bento-text, #0F1A14);
             padding: 0.45rem 1rem 0.45rem 2.25rem;
             font-size: 0.825rem;
             transition: all 0.15s ease;
@@ -125,19 +125,19 @@
 
         .m3-search-field:focus {
             outline: none;
-            border-color: #0E6838;
-            box-shadow: 0 0 0 2px rgba(14, 104, 56, 0.15);
+            border-color: var(--bento-primary, #0E6838);
+            box-shadow: 0 0 0 3px var(--bento-primary-soft, rgba(14, 104, 56, 0.11));
         }
 
         :is(.dark) .m3-search-field {
-            background: #141e18;
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #FFFFFF;
+            background: var(--bento-surface-subtle, #20252E);
+            border-color: var(--bento-border-strong, rgba(255, 255, 255, 0.18));
+            color: var(--bento-text, #F3F4F6);
         }
 
         :is(.dark) .m3-search-field:focus {
-            border-color: #4ADE80;
-            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.15);
+            border-color: var(--bento-primary, #4ADE80);
+            box-shadow: 0 0 0 3px var(--bento-primary-soft, rgba(74, 222, 128, 0.14));
         }
 
         .m3-search-ico {
@@ -159,25 +159,26 @@
         }
 
         .m3-doc-item {
-            background: var(--m3-surface, #ffffff);
-            border: 1px solid var(--m3-outline-variant, #E2E8F0);
+            background: var(--bento-surface, #ffffff);
+            border: 1px solid var(--bento-border, #E2E8F0);
             border-radius: 16px;
             padding: 1.15rem 1.4rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1.25rem;
+            box-shadow: var(--bento-shadow-card);
             transition: all 0.15s ease;
         }
 
         .m3-doc-item:hover {
-            border-color: #0E6838;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            border-color: var(--bento-primary, #0E6838);
+            box-shadow: var(--bento-shadow-hover);
             transform: translateY(-1px);
         }
 
         :is(.dark) .m3-doc-item {
-            background: #141e18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.06);
         }
 
@@ -433,48 +434,63 @@
         }
 
         .m3-modal-box {
-            background: var(--m3-surface, #ffffff);
-            border: 1px solid var(--m3-outline-variant, #E2E8F0);
+            background: var(--bento-surface, #ffffff);
+            border: 1px solid var(--bento-border, #E2E8F0);
             border-radius: 24px;
             max-width: 580px;
             width: 100%;
             padding: 1.75rem 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--bento-shadow-overlay);
             max-height: 85vh;
             overflow-y: auto;
         }
 
         :is(.dark) .m3-modal-box {
-            background: #141e18;
-            border-color: rgba(255, 255, 255, 0.1);
+            background: var(--bento-surface, #181C23);
+            border-color: var(--bento-border, rgba(255, 255, 255, 0.09));
+        }
+
+        .m3-policy-bento-bar {
+            background: var(--bento-surface, #ffffff);
+            border: 1px solid var(--bento-border, #E2E8F0);
+            border-radius: 16px;
+            padding: 1.15rem 1.4rem;
+            box-shadow: var(--bento-shadow-card);
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .m3-policy-bento-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
     </style>
 
-    <!-- 1. Sleek Header (Clean, Zero-Clutter) -->
-    <div class="m3-policy-header">
-        <div>
-            <h1 class="m3-policy-title">
-                Kebijakan Kepatuhan & SOP Bank
-            </h1>
-            <p class="m3-policy-subtitle">
+    <!-- 1. Unified Clean Bento Toolbar (No Duplicate H1) -->
+    <div class="m3-policy-bento-bar">
+        <div class="m3-policy-bento-top">
+            <p class="m3-policy-subtitle" style="margin: 0;">
                 Pedoman resmi, surat edaran direksi, dan regulasi operasional perbankan PT BPR Banda Raya.
             </p>
+
+            <div class="m3-search-input-wrap">
+                <x-heroicon-o-magnifying-glass class="m3-search-ico" aria-hidden="true" />
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="search"
+                    class="m3-search-field"
+                    placeholder="Cari nomor SK, judul, atau kata kunci..."
+                />
+            </div>
         </div>
 
-        <div class="m3-search-input-wrap">
-            <x-heroicon-o-magnifying-glass class="m3-search-ico" />
-            <input
-                type="text"
-                wire:model.live.debounce.300ms="search"
-                class="m3-search-field"
-                placeholder="Cari nomor SK, judul, atau kata kunci..."
-            />
-        </div>
-    </div>
-
-    <!-- 2. Clean Category Pills Toolbar -->
-    <div class="m3-toolbar">
-        <div class="m3-pills-row">
+        <div class="m3-toolbar" style="margin-bottom: 0;">
+            <div class="m3-pills-row">
             <button
                 type="button"
                 wire:click="setCategory('all')"
@@ -515,6 +531,7 @@
                 Peraturan Perusahaan ({{ $categoryCounts['company_regulation'] }})
             </button>
         </div>
+    </div>
     </div>
 
     <!-- 3. Minimalist Document List -->
