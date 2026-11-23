@@ -76,23 +76,19 @@
 }
 
 .dark {
-    /* Dark Mode: Rich Emerald Obsidian with Luminous Color Accents */
-    --bento-bg: #0A110D;
-    --bento-bg-mesh:
-        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
-        radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.08) 0%, transparent 40%),
-        radial-gradient(at 60% 100%, rgba(250, 204, 21, 0.06) 0%, transparent 50%),
-        #0A110D;
-    --bento-chrome: #0E1712;
-    --bento-surface: #131E18;
-    --bento-surface-subtle: #19261F;
-    --bento-surface-hover: #203128;
-    --bento-border: rgba(74, 222, 128, 0.13);
-    --bento-border-strong: rgba(74, 222, 128, 0.32);
+    /* Dark Mode: Standard Clean Modern SaaS Dark (Neutral Slate/Charcoal, Zero Heavy Green Cave) */
+    --bento-bg: #0F1115;
+    --bento-bg-mesh: #0F1115;
+    --bento-chrome: #14171D;
+    --bento-surface: #181C23;
+    --bento-surface-subtle: #20252E;
+    --bento-surface-hover: #272D38;
+    --bento-border: rgba(255, 255, 255, 0.09);
+    --bento-border-strong: rgba(255, 255, 255, 0.18);
 
-    --bento-text: #F2F7F4;
-    --bento-text-secondary: #C6D5CC;
-    --bento-text-muted: #8FA397;
+    --bento-text: #F3F4F6;
+    --bento-text-secondary: #D1D5DB;
+    --bento-text-muted: #9CA3AF;
 
     --bento-primary: #4ADE80;
     --bento-primary-hover: #22C55E;
@@ -114,8 +110,8 @@
     --bento-danger: #F87171;
     --bento-danger-soft: rgba(248, 113, 113, 0.15);
 
-    --bento-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    --bento-shadow-hover: 0 12px 28px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(74, 222, 128, 0.2);
+    --bento-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --bento-shadow-hover: 0 10px 24px -6px rgba(0, 0, 0, 0.5);
     --bento-shadow-overlay: 0 24px 48px -8px rgba(0, 0, 0, 0.72);
 }
 
@@ -126,6 +122,25 @@ html, body {
     font-family: var(--bento-font) !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bento-border-strong) transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+    *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    *::-webkit-scrollbar-thumb {
+        background: var(--bento-border-strong);
+        border-radius: 9999px;
+    }
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
 }
 
 body.fi-body {
