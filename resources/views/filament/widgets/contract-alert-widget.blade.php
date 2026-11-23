@@ -23,7 +23,7 @@
         }
 
         :is(.dark) .m3-contract-card {
-            background: #141e18 !important;
+            background: var(--bento-surface, #181C23) !important;
             border-color: rgba(255, 255, 255, 0.08) !important;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
         }
@@ -118,7 +118,7 @@
         }
 
         :is(.dark) .m3-contract-item {
-            background: #19261e;
+            background: var(--bento-surface-subtle, #20252E);
             border-color: rgba(255, 255, 255, 0.06);
         }
 

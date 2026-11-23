@@ -36,7 +36,7 @@
         }
 
         :is(.dark) .m3-step-badge {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.1);
             color: #f1f5f9;
         }
@@ -74,7 +74,7 @@
         }
 
         :is(.dark) .m3-import-card {
-            background-color: #141E18;
+            background-color: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
@@ -154,7 +154,7 @@
         }
 
         :is(.dark) .m3-file-input {
-            background: #19261E;
+            background: var(--bento-surface-subtle, #20252E);
             border-color: rgba(255, 255, 255, 0.12);
             color: #FFFFFF;
         }

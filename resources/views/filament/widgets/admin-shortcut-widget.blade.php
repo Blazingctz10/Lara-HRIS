@@ -27,7 +27,7 @@
         }
 
         :is(.dark) .m3-dash-shortcuts-bar {
-            background: #111a14;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }

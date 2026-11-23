@@ -20,7 +20,7 @@
             padding: 1rem 1.2rem;
         }
         :is(.dark) .m3-syslog-stat {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
         }
         .m3-syslog-stat-label {
@@ -54,7 +54,7 @@
             padding: 1.25rem;
         }
         :is(.dark) .m3-syslog-card {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
         }
 
@@ -80,7 +80,7 @@
         }
         :is(.dark) .m3-syslog-select,
         :is(.dark) .m3-syslog-input {
-            background: #0d1410;
+            background: var(--bento-bg, #0F1115);
             border-color: rgba(255, 255, 255, 0.12);
             color: #f8fafc;
         }
@@ -117,7 +117,7 @@
             background: #f8fafc;
         }
         :is(.dark) .m3-log-entry {
-            background: #0d1410;
+            background: var(--bento-bg, #0F1115);
             border-color: rgba(255, 255, 255, 0.08);
         }
         .m3-log-entry.lvl-error { border-left-color: #dc2626; }

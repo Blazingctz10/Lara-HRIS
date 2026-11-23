@@ -22,7 +22,7 @@
         }
 
         :is(.dark) .m3-profile-subcard {
-            background-color: #141E18;
+            background-color: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }

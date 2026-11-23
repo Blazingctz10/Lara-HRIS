@@ -279,7 +279,7 @@
         }
 
         :is(.dark) dialog.m3-leave-dialog {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             color: #f1f5f9;
             border-color: rgba(74, 222, 128, 0.2);
         }
@@ -406,7 +406,7 @@
         }
 
         :is(.dark) .m3-leave-modal-row {
-            background: #19261E;
+            background: var(--bento-surface-subtle, #20252E);
             border-color: rgba(255, 255, 255, 0.08);
         }
     </style>

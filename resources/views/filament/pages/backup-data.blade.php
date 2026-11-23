@@ -24,7 +24,7 @@
         }
 
         :is(.dark) .m3-stat-card {
-            background-color: #141E18;
+            background-color: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
@@ -62,7 +62,7 @@
         }
 
         :is(.dark) .m3-action-panel {
-            background-color: #141E18;
+            background-color: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
         }
 
@@ -90,7 +90,7 @@
         }
 
         :is(.dark) .m3-table-wrap {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
         }
 
@@ -162,7 +162,7 @@
         }
 
         :is(.dark) .m3-select-input {
-            background-color: #19261E;
+            background-color: var(--bento-surface-subtle, #20252E);
             border-color: rgba(255, 255, 255, 0.12);
             color: #FFFFFF;
         }
@@ -206,7 +206,7 @@
 
         :is(.dark) .m3-save-schedule-btn {
             background-color: #4ADE80;
-            color: #0D1410;
+            color: var(--bento-on-primary, #052E16);
         }
 
         :is(.dark) .m3-save-schedule-btn:hover {

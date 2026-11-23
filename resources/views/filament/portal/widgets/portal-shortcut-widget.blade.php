@@ -21,7 +21,7 @@
         }
 
         :is(.dark) .m3-portal-dash-strip {
-            background: #141E18;
+            background: var(--bento-surface, #181C23);
             border-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }

@@ -370,7 +370,7 @@
 
         :is(.dark) .m3-btn-pdf {
             background: #4ADE80;
-            color: #0D1410 !important;
+            color: var(--bento-on-primary, #052E16) !important;
         }
 
         :is(.dark) .m3-btn-pdf:hover {
