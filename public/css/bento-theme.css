@@ -1,7 +1,7 @@
 /* =============================================================================
    PT BPR BANDA RAYA — UNIVERSAL CLEAN BENTO SAAS DESIGN SYSTEM
    External Stylesheet (public/css/bento-theme.css)
-   Applies universally across /admin, /portal, and all custom Bento widgets.
+   Warm Sage-Mint Light Mode (Zero Flashbang) + Rich Emerald Dark Mode
    ============================================================================= */
 
 :root {
@@ -9,34 +9,50 @@
 
     --bento-font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
-    /* Light Mode Surfaces */
-    --bento-bg: #F4F6F5;
-    --bento-surface: #FFFFFF;
-    --bento-surface-subtle: #F8FAF9;
-    --bento-surface-hover: #EEF3F0;
-    --bento-border: #E2E8E4;
-    --bento-border-strong: #C8D4CD;
+    /* Light Mode: Warm Sage-Mint Layered Surfaces (Eye-Friendly, Zero Flashbang) */
+    --bento-bg: #EBF1ED;
+    --bento-bg-mesh:
+        radial-gradient(at 0% 0%, rgba(14, 104, 56, 0.09) 0%, transparent 45%),
+        radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.06) 0%, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(202, 138, 4, 0.05) 0%, transparent 50%),
+        #EBF1ED;
+    --bento-chrome: #F4F7F5;
+    --bento-surface: #F9FBFA;
+    --bento-surface-subtle: #EFF4F1;
+    --bento-surface-hover: #E4EDE8;
+    --bento-border: #D5E0D9;
+    --bento-border-strong: #B6C9BE;
 
     /* Light Mode Text */
-    --bento-text: #0F1713;
-    --bento-text-secondary: #3A4B40;
-    --bento-text-muted: #64748B;
+    --bento-text: #0F1A14;
+    --bento-text-secondary: #2F4237;
+    --bento-text-muted: #55695E;
 
     /* Brand Accents (BPR Banda Raya) */
     --bento-primary: #0E6838;
     --bento-primary-hover: #0B532C;
-    --bento-primary-soft: rgba(14, 104, 56, 0.08);
+    --bento-primary-soft: rgba(14, 104, 56, 0.11);
     --bento-on-primary: #FFFFFF;
+
+    --bento-teal: #0D9488;
+    --bento-teal-soft: rgba(13, 148, 136, 0.11);
+
     --bento-warning: #EA580C;
-    --bento-warning-soft: rgba(234, 88, 12, 0.09);
+    --bento-warning-soft: rgba(234, 88, 12, 0.11);
+
     --bento-amber: #CA8A04;
+    --bento-amber-soft: rgba(202, 138, 4, 0.12);
+
+    --bento-blue: #2563EB;
+    --bento-blue-soft: rgba(37, 99, 235, 0.10);
+
     --bento-danger: #DC2626;
-    --bento-danger-soft: rgba(220, 38, 38, 0.09);
+    --bento-danger-soft: rgba(220, 38, 38, 0.10);
 
     /* Elevation */
-    --bento-shadow-card: 0 1px 2px rgba(15, 23, 19, 0.04);
-    --bento-shadow-hover: 0 6px 16px -4px rgba(15, 23, 19, 0.07);
-    --bento-shadow-overlay: 0 18px 38px -8px rgba(15, 23, 19, 0.16);
+    --bento-shadow-card: 0 2px 6px -1px rgba(14, 104, 56, 0.06), 0 1px 2px rgba(15, 26, 20, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    --bento-shadow-hover: 0 10px 24px -6px rgba(14, 104, 56, 0.12), 0 4px 10px -2px rgba(15, 26, 20, 0.06);
+    --bento-shadow-overlay: 0 20px 42px -10px rgba(15, 26, 20, 0.18);
 
     /* Unified Radius Scale */
     --bento-radius-card: 16px;
@@ -60,30 +76,47 @@
 }
 
 .dark {
-    --bento-bg: #0B100D;
-    --bento-surface: #131B16;
-    --bento-surface-subtle: #18221C;
-    --bento-surface-hover: #1F2C24;
-    --bento-border: rgba(255, 255, 255, 0.08);
-    --bento-border-strong: rgba(74, 222, 128, 0.28);
+    /* Dark Mode: Rich Emerald Obsidian with Luminous Color Accents */
+    --bento-bg: #0A110D;
+    --bento-bg-mesh:
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+        radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.08) 0%, transparent 40%),
+        radial-gradient(at 60% 100%, rgba(250, 204, 21, 0.06) 0%, transparent 50%),
+        #0A110D;
+    --bento-chrome: #0E1712;
+    --bento-surface: #131E18;
+    --bento-surface-subtle: #19261F;
+    --bento-surface-hover: #203128;
+    --bento-border: rgba(74, 222, 128, 0.13);
+    --bento-border-strong: rgba(74, 222, 128, 0.32);
 
-    --bento-text: #F3F6F4;
-    --bento-text-secondary: #C5D1C9;
-    --bento-text-muted: #8A9A90;
+    --bento-text: #F2F7F4;
+    --bento-text-secondary: #C6D5CC;
+    --bento-text-muted: #8FA397;
 
     --bento-primary: #4ADE80;
     --bento-primary-hover: #22C55E;
-    --bento-primary-soft: rgba(74, 222, 128, 0.12);
+    --bento-primary-soft: rgba(74, 222, 128, 0.14);
     --bento-on-primary: #052E16;
-    --bento-warning: #FB923C;
-    --bento-warning-soft: rgba(251, 146, 60, 0.14);
-    --bento-amber: #FACC15;
-    --bento-danger: #F87171;
-    --bento-danger-soft: rgba(248, 113, 113, 0.14);
 
-    --bento-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
-    --bento-shadow-hover: 0 8px 20px -4px rgba(0, 0, 0, 0.45);
-    --bento-shadow-overlay: 0 20px 44px -8px rgba(0, 0, 0, 0.65);
+    --bento-teal: #2DD4BF;
+    --bento-teal-soft: rgba(45, 212, 191, 0.14);
+
+    --bento-warning: #FB923C;
+    --bento-warning-soft: rgba(251, 146, 60, 0.15);
+
+    --bento-amber: #FACC15;
+    --bento-amber-soft: rgba(250, 204, 21, 0.14);
+
+    --bento-blue: #60A5FA;
+    --bento-blue-soft: rgba(96, 165, 250, 0.15);
+
+    --bento-danger: #F87171;
+    --bento-danger-soft: rgba(248, 113, 113, 0.15);
+
+    --bento-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --bento-shadow-hover: 0 12px 28px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(74, 222, 128, 0.2);
+    --bento-shadow-overlay: 0 24px 48px -8px rgba(0, 0, 0, 0.72);
 }
 
 /* =============================================================================
@@ -96,7 +129,8 @@ html, body {
 }
 
 body.fi-body {
-    background: var(--bento-bg) !important;
+    background: var(--bento-bg-mesh) !important;
+    background-attachment: fixed !important;
     color: var(--bento-text) !important;
     min-height: 100vh;
 }
@@ -114,7 +148,6 @@ body.fi-body {
     font-variant-numeric: tabular-nums !important;
 }
 
-/* Neutralize double Tailwind rings on Filament containers */
 .fi-section,
 .fi-card,
 .fi-ta-ctn,
@@ -127,10 +160,10 @@ body.fi-body {
 }
 
 /* =============================================================================
-   2. SIDEBAR & TOPBAR
+   2. SIDEBAR & TOPBAR (Layered Chrome Surface)
    ============================================================================= */
 .fi-sidebar {
-    background: var(--bento-surface) !important;
+    background: var(--bento-chrome) !important;
     border-right: 1px solid var(--bento-border) !important;
     box-shadow: none !important;
 }
@@ -149,11 +182,17 @@ body.fi-body {
     border-radius: 12px !important;
     padding: 0.55rem 0.85rem !important;
     margin: 0.12rem 0.5rem !important;
-    transition: background-color 0.15s ease, color 0.15s ease !important;
+    transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
 }
 
 .fi-sidebar-item-btn:hover {
     background: var(--bento-surface-hover) !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .fi-sidebar-item-btn:hover {
+        transform: translateX(2px);
+    }
 }
 
 .fi-sidebar-item-active > .fi-sidebar-item-btn {
@@ -167,7 +206,7 @@ body.fi-body {
 }
 
 .fi-topbar {
-    background: var(--bento-surface) !important;
+    background: var(--bento-chrome) !important;
     border-bottom: 1px solid var(--bento-border) !important;
     box-shadow: none !important;
 }
@@ -187,7 +226,7 @@ body.fi-body {
 }
 
 /* =============================================================================
-   3. BENTO GRID & FILAMENT CORE CONTAINERS
+   3. BENTO GRID, CARDS & COLOR PLAY
    ============================================================================= */
 .fi-wi {
     gap: 1.25rem !important;
@@ -212,7 +251,7 @@ body.fi-body {
     box-shadow: var(--bento-shadow-card) !important;
 }
 
-/* Remove outer box around StatsOverviewWidget (prevents card-in-card & orphan gap) */
+/* Remove outer box around StatsOverviewWidget (prevents card-in-card) */
 .fi-wi-stats-overview,
 .fi-wi-stats-overview .fi-section,
 .fi-wi-stats-overview .fi-sc-section,
@@ -231,14 +270,33 @@ body.fi-body {
 }
 
 .fi-wi-stats-overview-stat {
-    padding: 1.25rem 1.35rem !important;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+    position: relative;
+    overflow: hidden;
+    padding: 1.2rem 1.3rem !important;
+    border-top-width: 3px !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Bento Stat Color Rhythm (BPR Corporate Palette) */
+.fi-wi-stats-overview-stat:nth-child(1) {
+    border-top-color: var(--bento-primary) !important;
+}
+.fi-wi-stats-overview-stat:nth-child(2) {
+    border-top-color: var(--bento-teal) !important;
+}
+.fi-wi-stats-overview-stat:nth-child(3) {
+    border-top-color: var(--bento-blue) !important;
+}
+.fi-wi-stats-overview-stat:nth-child(4) {
+    border-top-color: var(--bento-amber) !important;
+}
+.fi-wi-stats-overview-stat:nth-child(5) {
+    border-top-color: var(--bento-warning) !important;
 }
 
 .fi-wi-stats-overview-stat:hover {
     border-color: var(--bento-border-strong) !important;
     box-shadow: var(--bento-shadow-hover) !important;
-    transform: translateY(-1px);
 }
 
 .fi-wi-stats-overview-stat-label {
@@ -258,12 +316,14 @@ body.fi-body {
 .fi-wi-stats-overview-stat-description {
     color: var(--bento-text-muted) !important;
     font-size: 0.78rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
 }
 
-.fi-wi-stats-overview-stat-description svg {
-    color: var(--bento-primary) !important;
-}
+.fi-wi-stats-overview-stat:nth-child(1) .fi-wi-stats-overview-stat-description svg { color: var(--bento-primary) !important; }
+.fi-wi-stats-overview-stat:nth-child(2) .fi-wi-stats-overview-stat-description svg { color: var(--bento-teal) !important; }
+.fi-wi-stats-overview-stat:nth-child(3) .fi-wi-stats-overview-stat-description svg { color: var(--bento-blue) !important; }
+.fi-wi-stats-overview-stat:nth-child(4) .fi-wi-stats-overview-stat-description svg { color: var(--bento-amber) !important; }
+.fi-wi-stats-overview-stat:nth-child(5) .fi-wi-stats-overview-stat-description svg { color: var(--bento-warning) !important; }
 
 .fi-section.fi-collapsed .fi-section-header {
     border-bottom: none !important;
@@ -274,17 +334,54 @@ body.fi-body {
     background: var(--bento-surface-subtle) !important;
 }
 
+.fi-ta-row {
+    transition: background-color 0.14s ease;
+}
+
 .fi-ta-row:hover {
     background: var(--bento-surface-hover) !important;
 }
 
 /* =============================================================================
-   4. INPUTS, BUTTONS, TABS, BADGES & MODALS
+   4. COMPOSITOR-FRIENDLY MICRO-ANIMATIONS (Respects prefers-reduced-motion)
+   ============================================================================= */
+@keyframes bentoFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .fi-wi-widget {
+        animation: bentoFadeUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .fi-wi-widget:nth-child(2) { animation-delay: 0.04s; }
+    .fi-wi-widget:nth-child(3) { animation-delay: 0.08s; }
+    .fi-wi-widget:nth-child(4) { animation-delay: 0.12s; }
+    .fi-wi-widget:nth-child(5) { animation-delay: 0.16s; }
+    .fi-wi-widget:nth-child(6) { animation-delay: 0.20s; }
+
+    .fi-wi-stats-overview-stat:hover,
+    .m3-shortcut-chip:hover,
+    .m3-portal-action-pill:hover,
+    .m3-hero-action-btn:hover {
+        transform: translateY(-2px);
+    }
+}
+
+/* =============================================================================
+   5. INPUTS, BUTTONS, TABS, BADGES & MODALS
    ============================================================================= */
 .fi-input-wrp {
     border-radius: var(--bento-radius-input) !important;
     border-color: var(--bento-border-strong) !important;
     background: var(--bento-surface) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .fi-input-wrp:focus-within {
@@ -296,6 +393,7 @@ body.fi-body {
 .fi-badge,
 .fi-tabs-item {
     border-radius: var(--bento-radius-pill) !important;
+    transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease !important;
 }
 
 .fi-tabs {
@@ -321,8 +419,7 @@ body.fi-body {
 }
 
 /* =============================================================================
-   5. UNIVERSAL OVERRIDES FOR CUSTOM BENTO WIDGETS & PAGES (.m3-*)
-   Ensures zero visual clash across Admin & Portal custom views
+   6. CUSTOM BENTO WIDGETS & PAGES (.m3-*)
    ============================================================================= */
 .m3-dash-shortcuts-bar,
 .m3-portal-dash-strip,
@@ -378,37 +475,60 @@ body.fi-body {
     color: var(--bento-text-muted) !important;
 }
 
+/* Tonal Color Chips for Shortcuts */
 .m3-shortcut-chip,
 .m3-portal-action-pill,
 .m3-filter-chip,
 .m3-step-badge {
     border-radius: var(--bento-radius-pill) !important;
-    border: 1px solid var(--bento-border) !important;
+    transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease !important;
+}
+
+.m3-chip-neutral,
+.m3-pill-neutral {
     background: var(--bento-surface-subtle) !important;
+    border: 1px solid var(--bento-border) !important;
     color: var(--bento-text-secondary) !important;
 }
 
-.m3-shortcut-chip:hover,
-.m3-portal-action-pill:hover,
-.m3-filter-chip:hover {
-    background: var(--bento-surface-hover) !important;
-    border-color: var(--bento-border-strong) !important;
-    color: var(--bento-text) !important;
+.m3-chip-emerald,
+.m3-pill-emerald {
+    background: var(--bento-primary-soft) !important;
+    border: 1px solid rgba(14, 104, 56, 0.25) !important;
+    color: var(--bento-primary) !important;
+}
+.dark .m3-chip-emerald,
+.dark .m3-pill-emerald {
+    border-color: rgba(74, 222, 128, 0.28) !important;
 }
 
-.m3-shortcut-chip .m3-chip-count {
-    background: var(--bento-primary-soft) !important;
-    color: var(--bento-primary) !important;
+.m3-chip-blue {
+    background: var(--bento-blue-soft) !important;
+    border: 1px solid rgba(37, 99, 235, 0.24) !important;
+    color: var(--bento-blue) !important;
+}
+.dark .m3-chip-blue {
+    border-color: rgba(96, 165, 250, 0.28) !important;
 }
 
 .m3-chip-amber,
 .m3-pill-amber {
-    border-color: rgba(234, 88, 12, 0.25) !important;
+    background: var(--bento-warning-soft) !important;
+    border: 1px solid rgba(234, 88, 12, 0.26) !important;
     color: var(--bento-warning) !important;
+}
+.dark .m3-chip-amber,
+.dark .m3-pill-amber {
+    border-color: rgba(251, 146, 60, 0.28) !important;
+}
+
+.m3-shortcut-chip .m3-chip-count {
+    background: var(--bento-primary) !important;
+    color: var(--bento-on-primary) !important;
 }
 
 /* =============================================================================
-   6. ROLE INDICATOR & TOPBAR RESPONSIVENESS
+   7. ROLE INDICATOR & TOPBAR RESPONSIVENESS
    ============================================================================= */
 .m3-topbar-date-text {
     font-size: 0.8rem;
@@ -432,7 +552,7 @@ body.fi-body {
 }
 
 /* =============================================================================
-   7. STACKING, NOTIFICATIONS & ACCESSIBILITY
+   8. STACKING, NOTIFICATIONS & HIGH CONTRAST
    ============================================================================= */
 .fi-elevated-active {
     position: relative !important;
@@ -445,7 +565,7 @@ body.fi-body {
 }
 
 @media (forced-colors: active) {
-    .fi-section,
+    .fi-section:not(.fi-section-not-contained),
     .fi-card,
     .fi-ta-ctn,
     .fi-wi-stats-overview-stat,
