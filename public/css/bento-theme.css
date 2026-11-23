@@ -202,7 +202,7 @@ body.fi-body {
     border-radius: var(--bento-radius-card) !important;
 }
 
-.fi-section,
+.fi-section:not(.fi-section-not-contained),
 .fi-card,
 .fi-ta-ctn,
 .fi-wi-stats-overview-stat,
@@ -214,16 +214,19 @@ body.fi-body {
 
 /* Remove outer box around StatsOverviewWidget (prevents card-in-card & orphan gap) */
 .fi-wi-stats-overview,
-.fi-wi-stats-overview > .fi-section {
+.fi-wi-stats-overview .fi-section,
+.fi-wi-stats-overview .fi-sc-section,
+.fi-section-not-contained {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
 }
 
+.fi-wi-stats-overview .fi-grid,
 .fi-wi-stats-overview-stats-ctn {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)) !important;
     gap: 1rem !important;
 }
 
