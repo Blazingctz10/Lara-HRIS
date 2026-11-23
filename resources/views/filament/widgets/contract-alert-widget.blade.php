@@ -5,11 +5,11 @@
 
     <style>
         .m3-contract-card {
-            border-radius: 24px !important;
-            background: #ffffff !important;
-            border: 1px solid var(--m3-outline-variant, #B6CAC0) !important;
+            border-radius: 16px !important;
+            background: var(--bento-surface, #ffffff) !important;
+            border: 1px solid var(--bento-border, #E4EAE6) !important;
             padding: 1.5rem !important;
-            box-shadow: 0 2px 8px -2px rgba(14, 104, 56, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+            box-shadow: var(--bento-shadow-card, 0 1px 2px rgba(15, 23, 19, 0.04)) !important;
             margin-bottom: 1.5rem !important;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
             content-visibility: auto;

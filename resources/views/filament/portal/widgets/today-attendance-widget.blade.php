@@ -14,18 +14,20 @@
             position: relative;
             overflow: hidden;
             border-radius: 16px !important;
-            background: linear-gradient(135deg, #094726 0%, #0E6838 60%, #147a42 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            background: var(--bento-surface, #ffffff) !important;
+            border: 1px solid var(--bento-border, #E4EAE6) !important;
+            border-left: 4px solid var(--bento-primary, #0E6838) !important;
             padding: 1.35rem 1.75rem !important;
-            color: #ffffff !important;
-            box-shadow: 0 6px 20px -4px rgba(14, 104, 56, 0.22) !important;
+            color: var(--bento-text, #0F1713) !important;
+            box-shadow: var(--bento-shadow-card, 0 1px 2px rgba(15, 23, 19, 0.04)) !important;
             margin-bottom: 0.75rem !important;
         }
 
         :is(.dark) .m3-att-banner {
-            background: linear-gradient(135deg, #072916 0%, #0a3f22 60%, #0E6838 100%) !important;
-            border-color: rgba(74, 222, 128, 0.2) !important;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+            background: var(--bento-surface, #131B16) !important;
+            border-color: var(--bento-border, rgba(255, 255, 255, 0.08)) !important;
+            border-left-color: var(--bento-primary, #4ADE80) !important;
+            color: var(--bento-text, #F3F6F4) !important;
         }
 
         .m3-att-content {
@@ -52,13 +54,12 @@
         }
 
         .m3-profile-avatar-simple {
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            border: 2.5px solid rgba(255, 255, 255, 0.85);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--bento-border-strong, #CBD7CF);
             object-fit: cover;
-            background: #0E6838;
+            background: var(--bento-primary-soft, rgba(14, 104, 56, 0.08));
             display: block;
             flex-shrink: 0;
             transition: transform 0.2s ease, border-color 0.2s ease;
@@ -66,30 +67,30 @@
 
         .m3-profile-avatar-simple:hover {
             transform: scale(1.03);
-            border-color: #ffffff;
+            border-color: var(--bento-primary, #0E6838);
         }
 
         .m3-profile-salutation {
-            font-size: 0.775rem;
-            font-weight: 600;
-            color: #a7f3d0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--bento-primary, #0E6838);
             letter-spacing: 0.2px;
             margin-bottom: 0.1rem;
         }
 
         .m3-profile-name {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-            font-size: 1.35rem;
+            font-family: var(--bento-font, 'Plus Jakarta Sans', system-ui, sans-serif);
+            font-size: 1.3rem;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--bento-text, #0F1713);
             line-height: 1.2;
             letter-spacing: -0.015em;
             margin: 0;
         }
 
         .m3-profile-role {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.92);
+            font-size: 0.84rem;
+            color: var(--bento-text-secondary, #3B4D42);
             font-weight: 600;
             margin-top: 0.2rem;
         }
@@ -99,15 +100,15 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 0.4rem;
-            font-size: 0.775rem;
-            color: #d1fae5;
+            font-size: 0.76rem;
+            color: var(--bento-text-muted, #64748B);
             font-weight: 500;
             margin-top: 0.3rem;
             line-height: 1.35;
         }
 
         .m3-meta-bullet {
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--bento-border-strong, #CBD7CF);
             font-size: 0.7rem;
         }
 
@@ -139,7 +140,7 @@
             font-size: 0.68rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #a7f3d0;
+            color: var(--bento-primary, #0E6838);
             font-weight: 700;
         }
 
@@ -157,10 +158,11 @@
         }
 
         .m3-metric-num {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            font-family: var(--bento-font, 'Plus Jakarta Sans', system-ui, sans-serif);
+            font-variant-numeric: tabular-nums;
             font-size: 1.45rem;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--bento-text, #0F1713);
             line-height: 1.05;
             letter-spacing: -0.02em;
         }
@@ -168,7 +170,7 @@
         .m3-metric-unit {
             font-size: 0.825rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--bento-text-secondary, #3B4D42);
         }
 
         .m3-metric-sub {
@@ -176,7 +178,7 @@
             align-items: center;
             gap: 0.2rem;
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.75);
+            color: var(--bento-text-muted, #64748B);
             font-weight: 500;
             margin-top: 0.15rem;
             transition: color 0.15s ease;
@@ -189,13 +191,13 @@
         }
 
         .m3-metric-item:hover .m3-metric-sub {
-            color: #FACC15;
+            color: var(--bento-primary, #0E6838);
         }
 
         .m3-metric-divider {
             width: 1px;
             height: 38px;
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--bento-border, #E4EAE6);
             flex-shrink: 0;
         }
 
@@ -210,36 +212,36 @@
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
-            background: #ffffff;
-            color: #0E6838;
+            background: var(--bento-primary, #0E6838);
+            color: var(--bento-on-primary, #ffffff);
             font-weight: 700;
             font-size: 0.8rem;
             padding: 0.55rem 1.1rem;
             border-radius: 9999px;
             text-decoration: none;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: none;
             transition: all 0.15s ease;
             white-space: nowrap;
             cursor: pointer;
-            border: none;
+            border: 1px solid transparent;
         }
 
         .m3-hero-action-btn:hover {
-            background: #FACC15;
-            color: #0b381e;
+            background: var(--bento-primary-hover, #0B532C);
+            color: var(--bento-on-primary, #ffffff);
             transform: translateY(-1px);
         }
 
         .m3-hero-action-btn-ghost {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: var(--bento-surface-subtle, #F1F5F3);
+            color: var(--bento-text, #0F1713);
+            border: 1px solid var(--bento-border, #E4EAE6);
             box-shadow: none;
         }
 
         .m3-hero-action-btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.22);
-            color: #ffffff;
+            background: var(--bento-surface-hover, #EBF1ED);
+            color: var(--bento-text, #0F1713);
         }
 
         .m3-hero-action-btn:focus-visible,
@@ -247,7 +249,7 @@
         .m3-leave-modal-close:focus-visible,
         .m3-leave-modal-primary:focus-visible,
         .m3-leave-modal-secondary:focus-visible {
-            outline: 3px solid #FACC15;
+            outline: 3px solid var(--bento-primary, #0E6838);
             outline-offset: 3px;
         }
 
