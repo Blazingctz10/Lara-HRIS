@@ -1,0 +1,419 @@
+/* =============================================================================
+   PT BPR BANDA RAYA — UNIVERSAL CLEAN BENTO SAAS DESIGN SYSTEM
+   External Stylesheet (public/css/bento-theme.css)
+   Applies universally across /admin, /portal, and all custom Bento widgets.
+   ============================================================================= */
+
+:root {
+    color-scheme: light dark;
+
+    --bento-font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+    /* Light Mode Surfaces */
+    --bento-bg: #F4F6F5;
+    --bento-surface: #FFFFFF;
+    --bento-surface-subtle: #F8FAF9;
+    --bento-surface-hover: #EEF3F0;
+    --bento-border: #E2E8E4;
+    --bento-border-strong: #C8D4CD;
+
+    /* Light Mode Text */
+    --bento-text: #0F1713;
+    --bento-text-secondary: #3A4B40;
+    --bento-text-muted: #64748B;
+
+    /* Brand Accents (BPR Banda Raya) */
+    --bento-primary: #0E6838;
+    --bento-primary-hover: #0B532C;
+    --bento-primary-soft: rgba(14, 104, 56, 0.08);
+    --bento-on-primary: #FFFFFF;
+    --bento-warning: #EA580C;
+    --bento-warning-soft: rgba(234, 88, 12, 0.09);
+    --bento-amber: #CA8A04;
+    --bento-danger: #DC2626;
+    --bento-danger-soft: rgba(220, 38, 38, 0.09);
+
+    /* Elevation */
+    --bento-shadow-card: 0 1px 2px rgba(15, 23, 19, 0.04);
+    --bento-shadow-hover: 0 6px 16px -4px rgba(15, 23, 19, 0.07);
+    --bento-shadow-overlay: 0 18px 38px -8px rgba(15, 23, 19, 0.16);
+
+    /* Unified Radius Scale */
+    --bento-radius-card: 16px;
+    --bento-radius-input: 12px;
+    --bento-radius-modal: 24px;
+    --bento-radius-pill: 9999px;
+
+    /* Legacy M3 Token Aliases */
+    --m3-bg: var(--bento-bg);
+    --m3-surface: var(--bento-surface);
+    --m3-surface-container: var(--bento-surface-subtle);
+    --m3-surface-container-low: var(--bento-surface-subtle);
+    --m3-on-surface: var(--bento-text);
+    --m3-on-surface-variant: var(--bento-text-secondary);
+    --m3-outline: var(--bento-border-strong);
+    --m3-outline-variant: var(--bento-border);
+    --m3-primary: var(--bento-primary);
+    --m3-on-primary: var(--bento-on-primary);
+    --m3-secondary: var(--bento-warning);
+    --m3-tertiary: var(--bento-amber);
+}
+
+.dark {
+    --bento-bg: #0B100D;
+    --bento-surface: #131B16;
+    --bento-surface-subtle: #18221C;
+    --bento-surface-hover: #1F2C24;
+    --bento-border: rgba(255, 255, 255, 0.08);
+    --bento-border-strong: rgba(74, 222, 128, 0.28);
+
+    --bento-text: #F3F6F4;
+    --bento-text-secondary: #C5D1C9;
+    --bento-text-muted: #8A9A90;
+
+    --bento-primary: #4ADE80;
+    --bento-primary-hover: #22C55E;
+    --bento-primary-soft: rgba(74, 222, 128, 0.12);
+    --bento-on-primary: #052E16;
+    --bento-warning: #FB923C;
+    --bento-warning-soft: rgba(251, 146, 60, 0.14);
+    --bento-amber: #FACC15;
+    --bento-danger: #F87171;
+    --bento-danger-soft: rgba(248, 113, 113, 0.14);
+
+    --bento-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --bento-shadow-hover: 0 8px 20px -4px rgba(0, 0, 0, 0.45);
+    --bento-shadow-overlay: 0 20px 44px -8px rgba(0, 0, 0, 0.65);
+}
+
+/* =============================================================================
+   1. BASE CANVAS & TYPOGRAPHY
+   ============================================================================= */
+html, body {
+    font-family: var(--bento-font) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body.fi-body {
+    background: var(--bento-bg) !important;
+    color: var(--bento-text) !important;
+    min-height: 100vh;
+}
+
+.fi-header-heading {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--bento-text) !important;
+}
+
+.fi-wi-stats-overview-stat-value,
+.fi-ta-cell,
+.m3-metric-num,
+.tabular-nums {
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* Neutralize double Tailwind rings on Filament containers */
+.fi-section,
+.fi-card,
+.fi-ta-ctn,
+.fi-modal-window,
+.fi-dropdown-panel,
+.fi-wi-stats-overview-stat {
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+/* =============================================================================
+   2. SIDEBAR & TOPBAR
+   ============================================================================= */
+.fi-sidebar {
+    background: var(--bento-surface) !important;
+    border-right: 1px solid var(--bento-border) !important;
+    box-shadow: none !important;
+}
+
+.fi-sidebar-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--bento-border) !important;
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 12px !important;
+    padding: 0.55rem 0.85rem !important;
+    margin: 0.12rem 0.5rem !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.fi-sidebar-item-btn:hover {
+    background: var(--bento-surface-hover) !important;
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-btn {
+    background: var(--bento-primary-soft) !important;
+    color: var(--bento-primary) !important;
+    font-weight: 700 !important;
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-btn svg {
+    color: var(--bento-primary) !important;
+}
+
+.fi-topbar {
+    background: var(--bento-surface) !important;
+    border-bottom: 1px solid var(--bento-border) !important;
+    box-shadow: none !important;
+}
+
+.fi-topbar-ctn {
+    overflow-x: visible !important;
+}
+
+.fi-topbar-end,
+.fi-user-menu {
+    flex-shrink: 0 !important;
+}
+
+.fi-dropdown-header span {
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+
+/* =============================================================================
+   3. BENTO GRID & FILAMENT CORE CONTAINERS
+   ============================================================================= */
+.fi-wi {
+    gap: 1.25rem !important;
+}
+
+.fi-section,
+.fi-card,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-wi-chart,
+.fi-wi-widget > div {
+    border-radius: var(--bento-radius-card) !important;
+}
+
+.fi-section,
+.fi-card,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-wi-chart {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    box-shadow: var(--bento-shadow-card) !important;
+}
+
+.fi-wi-stats-overview-stat {
+    padding: 1.25rem 1.35rem !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    border-color: var(--bento-border-strong) !important;
+    box-shadow: var(--bento-shadow-hover) !important;
+    transform: translateY(-1px);
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: var(--bento-text-muted) !important;
+    letter-spacing: 0.01em !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.65rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--bento-text) !important;
+}
+
+.fi-section.fi-collapsed .fi-section-header {
+    border-bottom: none !important;
+}
+
+.fi-ta-header-ctn,
+.fi-ta-thead {
+    background: var(--bento-surface-subtle) !important;
+}
+
+.fi-ta-row:hover {
+    background: var(--bento-surface-hover) !important;
+}
+
+/* =============================================================================
+   4. INPUTS, BUTTONS, TABS, BADGES & MODALS
+   ============================================================================= */
+.fi-input-wrp {
+    border-radius: var(--bento-radius-input) !important;
+    border-color: var(--bento-border-strong) !important;
+    background: var(--bento-surface) !important;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--bento-primary) !important;
+    box-shadow: 0 0 0 3px var(--bento-primary-soft) !important;
+}
+
+.fi-btn,
+.fi-badge,
+.fi-tabs-item {
+    border-radius: var(--bento-radius-pill) !important;
+}
+
+.fi-tabs {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-radius: var(--bento-radius-card) !important;
+    padding: 0.35rem !important;
+    box-shadow: var(--bento-shadow-card) !important;
+}
+
+.fi-modal-window {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-radius: var(--bento-radius-modal) !important;
+    box-shadow: var(--bento-shadow-overlay) !important;
+}
+
+.fi-dropdown-panel {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-radius: var(--bento-radius-card) !important;
+    box-shadow: var(--bento-shadow-overlay) !important;
+}
+
+/* =============================================================================
+   5. UNIVERSAL OVERRIDES FOR CUSTOM BENTO WIDGETS & PAGES (.m3-*)
+   Ensures zero visual clash across Admin & Portal custom views
+   ============================================================================= */
+.m3-dash-shortcuts-bar,
+.m3-portal-dash-strip,
+.m3-memo-card,
+.m3-contract-card,
+.m3-stat-card,
+.m3-action-panel,
+.m3-import-card,
+.m3-profile-subcard,
+.m3-table-wrap {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-radius: var(--bento-radius-card) !important;
+    box-shadow: var(--bento-shadow-card) !important;
+    color: var(--bento-text) !important;
+}
+
+.m3-att-banner {
+    background: var(--bento-surface) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-left: 4px solid var(--bento-primary) !important;
+    border-radius: var(--bento-radius-card) !important;
+    box-shadow: var(--bento-shadow-card) !important;
+    color: var(--bento-text) !important;
+}
+
+.m3-contract-item,
+.m3-leave-modal-row {
+    background: var(--bento-surface-subtle) !important;
+    border: 1px solid var(--bento-border) !important;
+    border-radius: 12px !important;
+}
+
+.m3-contract-title,
+.m3-contract-emp-title,
+.m3-contract-days-label,
+.m3-memo-h3,
+.m3-item-title,
+.m3-card-title,
+.m3-subcard-title,
+.m3-policy-title,
+.m3-profile-name {
+    color: var(--bento-text) !important;
+}
+
+.m3-contract-desc,
+.m3-contract-emp-meta,
+.m3-memo-desc,
+.m3-memo-meta-text,
+.m3-item-body,
+.m3-subcard-desc,
+.m3-policy-subtitle {
+    color: var(--bento-text-muted) !important;
+}
+
+.m3-shortcut-chip,
+.m3-portal-action-pill,
+.m3-filter-chip,
+.m3-step-badge {
+    border-radius: var(--bento-radius-pill) !important;
+    border-color: var(--bento-border) !important;
+}
+
+.m3-chip-neutral,
+.m3-pill-neutral {
+    background: var(--bento-surface-subtle) !important;
+    color: var(--bento-text-secondary) !important;
+}
+
+.m3-chip-neutral:hover,
+.m3-pill-neutral:hover {
+    background: var(--bento-surface-hover) !important;
+    color: var(--bento-text) !important;
+}
+
+/* =============================================================================
+   6. ROLE INDICATOR & TOPBAR RESPONSIVENESS
+   ============================================================================= */
+.m3-topbar-date-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--bento-text-muted);
+    white-space: nowrap;
+    margin-right: 0.75rem;
+}
+
+@media (max-width: 1320px) {
+    .m3-role-branch-label,
+    .m3-role-branch-dot {
+        display: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .m3-topbar-date-text {
+        display: none !important;
+    }
+}
+
+/* =============================================================================
+   7. STACKING, NOTIFICATIONS & ACCESSIBILITY
+   ============================================================================= */
+.fi-elevated-active {
+    position: relative !important;
+    z-index: 60 !important;
+}
+
+.fi-no {
+    z-index: 999999 !important;
+    top: 4.75rem !important;
+}
+
+@media (forced-colors: active) {
+    .fi-section,
+    .fi-card,
+    .fi-ta-ctn,
+    .fi-wi-stats-overview-stat,
+    .fi-modal-window,
+    .fi-dropdown-panel,
+    .m3-dash-shortcuts-bar,
+    .m3-portal-dash-strip,
+    .m3-att-banner,
+    .m3-memo-card,
+    .m3-contract-card {
+        border: 1px solid ButtonBorder !important;
+    }
+}

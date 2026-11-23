@@ -65,31 +65,6 @@
     };
 @endphp
 
-<style>
-    @media (max-width: 1320px) {
-        .m3-role-branch-label,
-        .m3-role-branch-dot {
-            display: none !important;
-        }
-    }
-    @media (max-width: 900px) {
-        .m3-topbar-date-text {
-            display: none !important;
-        }
-    }
-    .m3-topbar-date-text {
-        font-size: 0.825rem;
-        font-weight: 600;
-        color: #475569;
-        white-space: nowrap;
-        letter-spacing: 0.15px;
-        margin-right: 0.75rem;
-    }
-    :is(.dark) .m3-topbar-date-text {
-        color: #94a3b8;
-    }
-</style>
-
 <div class="m3-role-bar" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-right: 0.5rem;">
     <!-- Plain Text Navbar Date (No Card, Polos Tanggal Saja Sesuai Permintaan) -->
     <span class="m3-topbar-date-text">
