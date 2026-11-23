@@ -1,0 +1,40 @@
+# =============================================================================
+# PT BPR BANDA RAYA — Caddy Configuration for Lara-HRIS (Windows LAN / Server)
+# =============================================================================
+# Mode Default: HTTP LAN pada Port 80 (bisa langsung diakses dari semua PC kantor
+# via http://IP_PC_HOST atau http://hris.bpr.local tanpa instalasi sertifikat).
+#
+# Mode HTTPS Internal (untuk PWA Install & Kamera HP di LAN):
+# Ganti ":80" di bawah dengan domain lokal Anda + "tls internal", contoh:
+#
+#   hris.bprbandaraya.internal {
+#       tls internal
+#       ...
+#   }
+# =============================================================================
+
+:80 {
+	encode zstd gzip
+
+	root * public
+
+	# Lindungi file sensitif agar tidak pernah bisa diakses
+	@blocked path /.env* /storage/* /.git* /composer.* /artisan /phpunit.xml
+	respond @blocked 403
+
+	# Layani aset statis (CSS, JS, gambar, PWA manifest/sw) langsung oleh Caddy
+	@static {
+		file
+		path *.css *.js *.png *.jpg *.jpeg *.svg *.webp *.woff2 *.ico *.webmanifest *.html
+	}
+	handle @static {
+		file_server
+	}
+
+	# Teruskan seluruh request dinamis Laravel/Filament ke backend PHP lokal
+	handle {
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+}
