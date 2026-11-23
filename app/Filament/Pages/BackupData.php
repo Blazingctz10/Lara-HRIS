@@ -173,7 +173,7 @@ class BackupData extends Page
             ->label('Hapus')
             ->color('danger')
             ->size('xs')
-            ->icon('heroicon-m-trash')
+            ->icon('heroicon-o-trash')
             ->requiresConfirmation()
             ->modalHeading('Konfirmasi Hapus Arsip Cadangan')
             ->modalDescription(fn (array $arguments) => "Apakah Anda yakin ingin menghapus file cadangan '{$arguments['filename']}' secara permanen dari server? Tindakan ini tidak dapat dibatalkan.")

@@ -45,27 +45,27 @@ class BankStatsOverview extends BaseWidget
             return [
                 Stat::make('Total Akun Sistem', "{$totalUsers} Akun")
                     ->description('Kredensial & hak akses terdaftar')
-                    ->descriptionIcon('heroicon-m-users')
+                    ->descriptionIcon('heroicon-o-users')
                     ->color('primary'),
 
                 Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                     ->description('Kantor Pusat, Cabang & Kas')
-                    ->descriptionIcon('heroicon-m-building-office-2')
+                    ->descriptionIcon('heroicon-o-building-office-2')
                     ->color('primary'),
 
                 Stat::make('Master Pegawai', "{$activeEmployees} / {$totalEmployees}")
                     ->description('Data pegawai aktif di sistem')
-                    ->descriptionIcon('heroicon-m-user-group')
+                    ->descriptionIcon('heroicon-o-user-group')
                     ->color('info'),
 
                 Stat::make('Log Presensi Masuk Hari Ini', "{$attendanceToday} Data")
                     ->description('Transaksi kehadiran tersimpan')
-                    ->descriptionIcon('heroicon-m-clock')
+                    ->descriptionIcon('heroicon-o-clock')
                     ->color('success'),
 
                 Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
                     ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : 'Tidak ada antrean klaim')
-                    ->descriptionIcon('heroicon-m-receipt-percent')
+                    ->descriptionIcon('heroicon-o-receipt-percent')
                     ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
             ];
         }
@@ -77,27 +77,27 @@ class BankStatsOverview extends BaseWidget
             return [
                 Stat::make('Total Pegawai BPR', "{$activeEmployees} Pegawai")
                     ->description("Total master: {$totalEmployees} pegawai")
-                    ->descriptionIcon('heroicon-m-user-group')
+                    ->descriptionIcon('heroicon-o-user-group')
                     ->color('primary'),
 
                 Stat::make('Presensi Hari Ini', "{$attendanceToday} Hadir")
                     ->description('Kehadiran pegawai seluruh cabang')
-                    ->descriptionIcon('heroicon-m-check-badge')
+                    ->descriptionIcon('heroicon-o-check-badge')
                     ->color('success'),
 
                 Stat::make('Otorisasi Cuti Direksi', "{$pendingDireksi} Berkas")
                     ->description($pendingDireksi > 0 ? 'Menunggu persetujuan Direksi' : 'Semua otorisasi selesai')
-                    ->descriptionIcon('heroicon-m-pencil-square')
+                    ->descriptionIcon('heroicon-o-pencil-square')
                     ->color($pendingDireksi > 0 ? 'danger' : 'gray'),
 
                 Stat::make('Beban Klaim Operasional', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
                     ->description("{$unpaidClaimsCount} klaim aktif dalam proses")
-                    ->descriptionIcon('heroicon-m-banknotes')
+                    ->descriptionIcon('heroicon-o-banknotes')
                     ->color('warning'),
 
                 Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                     ->description('Kantor Pusat & Kantor Cabang')
-                    ->descriptionIcon('heroicon-m-building-office-2')
+                    ->descriptionIcon('heroicon-o-building-office-2')
                     ->color('info'),
             ];
         }
@@ -110,27 +110,27 @@ class BankStatsOverview extends BaseWidget
             return [
                 Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
                     ->description('Status operasional aktif')
-                    ->descriptionIcon('heroicon-m-user-group')
+                    ->descriptionIcon('heroicon-o-user-group')
                     ->color('success'),
 
                 Stat::make('Presensi Hari Ini', "{$attendanceToday} Pegawai")
                     ->description('Tercatat masuk sistem')
-                    ->descriptionIcon('heroicon-m-clock')
+                    ->descriptionIcon('heroicon-o-clock')
                     ->color('info'),
 
                 Stat::make('Verifikasi Cuti Pending', "{$pendingHrLeaves} Berkas")
                     ->description('Menunggu verifikasi HR')
-                    ->descriptionIcon('heroicon-m-document-text')
+                    ->descriptionIcon('heroicon-o-document-text')
                     ->color($pendingHrLeaves > 0 ? 'warning' : 'gray'),
 
                 Stat::make('Pelamar Baru', "{$newApplicants} Berkas")
                     ->description('Kandidat rekrutmen masuk')
-                    ->descriptionIcon('heroicon-m-briefcase')
+                    ->descriptionIcon('heroicon-o-briefcase')
                     ->color($newApplicants > 0 ? 'primary' : 'gray'),
 
                 Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
                     ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : 'Tidak ada antrean klaim')
-                    ->descriptionIcon('heroicon-m-receipt-percent')
+                    ->descriptionIcon('heroicon-o-receipt-percent')
                     ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
             ];
         }
@@ -145,31 +145,31 @@ class BankStatsOverview extends BaseWidget
             return [
                 Stat::make('Katalog Kebijakan & SOP', "{$policyCount} Regulasi")
                     ->description('Pedoman aktif berlaku bank')
-                    ->descriptionIcon('heroicon-m-shield-check')
+                    ->descriptionIcon('heroicon-o-shield-check')
                     ->color('success')
                     ->url('/admin/compliance-policies'),
 
                 Stat::make('Regulasi APU & PPT (OJK)', "{$ojkPolicyCount} Dokumen")
                     ->description('Kepatuhan anti pencucian uang')
-                    ->descriptionIcon('heroicon-m-scale')
+                    ->descriptionIcon('heroicon-o-scale')
                     ->color('danger')
                     ->url('/admin/compliance-policies'),
 
                 Stat::make('SOP Operasional & Kas', "{$sopPolicyCount} Prosedur")
                     ->description('Standar operasional cabang & teller')
-                    ->descriptionIcon('heroicon-m-banknotes')
+                    ->descriptionIcon('heroicon-o-banknotes')
                     ->color('primary')
                     ->url('/admin/compliance-policies'),
 
                 Stat::make('Surat Edaran Aktif', "{$activeAnnouncements} Memo")
                     ->description('Edaran & pengumuman internal bank')
-                    ->descriptionIcon('heroicon-m-megaphone')
+                    ->descriptionIcon('heroicon-o-megaphone')
                     ->color('warning')
                     ->url('/admin/announcements'),
 
                 Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                     ->description('Kantor Pusat & Kantor Cabang')
-                    ->descriptionIcon('heroicon-m-building-office-2')
+                    ->descriptionIcon('heroicon-o-building-office-2')
                     ->color('gray'),
             ];
         }
@@ -185,23 +185,23 @@ class BankStatsOverview extends BaseWidget
             return [
                 Stat::make('Pegawai Cabang Aktif', "{$branchEmployeesCount} Pegawai")
                     ->description($user->branch?->name ?? 'Cabang Penempatan')
-                    ->descriptionIcon('heroicon-m-user-group')
+                    ->descriptionIcon('heroicon-o-user-group')
                     ->color('primary'),
 
                 Stat::make('Presensi Cabang Hari Ini', "{$branchAttendanceToday} Hadir")
                     ->description('Kehadiran staf kantor cabang')
-                    ->descriptionIcon('heroicon-m-clock')
+                    ->descriptionIcon('heroicon-o-clock')
                     ->color('success'),
 
                 Stat::make('Persetujuan Cuti Cabang', "{$branchPendingLeaves} Berkas")
                     ->description($branchPendingLeaves > 0 ? 'Menunggu review Pincab' : 'Tidak ada cuti pending')
-                    ->descriptionIcon('heroicon-m-document-text')
+                    ->descriptionIcon('heroicon-o-document-text')
                     ->color($branchPendingLeaves > 0 ? 'warning' : 'gray')
                     ->url('/admin/leave-requests'),
 
                 Stat::make('Klaim Reimbursement Cabang', "{$branchPendingClaims} Berkas")
                     ->description($branchPendingClaims > 0 ? 'Menunggu persetujuan Pincab' : 'Semua klaim diproses')
-                    ->descriptionIcon('heroicon-m-receipt-percent')
+                    ->descriptionIcon('heroicon-o-receipt-percent')
                     ->color($branchPendingClaims > 0 ? 'warning' : 'gray')
                     ->url('/admin/reimbursements'),
             ];
@@ -213,27 +213,27 @@ class BankStatsOverview extends BaseWidget
         return [
             Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
                 ->description('Status operasional bank')
-                ->descriptionIcon('heroicon-m-user-group')
+                ->descriptionIcon('heroicon-o-user-group')
                 ->color('success'),
 
             Stat::make('Presensi Hari Ini', "{$attendanceToday} Hadir")
                 ->description('Kehadiran pegawai')
-                ->descriptionIcon('heroicon-m-clock')
+                ->descriptionIcon('heroicon-o-clock')
                 ->color('info'),
 
             Stat::make('Pengajuan Cuti Berjalan', "{$pendingLeaves} Berkas")
                 ->description('Dalam proses verifikasi/otorisasi')
-                ->descriptionIcon('heroicon-m-document-text')
+                ->descriptionIcon('heroicon-o-document-text')
                 ->color($pendingLeaves > 0 ? 'warning' : 'gray'),
 
             Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
                 ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim diajukan" : 'Tidak ada klaim pending')
-                ->descriptionIcon('heroicon-m-receipt-percent')
+                ->descriptionIcon('heroicon-o-receipt-percent')
                 ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
 
             Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                 ->description('Kantor Pusat, Cabang & Kas')
-                ->descriptionIcon('heroicon-m-building-office')
+                ->descriptionIcon('heroicon-o-building-office')
                 ->color('gray'),
         ];
     }

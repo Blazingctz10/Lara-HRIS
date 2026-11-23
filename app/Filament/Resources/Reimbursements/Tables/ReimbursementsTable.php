@@ -84,7 +84,7 @@ class ReimbursementsTable
 
                 Action::make('approve_pincab')
                     ->label('Setujui (Pemimpin Cabang)')
-                    ->icon('heroicon-m-check')
+                    ->icon('heroicon-o-check')
                     ->color('info')
                     ->button()
                     ->visible(fn (Reimbursement $record) => $record->status === 'Pending' && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
@@ -118,7 +118,7 @@ class ReimbursementsTable
 
                 Action::make('mark_paid')
                     ->label('Konfirmasi Pencairan')
-                    ->icon('heroicon-m-banknotes')
+                    ->icon('heroicon-o-banknotes')
                     ->color('success')
                     ->button()
                     ->visible(fn (Reimbursement $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && auth()->user()->isHrAdmin())
@@ -147,6 +147,45 @@ class ReimbursementsTable
                                 ->body("Klaim '{$record->title}' sebesar Rp " . number_format($record->amount, 0, ',', '.') . " telah dicairkan/ditransfer.")
                                 ->icon('heroicon-o-banknotes')
                                 ->iconColor('success')
+                                ->sendToDatabase($record->employee->user);
+                        }
+                    }),
+
+                Action::make('reject')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->button()
+                    ->outlined()
+                    ->visible(fn (Reimbursement $record) => in_array($record->status, ['Pending', 'Approved_Pincab']) && (auth()->user()->isBranchManager() || auth()->user()->isHrAdmin()))
+                    ->form([
+                        \Filament\Forms\Components\Textarea::make('rejection_note')
+                            ->label('Alasan Penolakan')
+                            ->placeholder('Jelaskan alasan penolakan klaim reimbursement ini...')
+                            ->required(),
+                    ])
+                    ->modalHeading('Tolak Klaim Reimbursement')
+                    ->modalSubmitActionLabel('Tolak Klaim')
+                    ->modalCancelActionLabel('Batal')
+                    ->action(function (Reimbursement $record, array $data) {
+                        $record->update([
+                            'status' => 'Rejected',
+                            'approved_by' => auth()->id(),
+                            'notes' => $data['rejection_note'],
+                        ]);
+
+                        Notification::make()
+                            ->title('Klaim Reimbursement Ditolak')
+                            ->body("Klaim '{$record->title}' untuk {$record->employee->full_name} telah ditolak.")
+                            ->warning()
+                            ->send();
+
+                        if ($record->employee?->user) {
+                            Notification::make()
+                                ->title('Klaim Reimbursement Ditolak')
+                                ->body("Klaim '{$record->title}' ditolak. Alasan: {$data['rejection_note']}")
+                                ->icon('heroicon-o-x-circle')
+                                ->iconColor('danger')
                                 ->sendToDatabase($record->employee->user);
                         }
                     }),

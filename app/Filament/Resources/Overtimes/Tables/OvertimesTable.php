@@ -83,7 +83,7 @@ class OvertimesTable
             ->recordActions([
                 Action::make('approve')
                     ->label('Setujui Lembur')
-                    ->icon('heroicon-m-check-badge')
+                    ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->button()
                     ->visible(fn (Overtime $record) => $record->status === 'Pending' && in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
@@ -124,7 +124,7 @@ class OvertimesTable
 
                 Action::make('reject')
                     ->label('Tolak')
-                    ->icon('heroicon-m-x-circle')
+                    ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->button()
                     ->outlined()

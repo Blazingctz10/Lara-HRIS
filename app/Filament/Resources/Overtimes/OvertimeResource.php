@@ -38,7 +38,7 @@ class OvertimeResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi']);
+        return in_array(auth()->user()?->role, ['super_admin', 'hr_admin', 'direksi', 'branch_manager']);
     }
 
     public static function canCreate(): bool
