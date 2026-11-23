@@ -135,6 +135,11 @@ body.fi-body {
     box-shadow: none !important;
 }
 
+.fi-sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bento-border-strong) transparent;
+}
+
 .fi-sidebar-header {
     background: transparent !important;
     border-bottom: 1px solid var(--bento-border) !important;
@@ -207,6 +212,21 @@ body.fi-body {
     box-shadow: var(--bento-shadow-card) !important;
 }
 
+/* Remove outer box around StatsOverviewWidget (prevents card-in-card & orphan gap) */
+.fi-wi-stats-overview,
+.fi-wi-stats-overview > .fi-section {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.fi-wi-stats-overview-stats-ctn {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
 .fi-wi-stats-overview-stat {
     padding: 1.25rem 1.35rem !important;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
@@ -230,6 +250,16 @@ body.fi-body {
     font-weight: 800 !important;
     letter-spacing: -0.025em !important;
     color: var(--bento-text) !important;
+}
+
+.fi-wi-stats-overview-stat-description {
+    color: var(--bento-text-muted) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+}
+
+.fi-wi-stats-overview-stat-description svg {
+    color: var(--bento-primary) !important;
 }
 
 .fi-section.fi-collapsed .fi-section-header {
@@ -350,19 +380,28 @@ body.fi-body {
 .m3-filter-chip,
 .m3-step-badge {
     border-radius: var(--bento-radius-pill) !important;
-    border-color: var(--bento-border) !important;
-}
-
-.m3-chip-neutral,
-.m3-pill-neutral {
+    border: 1px solid var(--bento-border) !important;
     background: var(--bento-surface-subtle) !important;
     color: var(--bento-text-secondary) !important;
 }
 
-.m3-chip-neutral:hover,
-.m3-pill-neutral:hover {
+.m3-shortcut-chip:hover,
+.m3-portal-action-pill:hover,
+.m3-filter-chip:hover {
     background: var(--bento-surface-hover) !important;
+    border-color: var(--bento-border-strong) !important;
     color: var(--bento-text) !important;
+}
+
+.m3-shortcut-chip .m3-chip-count {
+    background: var(--bento-primary-soft) !important;
+    color: var(--bento-primary) !important;
+}
+
+.m3-chip-amber,
+.m3-pill-amber {
+    border-color: rgba(234, 88, 12, 0.25) !important;
+    color: var(--bento-warning) !important;
 }
 
 /* =============================================================================
