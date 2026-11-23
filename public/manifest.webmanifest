@@ -1,0 +1,26 @@
+{
+    "name": "Core HRIS & ESS Portal — PT BPR Banda Raya",
+    "short_name": "HRIS BPR",
+    "description": "Sistem Informasi Manajemen SDM & Portal Mandiri Pegawai PT Bank Perekonomian Rakyat Banda Raya.",
+    "start_url": "/portal",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#EBF1ED",
+    "theme_color": "#0E6838",
+    "lang": "id",
+    "icons": [
+        {
+            "src": "/images/logo-tight.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

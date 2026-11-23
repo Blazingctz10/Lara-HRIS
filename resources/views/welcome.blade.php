@@ -6,6 +6,21 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Masuk — Core HRIS PT BPR Banda Raya</title>
 <link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
+<link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+<meta name="theme-color" content="#0E6838" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HRIS BPR">
+<link rel="apple-touch-icon" href="{{ asset('images/logo-tight.png') }}">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+</script>
 
 <!-- Google Fonts: Plus Jakarta Sans (Unified Across Lara-HRIS) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
