@@ -200,23 +200,32 @@ body.fi-body {
     transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
 }
 
+/* Center icons cleanly when desktop sidebar is collapsed */
+.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item-btn {
+    justify-content: center !important;
+    padding: 0.55rem !important;
+    margin: 0.15rem auto !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+}
+
 .fi-sidebar-item-btn:hover {
     background: var(--bento-surface-hover) !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .fi-sidebar-item-btn:hover {
+    .fi-sidebar.fi-sidebar-open .fi-sidebar-item-btn:hover {
         transform: translateX(2px);
     }
 }
 
-.fi-sidebar-item-active > .fi-sidebar-item-btn {
+.fi-sidebar-item-active .fi-sidebar-item-btn {
     background: var(--bento-primary-soft) !important;
     color: var(--bento-primary) !important;
     font-weight: 700 !important;
 }
 
-.fi-sidebar-item-active > .fi-sidebar-item-btn svg {
+.fi-sidebar-item-active .fi-sidebar-item-btn svg {
     color: var(--bento-primary) !important;
 }
 
@@ -563,6 +572,65 @@ body.fi-body {
 @media (max-width: 900px) {
     .m3-topbar-date-text {
         display: none !important;
+    }
+}
+
+/* =============================================================================
+   8. RESPONSIVE ADAPTATION ACROSS DEVICES (Mobile, Tablet, Laptop, Desktop)
+   ============================================================================= */
+@media (max-width: 1023px) {
+    .fi-sidebar.fi-sidebar-open {
+        box-shadow: var(--bento-shadow-overlay) !important;
+    }
+
+    .fi-main {
+        padding-inline: 1rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .fi-main {
+        padding-inline: 0.75rem !important;
+    }
+
+    .fi-header-heading {
+        font-size: 1.35rem !important;
+    }
+
+    .fi-wi {
+        gap: 0.85rem !important;
+    }
+
+    .fi-wi-stats-overview .fi-grid,
+    .fi-wi-stats-overview-stats-ctn {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    .fi-wi-stats-overview-stat {
+        padding: 1rem 1.1rem !important;
+    }
+
+    .fi-wi-stats-overview-stat-value {
+        font-size: 1.4rem !important;
+    }
+
+    .m3-att-banner,
+    .m3-memo-card,
+    .m3-contract-card,
+    .m3-policy-bento-bar,
+    .m3-doc-item {
+        padding: 1rem !important;
+    }
+
+    .m3-doc-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .m3-search-input-wrap {
+        min-width: 0 !important;
+        max-width: 100% !important;
     }
 }
 

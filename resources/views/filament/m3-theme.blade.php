@@ -1,17 +1,20 @@
 <!-- Early Theme Initializer & UI Stacking Controller -->
 <script>
     (function() {
-        const theme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'system';
-        let isDark = false;
-        if (theme === 'dark') {
-            isDark = true;
-        } else if (theme === 'system') {
-            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        function applySystemTheme() {
+            const currentTheme = localStorage.getItem('theme') || localStorage.getItem('hris_theme') || 'system';
+            let dark = false;
+            if (currentTheme === 'dark') {
+                dark = true;
+            } else if (currentTheme === 'system') {
+                dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            document.documentElement.classList.toggle('dark', dark);
         }
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+
+        applySystemTheme();
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySystemTheme);
         }
 
         function elevateChain(target) {
