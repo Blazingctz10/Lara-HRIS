@@ -600,10 +600,15 @@ CSV;
                 $permanentDate = ! empty($data['tanggal_pengangkatan_tetap']) ? Carbon::parse($data['tanggal_pengangkatan_tetap'])->toDateString() : null;
                 $contractEndDate = ! empty($data['akhir_kontrak']) ? Carbon::parse($data['akhir_kontrak'])->toDateString() : null;
 
-                $status = trim($data['status_pegawai'] ?? ($data['status'] ?? 'Active'));
-                if (! in_array($status, ['Active', 'On Leave', 'Resigned', 'Terminated'])) {
-                    $status = 'Active';
-                }
+                $rawStatus = trim($data['status_pegawai'] ?? ($data['status'] ?? 'Active'));
+                $lowerStatus = strtolower($rawStatus);
+                $status = match (true) {
+                    in_array($lowerStatus, ['resigned', 'resign', 'keluar', 'berhenti', 'nonaktif', 'non-aktif', 'pensiun'], true) => 'Resigned',
+                    in_array($lowerStatus, ['terminated', 'pecat', 'phk', 'diberhentikan'], true) => 'Terminated',
+                    in_array($lowerStatus, ['on leave', 'cuti'], true) => 'On Leave',
+                    in_array($rawStatus, ['Active', 'On Leave', 'Resigned', 'Terminated'], true) => $rawStatus,
+                    default => 'Active',
+                };
 
                 // 7. Simpan atau Perbarui Profil Employee
                 $employee = Employee::where('nip', $nip)->first();

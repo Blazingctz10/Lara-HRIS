@@ -20,6 +20,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('employee'))
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('name')
@@ -70,6 +71,19 @@ class UsersTable
                     ->color('primary')
                     ->placeholder('Belum Terhubung')
                     ->formatStateUsing(fn ($record) => $record->employee ? "NIP: {$record->employee->nip}" : 'Belum Terhubung'),
+
+                TextColumn::make('access_status')
+                    ->label('Akses Portal')
+                    ->state(function (User $record): string {
+                        $status = $record->employee?->status;
+                        if (in_array($status, ['Resigned', 'Terminated'], true)) {
+                            return "Diblokir ({$status})";
+                        }
+                        return 'Aktif';
+                    })
+                    ->badge()
+                    ->color(fn (User $record): string => in_array($record->employee?->status, ['Resigned', 'Terminated'], true) ? 'danger' : 'success')
+                    ->icon(fn (User $record): string => in_array($record->employee?->status, ['Resigned', 'Terminated'], true) ? 'heroicon-o-no-symbol' : 'heroicon-o-check-circle'),
 
                 TextColumn::make('created_at')
                     ->label('Terdaftar')
