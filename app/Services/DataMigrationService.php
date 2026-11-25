@@ -1355,29 +1355,83 @@ CSV;
      */
     public function resolveBprDepartment(string $posName, string $branchName = ''): Department
     {
-        $lower = strtolower($posName . ' ' . $branchName);
+        $lower = strtolower(trim($posName));
 
-        if (str_contains($lower, 'direktur') || str_contains($lower, 'direksi') || str_contains($lower, 'komisaris')) {
-            $dept = Department::where('name', 'LIKE', '%Direksi%')->first();
-        } elseif (str_contains($lower, 'kredit') || str_contains($lower, 'bisnis') || str_contains($lower, 'ao') || str_contains($lower, 'funding') || str_contains($lower, 'marketing')) {
-            $dept = Department::where('name', 'LIKE', '%Kredit%')->orWhere('name', 'LIKE', '%Bisnis%')->first();
-        } elseif (str_contains($lower, 'hr') || str_contains($lower, 'sdm') || str_contains($lower, 'ga') || str_contains($lower, 'human')) {
-            $dept = Department::where('name', 'LIKE', '%Human%')->orWhere('name', 'LIKE', '%GA%')->first();
-        } elseif (str_contains($lower, 'skai') || str_contains($lower, 'audit')) {
-            $dept = Department::where('name', 'LIKE', '%SKAI%')->orWhere('name', 'LIKE', '%Audit%')->first();
-        } elseif (str_contains($lower, 'kepatuhan') || str_contains($lower, 'risiko') || str_contains($lower, 'risk')) {
-            $dept = Department::where('name', 'LIKE', '%Kepatuhan%')->orWhere('name', 'LIKE', '%Risiko%')->first();
-        } elseif (str_contains($lower, 'it') || str_contains($lower, 'core') || str_contains($lower, 'teknologi')) {
-            $dept = Department::where('name', 'LIKE', '%Teknologi%')->first();
-        } else {
-            $dept = Department::where('name', 'LIKE', '%Operasional%')->first();
+        $rules = [
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(direktur|direksi|komisaris)\b/i', $s),
+                'likes' => ['%Direksi%'],
+                'name' => 'Direksi & Dewan Komisaris',
+                'code' => 'DIR01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(skai|audit|internal control)\b/i', $s),
+                'likes' => ['%SKAI%', '%Audit%'],
+                'name' => 'SKAI & Audit Internal',
+                'code' => 'SKAI01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(kepatuhan|risiko|risk|compliance|mr)\b/i', $s),
+                'likes' => ['%Kepatuhan%', '%Risiko%'],
+                'name' => 'Kepatuhan & Manajemen Risiko',
+                'code' => 'KPMR01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(legal|collector|collection|remedial)\b/i', $s),
+                'likes' => ['%Legal%', '%Collection%'],
+                'name' => 'Legal & Collection',
+                'code' => 'LEG01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(kredit|bisnis|account officer|ao|funding|marketing|lending|surveyor)\b/i', $s),
+                'likes' => ['%Kredit%', '%Bisnis%'],
+                'name' => 'Bisnis, Kredit & Pemasaran',
+                'code' => 'BKP01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(hr|hrd|sdm|ga|human|umum|driver|pramubakti|security|satpam)\b/i', $s),
+                'likes' => ['%Human%', '%HR%', '%GA%'],
+                'name' => 'Human Resources & GA',
+                'code' => 'HRGA01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(it|core|teknologi|sistem informasi)\b/i', $s),
+                'likes' => ['%Teknologi%', '%IT%'],
+                'name' => 'Teknologi Informasi (IT)',
+                'code' => 'IT01',
+            ],
+            [
+                'match' => fn (string $s): bool => (bool) preg_match('/\b(accounting|akuntansi|keuangan|finance)\b/i', $s),
+                'likes' => ['%Akuntansi%', '%Keuangan%'],
+                'name' => 'Keuangan & Akuntansi',
+                'code' => 'FIN01',
+            ],
+        ];
+
+        foreach ($rules as $rule) {
+            if ($rule['match']($lower)) {
+                $dept = Department::where(function ($q) use ($rule) {
+                    foreach ($rule['likes'] as $i => $like) {
+                        if ($i === 0) {
+                            $q->where('name', 'LIKE', $like);
+                        } else {
+                            $q->orWhere('name', 'LIKE', $like);
+                        }
+                    }
+                })->first();
+
+                return $dept ?? Department::firstOrCreate(
+                    ['name' => $rule['name']],
+                    ['code' => $rule['code']]
+                );
+            }
         }
 
-        if (! $dept) {
-            $dept = Department::firstOrCreate(['name' => 'Operasional & Layanan Kas'], ['code' => 'OPS01']);
-        }
-
-        return $dept;
+        return Department::where('name', 'LIKE', '%Operasional%')->first()
+            ?? Department::firstOrCreate(
+                ['name' => 'Operasional & Layanan Kas'],
+                ['code' => 'OPS01']
+            );
     }
 
     /**
