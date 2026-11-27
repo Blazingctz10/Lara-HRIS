@@ -160,8 +160,15 @@ class AttendanceReportController extends Controller
                         if ($isLateDisp) {
                             $cleanNote = trim(str_replace(['Hadir (', ')'], '', $att->notes ?? ''));
                             $dailyNotes[$d][] = $cleanNote ?: 'Disp. Telat';
-                        } elseif (! empty($att->notes) && ! str_contains($att->notes, 'Tarik Log Mesin')) {
-                            $dailyNotes[$d][] = $att->notes;
+                        } elseif (! empty($att->notes)) {
+                            $rawNote = trim((string) $att->notes);
+                            if (preg_match('/Lembur(?:\s*Mesin)?:\s*([0-9.:]+)/i', $rawNote, $otMatch)) {
+                                $dailyNotes[$d][] = 'Lembur ' . $otMatch[1];
+                            } elseif (str_contains($rawNote, 'Tidak Tap Masuk')) {
+                                $dailyNotes[$d][] = $rawNote;
+                            } elseif (! str_contains($rawNote, 'Tarik Log Mesin') && ! str_contains($rawNote, 'Tarik Berkas Mesin') && $rawNote !== 'Presensi Mesin' && $rawNote !== 'Hadir normal') {
+                                $dailyNotes[$d][] = $rawNote;
+                            }
                         }
                     } elseif ($isLate) {
                         $type = 'late';
@@ -171,8 +178,9 @@ class AttendanceReportController extends Controller
                         $dailyNotes[$d][] = "Telat " . ($att->late_minutes ?? 0) . "m";
                     } else {
                         $type = 'normal';
-                        if (! empty($att->notes) && ! str_contains($att->notes, 'Tarik Log Mesin')) {
-                            $dailyNotes[$d][] = $att->notes;
+                        $rawNote = trim((string) ($att->notes ?? ''));
+                        if ($rawNote !== '' && ! str_contains($rawNote, 'Tarik Log Mesin') && ! str_contains($rawNote, 'Tarik Berkas Mesin') && $rawNote !== 'Presensi Mesin') {
+                            $dailyNotes[$d][] = str_contains($rawNote, 'Alpa') ? 'Alpa' : $rawNote;
                         }
                     }
 

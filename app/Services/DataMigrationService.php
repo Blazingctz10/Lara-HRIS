@@ -1913,6 +1913,7 @@ CSV;
         $dataRows = array_slice($rows, $headerIndex + 1);
 
         $imported = 0;
+        $skippedResigned = 0;
         $errors = [];
         $employeeCache = [];
 
@@ -1928,7 +1929,7 @@ CSV;
                     $data[$hKey] = isset($rowValues[$hIdx]) ? trim((string) $rowValues[$hIdx]) : '';
                 }
 
-                // Resolusi Identitas Pegawai (NIP atau Nama Lengkap, termasuk singkatan mesin fingerprint seperti "M. Riva")
+                // Resolusi Identitas Pegawai (NIP atau Nama Lengkap, utamakan Pegawai Aktif & exact match)
                 $identifier = trim(preg_replace('/\s+/', ' ', (string) ($data['nip'] ?? ($data['name'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? ''))))));
                 if (empty($identifier)) {
                     continue;
@@ -1937,15 +1938,18 @@ CSV;
                 $cacheKey = strtolower($identifier);
                 if (! array_key_exists($cacheKey, $employeeCache)) {
                     $emp = Employee::where('nip', $identifier)->first()
+                        ?? Employee::whereRaw('LOWER(full_name) = ?', [$cacheKey])->where('status', 'Active')->first()
                         ?? Employee::whereRaw('LOWER(full_name) = ?', [$cacheKey])->first();
 
                     if (! $emp) {
                         $cleanName = trim(preg_replace('/,.*$/', '', $identifier));
-                        $emp = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first();
+                        $emp = Employee::where('status', 'Active')->whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first()
+                            ?? Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first();
 
                         if (! $emp && preg_match('/\b(?:m|muh|moh)\.?\s+/i', $cleanName)) {
                             $expanded = trim(preg_replace('/\b(?:m|muh|moh)\.?\s+/i', 'muhammad ', $cleanName));
-                            $emp = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first();
+                            $emp = Employee::where('status', 'Active')->whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first()
+                                ?? Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first();
                         }
                     }
 
@@ -1955,6 +1959,12 @@ CSV;
                 $employee = $employeeCache[$cacheKey];
                 if (! $employee) {
                     $errors[] = "Baris " . ($index + 2) . ": Pegawai '{$identifier}' tidak terdaftar di sistem HRIS.";
+                    continue;
+                }
+
+                // Jangan gabungkan/impor log presensi pegawai yang sudah Resign / Terminated
+                if (in_array($employee->status, ['Resigned', 'Terminated'], true)) {
+                    $skippedResigned++;
                     continue;
                 }
 
@@ -1994,7 +2004,7 @@ CSV;
                 // Lembur Mesin (OT Time) dari template mesin Solution X105 jika tersedia
                 $otRaw = trim((string) ($data['ot_time'] ?? ''));
                 $otNote = (! empty($otRaw) && $otRaw !== '-' && $otRaw !== '00:00' && $otRaw !== '00.00')
-                    ? " (Lembur: {$otRaw})"
+                    ? "Lembur Mesin: {$otRaw}"
                     : '';
 
                 $fileStatus = ucfirst(strtolower(trim($data['status'] ?? 'Present')));
@@ -2059,14 +2069,23 @@ CSV;
                             $lateMinutes = 0;
                             $penaltyAmount = 0;
                         }
-                        $baseNote = trim($data['catatan'] ?? ($data['notes'] ?? 'Tarik Berkas Mesin Presensi Cabang'));
-                        $notes = $baseNote . $otNote;
+                        $customNote = trim((string) ($data['catatan'] ?? ($data['notes'] ?? '')));
+                        $notesParts = array_filter([$customNote, $otNote]);
+                        $notes = ! empty($notesParts) ? implode(' | ', $notesParts) : 'Presensi Mesin';
+                    } elseif ($hasActualClockOut) {
+                        // Tap pulang tercatat tapi lupa tap masuk -> jangan langsung dicap Alpa
+                        $status = 'Present';
+                        $lateMinutes = 0;
+                        $penaltyAmount = 0;
+                        $outFormatted = $clockOut ? $clockOut->format('H:i') : $cleanOut;
+                        $notesParts = array_filter(["Tidak Tap Masuk (Pulang: {$outFormatted})", $otNote]);
+                        $notes = implode(' | ', $notesParts);
                     } else {
-                        // Tidak ada jam masuk dan tidak ada izin/cuti -> Alpa
+                        // Tidak ada jam masuk/pulang dan tidak ada izin/cuti -> Alpa
                         $status = 'Absent';
                         $lateMinutes = 0;
                         $penaltyAmount = 0;
-                        $notes = 'Tidak Ada Rekaman Mesin Presensi (Alpa)';
+                        $notes = 'Alpa';
                     }
                 }
 
@@ -2094,9 +2113,11 @@ CSV;
 
             DB::commit();
 
+            $skipMsg = $skippedResigned > 0 ? " ({$skippedResigned} baris pegawai resign dilewati)" : '';
+
             return [
                 'success' => true,
-                'message' => "Impor log kehadiran sukses: {$imported} catatan presensi tersimpan/diperbarui.",
+                'message' => "Impor log kehadiran sukses: {$imported} catatan presensi tersimpan/diperbarui{$skipMsg}.",
                 'imported' => $imported,
                 'errors' => $errors,
             ];

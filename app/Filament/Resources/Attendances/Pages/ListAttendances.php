@@ -41,7 +41,7 @@ class ListAttendances extends ListRecords
             ->first();
 
         return [
-            'active' => Tab::make('Pegawai Aktif')
+            'active' => Tab::make('Log Pegawai Aktif')
                 ->icon('heroicon-o-check-circle')
                 ->badge((int) ($counts->active_count ?? 0))
                 ->badgeColor('success')
