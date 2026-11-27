@@ -12,6 +12,7 @@ use App\Services\DataMigrationService;
 use App\Support\BprExcelExport;
 use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -75,248 +76,314 @@ class ListAttendances extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('import_attendance_csv')
-                ->label('Tarik / Unggah Berkas Presensi Mesin (XLS / CSV)')
-                ->icon('heroicon-o-arrow-up-tray')
-                ->color('warning')
-                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
-                ->modalHeading('Tarik & Unggah Berkas Log Presensi Mesin (XLS / CSV)')
-                ->modalDescription('Unggah berkas log presensi mesin cabang (.xls format Solution/ZK atau berkas .csv). Sistem akan secara otomatis MENGGABUNGKAN data jam masuk/keluar dengan data Cuti Resmi yang disetujui dan Logbook Dispensasi HRD & GA (termasuk membebaskan denda pegawai yang memiliki izin telat masuk sah).')
-                ->form([
-                    FileUpload::make('csv_file')
-                        ->label('Pilih Berkas Mesin Presensi (.xls, .xlsx, atau .csv)')
-                        ->acceptedFileTypes([
-                            'text/csv',
-                            'text/plain',
-                            'application/vnd.ms-excel',
-                            'application/x-msexcel',
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            'application/octet-stream',
-                        ])
-                        ->rules([
-                            fn () => function (string $attribute, $value, \Closure $fail) {
-                                if ($value && method_exists($value, 'getClientOriginalExtension')) {
-                                    $ext = strtolower($value->getClientOriginalExtension());
-                                    if (! in_array($ext, ['xls', 'xlsx', 'csv', 'txt'], true)) {
-                                        $fail('Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), atau TXT.');
+            ActionGroup::make([
+                Action::make('import_attendance_csv')
+                    ->label('Impor Log Mesin (XLS / XLSX / CSV)')
+                    ->icon('heroicon-o-finger-print')
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
+                    ->modalHeading('Tarik & Unggah Berkas Log Presensi Mesin (XLS / CSV)')
+                    ->modalDescription('Unggah berkas log presensi mesin cabang (.xls format Solution/ZK atau berkas .csv). Sistem akan secara otomatis MENGGABUNGKAN data jam masuk/keluar dengan data Cuti Resmi yang disetujui dan Logbook Dispensasi HRD & GA (termasuk membebaskan denda pegawai yang memiliki izin telat masuk sah).')
+                    ->form([
+                        FileUpload::make('csv_file')
+                            ->label('Pilih Berkas Mesin Presensi (.xls, .xlsx, atau .csv)')
+                            ->acceptedFileTypes([
+                                'text/csv',
+                                'text/plain',
+                                'application/vnd.ms-excel',
+                                'application/x-msexcel',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                'application/octet-stream',
+                            ])
+                            ->rules([
+                                fn () => function (string $attribute, $value, \Closure $fail) {
+                                    if ($value && method_exists($value, 'getClientOriginalExtension')) {
+                                        $ext = strtolower($value->getClientOriginalExtension());
+                                        if (! in_array($ext, ['xls', 'xlsx', 'csv', 'txt'], true)) {
+                                            $fail('Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), atau TXT.');
+                                        }
                                     }
-                                }
-                            },
-                        ])
-                        ->maxSize(20480)
-                        ->disk('local')
-                        ->directory('temp_imports')
-                        ->required()
-                        ->helperText('Mendukung berkas Excel ekspor mesin Solution/ZK (.xls biner maupun .xlsx/.csv template: Name, Date, Timetable, On duty, Off duty, Clock In, Clock Out, OT Time).'),
-                ])
-                ->modalSubmitActionLabel('Mulai Gabungkan Data')
-                ->action(function (array $data) {
-                    $path = Storage::disk('local')->path($data['csv_file']);
-                    $service = app(DataMigrationService::class);
-                    $result = $service->importAttendancesFromCsv($path);
+                                },
+                            ])
+                            ->maxSize(20480)
+                            ->disk('local')
+                            ->directory('temp_imports')
+                            ->required()
+                            ->helperText('Mendukung berkas Excel ekspor mesin Solution/ZK (.xls biner maupun .xlsx/.csv template: Name, Date, Timetable, On duty, Off duty, Clock In, Clock Out, OT Time).'),
+                    ])
+                    ->modalSubmitActionLabel('Mulai Gabungkan Data')
+                    ->action(function (array $data) {
+                        $path = Storage::disk('local')->path($data['csv_file']);
+                        $service = app(DataMigrationService::class);
+                        $result = $service->importAttendancesFromCsv($path);
 
-                    if ($result['success']) {
-                        Notification::make()
-                            ->title('Sinkronisasi Presensi Sukses')
-                            ->body($result['message'] . ' Data cuti dan dispensasi logbook berhasil digabungkan.')
-                            ->success()
-                            ->send();
-                    } else {
-                        Notification::make()
-                            ->title('Gagal Mengimpor Presensi')
-                            ->body($result['message'])
-                            ->danger()
-                            ->send();
-                    }
-
-                    if (File::exists($path)) {
-                        File::delete($path);
-                    }
-                }),
-
-            Action::make('export_csv')
-                ->label('Unduh Log Harian (Excel .xlsx)')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('success')
-                ->action(function (): StreamedResponse {
-                    $baseQuery = Attendance::accessibleBy()
-                        ->with(['employee.branch', 'employee.department'])
-                        ->orderBy('date', 'desc');
-
-                    $rows = [];
-                    $totalLateMinutes = 0;
-                    $totalPenalty = 0.0;
-                    $no = 1;
-
-                    foreach ($baseQuery->cursor() as $row) {
-                        $isLateDisp = str_contains($row->notes ?? '', 'Dispensasi Telat');
-                        $sumber = 'Tarik Berkas Mesin';
-                        if (str_contains($row->notes ?? '', 'Cuti Resmi') || str_contains($row->notes ?? '', 'Cuti')) {
-                            $sumber = 'Permohonan Cuti (ESS)';
-                        } elseif ($isLateDisp) {
-                            $sumber = 'Mesin Presensi + Disp. Telat';
-                        } elseif (str_contains($row->notes ?? '', 'Dispensasi') || $row->status === 'Excused') {
-                            $sumber = 'Logbook HRD & GA';
+                        if ($result['success']) {
+                            Notification::make()
+                                ->title('Sinkronisasi Presensi Sukses')
+                                ->body($result['message'] . ' Data cuti dan dispensasi logbook berhasil digabungkan.')
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal Mengimpor Presensi')
+                                ->body($result['message'])
+                                ->danger()
+                                ->send();
                         }
 
-                        $statusLabel = match ($row->status) {
-                            'Present' => $isLateDisp ? 'Hadir (Disp. Telat)' : 'Hadir Tepat Waktu',
-                            'Late' => 'Terlambat (' . ($row->late_minutes ?? 0) . ' m)',
-                            'Excused' => str_contains($row->notes ?? '', 'Cuti') ? 'Cuti Resmi' : 'Izin / Sakit',
-                            'Absent' => 'Alpa',
-                            default => $row->status ?? '-',
-                        };
+                        if (File::exists($path)) {
+                            File::delete($path);
+                        }
+                    }),
 
-                        $badgeClass = match ($row->status) {
-                            'Present', 'Excused' => 'badge-ok',
-                            'Late' => 'badge-warn',
-                            'Absent' => 'badge-danger',
-                            default => 'td-center',
-                        };
+                Action::make('import_legacy_logbook')
+                    ->label('Impor Logbook Lama (Matriks / Tabel)')
+                    ->icon('heroicon-o-document-text')
+                    ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
+                    ->modalHeading('Impor & Selaraskan Logbook Absen Lama')
+                    ->modalDescription('Unggah berkas Matriks Absen Lama (seperti Rekap Absen.xlsx) atau tabel logbook (.xlsx / .csv) untuk menyelaraskan MC/Sakit, Izin, TA, Izin Telat, dan Cuti ke data presensi.')
+                    ->form([
+                        FileUpload::make('logbook_file')
+                            ->label('Pilih Berkas Logbook (.xlsx, .xls, atau .csv)')
+                            ->acceptedFileTypes([
+                                'text/csv',
+                                'text/plain',
+                                'application/vnd.ms-excel',
+                                'application/x-msexcel',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                'application/octet-stream',
+                            ])
+                            ->rules([
+                                fn () => function (string $attribute, $value, \Closure $fail) {
+                                    if ($value && method_exists($value, 'getClientOriginalExtension')) {
+                                        $ext = strtolower($value->getClientOriginalExtension());
+                                        if (! in_array($ext, ['xls', 'xlsx', 'csv', 'txt'], true)) {
+                                            $fail('Format berkas harus berupa Excel (.xlsx, .xls), CSV (.csv), atau TXT.');
+                                        }
+                                    }
+                                },
+                            ])
+                            ->maxSize(20480)
+                            ->disk('local')
+                            ->directory('temp_imports')
+                            ->required(),
+                    ])
+                    ->modalSubmitActionLabel('Impor & Selaraskan')
+                    ->action(function (array $data) {
+                        $path = Storage::disk('local')->path($data['logbook_file']);
+                        $result = app(DataMigrationService::class)->importDispensationsFromFile($path, auth()->id());
 
-                        $lateMins = (int) ($row->late_minutes ?? 0);
-                        $penalty = (float) ($row->penalty_amount ?? 0);
-                        $totalLateMinutes += $lateMins;
-                        $totalPenalty += $penalty;
+                        if ($result['success']) {
+                            Notification::make()
+                                ->title('Logbook Berhasil Diselaraskan')
+                                ->body($result['message'])
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal Mengimpor Logbook')
+                                ->body($result['message'])
+                                ->danger()
+                                ->send();
+                        }
 
-                        $rows[] = [
-                            ['value' => $no++, 'class' => 'td-center'],
-                            ['value' => $row->date ? $row->date->format('d/m/Y') : '-', 'class' => 'td-center'],
-                            ['value' => $row->employee?->nip ?? '-', 'class' => 'td-nip'],
-                            ['value' => $row->employee?->full_name ?? '-', 'class' => 'td-bold'],
-                            ['value' => $row->employee?->branch?->name ?? 'Kantor Pusat'],
-                            ['value' => $row->employee?->department?->name ?? '-'],
-                            ['value' => $row->clock_in ? Carbon::parse($row->clock_in)->format('H:i') : '-', 'class' => 'td-center'],
-                            ['value' => $row->clock_out ? Carbon::parse($row->clock_out)->format('H:i') : '-', 'class' => 'td-center'],
-                            ['value' => $statusLabel, 'class' => $badgeClass],
-                            ['value' => $lateMins, 'class' => 'td-num'],
-                            ['value' => number_format($penalty, 0, '.', ''), 'class' => 'td-rp'],
-                            ['value' => $row->notes ? ($sumber . ' | ' . $row->notes) : $sumber],
-                        ];
-                    }
+                        if (File::exists($path)) {
+                            File::delete($path);
+                        }
+                    }),
+            ])
+                ->label('Impor Data')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('warning')
+                ->button()
+                ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
 
-                    $summaryRow = [
-                        ['value' => '', 'class' => 'td-center'],
-                        ['value' => 'TOTAL', 'class' => 'td-center'],
-                        ['value' => count($rows) . ' Log', 'class' => 'td-center'],
-                        ['value' => ''],
-                        ['value' => ''],
-                        ['value' => ''],
-                        ['value' => ''],
-                        ['value' => ''],
-                        ['value' => ''],
-                        ['value' => $totalLateMinutes, 'class' => 'td-num'],
-                        ['value' => number_format($totalPenalty, 0, '.', ''), 'class' => 'td-rp'],
-                        ['value' => ''],
-                    ];
+            ActionGroup::make([
+                Action::make('export_monthly_matrix')
+                    ->label('Matriks Rekap Bulanan (Preview / PDF / Excel)')
+                    ->icon('heroicon-o-printer')
+                    ->modalHeading('Cetak & Pratinjau Matriks Presensi Bulanan')
+                    ->modalDescription('Pilih periode bulan, tahun, filter kantor cabang, serta opsi tindakan: buka halaman pratinjau siap cetak (print/PDF) atau langsung unduh berkas.')
+                    ->form([
+                        Select::make('month')
+                            ->label('Periode Bulan')
+                            ->options([
+                                1 => '01 - Januari',
+                                2 => '02 - Februari',
+                                3 => '03 - Maret',
+                                4 => '04 - April',
+                                5 => '05 - Mei',
+                                6 => '06 - Juni',
+                                7 => '07 - Juli',
+                                8 => '08 - Agustus',
+                                9 => '09 - September',
+                                10 => '10 - Oktober',
+                                11 => '11 - November',
+                                12 => '12 - Desember',
+                            ])
+                            ->default(now()->month)
+                            ->required(),
+                        Select::make('year')
+                            ->label('Periode Tahun')
+                            ->options(function () {
+                                $cur = now()->year;
+                                return [
+                                    $cur - 2 => (string) ($cur - 2),
+                                    $cur - 1 => (string) ($cur - 1),
+                                    $cur => (string) $cur,
+                                    $cur + 1 => (string) ($cur + 1),
+                                ];
+                            })
+                            ->default(now()->year)
+                            ->required(),
+                        Select::make('branch_id')
+                            ->label('Filter Kantor Unit Kerja')
+                            ->options(fn () => Branch::orderBy('name')->pluck('name', 'id')->toArray())
+                            ->placeholder('Semua Unit Kerja BPR Banda Raya')
+                            ->visible(fn () => ! auth()->user()?->isBranchManager())
+                            ->nullable(),
+                        Select::make('action_type')
+                            ->label('Aksi Laporan')
+                            ->options([
+                                'preview' => 'Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
+                                'excel' => 'Langsung Unduh Berkas Excel Resmi (.xlsx)',
+                                'csv' => 'Langsung Unduh Berkas Teks (.csv)',
+                            ])
+                            ->default('preview')
+                            ->required(),
+                    ])
+                    ->modalSubmitActionLabel('Lanjutkan')
+                    ->action(function (array $data) {
+                        $user = auth()->user();
+                        $year = (int) ($data['year'] ?? now()->year);
+                        $month = (int) ($data['month'] ?? now()->month);
+                        $branchId = $user?->isBranchManager()
+                            ? (($user->branch_id ?? $user->employee?->branch_id) ?: 0)
+                            : (! empty($data['branch_id']) ? (int) $data['branch_id'] : null);
+                        $actionType = $data['action_type'] ?? 'preview';
 
-                    return BprExcelExport::stream(
-                        'Rekap_Log_Presensi_BPR_' . date('Ymd_His') . '.xlsx',
-                        'Log Presensi',
-                        'REKAPITULASI LOG PRESENSI & KEHADIRAN STAF',
-                        'Seluruh Data Log Harian',
-                        [
-                            ['label' => 'No'], ['label' => 'Tanggal'], ['label' => 'NIP Pegawai'], ['label' => 'Nama Pegawai'],
-                            ['label' => 'Unit Kantor'], ['label' => 'Departemen'], ['label' => 'Jam Masuk'], ['label' => 'Jam Pulang'],
-                            ['label' => 'Status Kehadiran'], ['label' => 'Terlambat (Mnt)'], ['label' => 'Denda (Rp)'],
-                            ['label' => 'Sumber Data & Rincian Logbook'],
-                        ],
-                        $rows,
-                        $summaryRow,
-                    );
-                }),
+                        if ($actionType === 'excel') {
+                            return redirect()->route('admin.attendance.export-matrix', [
+                                'year' => $year,
+                                'month' => $month,
+                                'branch_id' => $branchId,
+                                'format' => 'excel',
+                            ]);
+                        }
 
-            Action::make('export_monthly_matrix')
-                ->label('Matriks Rekap Bulanan (Preview, Cetak & Unduh)')
-                ->icon('heroicon-o-printer')
-                ->color('primary')
-                ->modalHeading('Cetak & Pratinjau Matriks Presensi Bulanan')
-                ->modalDescription('Pilih periode bulan, tahun, filter kantor cabang, serta opsi tindakan: buka halaman pratinjau siap cetak (print/PDF) atau langsung unduh berkas.')
-                ->form([
-                    Select::make('month')
-                        ->label('Periode Bulan')
-                        ->options([
-                            1 => '01 - Januari',
-                            2 => '02 - Februari',
-                            3 => '03 - Maret',
-                            4 => '04 - April',
-                            5 => '05 - Mei',
-                            6 => '06 - Juni',
-                            7 => '07 - Juli',
-                            8 => '08 - Agustus',
-                            9 => '09 - September',
-                            10 => '10 - Oktober',
-                            11 => '11 - November',
-                            12 => '12 - Desember',
-                        ])
-                        ->default(now()->month)
-                        ->required(),
-                    Select::make('year')
-                        ->label('Periode Tahun')
-                        ->options(function () {
-                            $cur = now()->year;
-                            return [
-                                $cur - 2 => (string) ($cur - 2),
-                                $cur - 1 => (string) ($cur - 1),
-                                $cur => (string) $cur,
-                                $cur + 1 => (string) ($cur + 1),
+                        if ($actionType === 'csv') {
+                            return redirect()->route('admin.attendance.export-matrix', [
+                                'year' => $year,
+                                'month' => $month,
+                                'branch_id' => $branchId,
+                                'format' => 'csv',
+                            ]);
+                        }
+
+                        return redirect()->route('admin.attendance.matrix-preview', [
+                            'year' => $year,
+                            'month' => $month,
+                            'branch_id' => $branchId,
+                        ]);
+                    }),
+
+                Action::make('export_csv')
+                    ->label('Unduh Log Harian (Excel .xlsx)')
+                    ->icon('heroicon-o-table-cells')
+                    ->action(function (): StreamedResponse {
+                        $baseQuery = Attendance::accessibleBy()
+                            ->with(['employee.branch', 'employee.department'])
+                            ->orderBy('date', 'desc');
+
+                        $rows = [];
+                        $totalLateMinutes = 0;
+                        $totalPenalty = 0.0;
+                        $no = 1;
+
+                        foreach ($baseQuery->cursor() as $row) {
+                            $isLateDisp = str_contains($row->notes ?? '', 'Dispensasi Telat');
+                            $sumber = 'Tarik Berkas Mesin';
+                            if (str_contains($row->notes ?? '', 'Cuti Resmi') || str_contains($row->notes ?? '', 'Cuti')) {
+                                $sumber = 'Permohonan Cuti (ESS)';
+                            } elseif ($isLateDisp) {
+                                $sumber = 'Mesin Presensi + Disp. Telat';
+                            } elseif (str_contains($row->notes ?? '', 'Dispensasi') || $row->status === 'Excused') {
+                                $sumber = 'Logbook HRD & GA';
+                            }
+
+                            $statusLabel = match ($row->status) {
+                                'Present' => $isLateDisp ? 'Hadir (Disp. Telat)' : 'Hadir Tepat Waktu',
+                                'Late' => 'Terlambat (' . ($row->late_minutes ?? 0) . ' m)',
+                                'Excused' => str_contains($row->notes ?? '', 'Cuti') ? 'Cuti Resmi' : 'Izin / Sakit',
+                                'Absent' => 'Alpa',
+                                default => $row->status ?? '-',
+                            };
+
+                            $badgeClass = match ($row->status) {
+                                'Present', 'Excused' => 'badge-ok',
+                                'Late' => 'badge-warn',
+                                'Absent' => 'badge-danger',
+                                default => 'td-center',
+                            };
+
+                            $lateMins = (int) ($row->late_minutes ?? 0);
+                            $penalty = (float) ($row->penalty_amount ?? 0);
+                            $totalLateMinutes += $lateMins;
+                            $totalPenalty += $penalty;
+
+                            $rows[] = [
+                                ['value' => $no++, 'class' => 'td-center'],
+                                ['value' => $row->date ? $row->date->format('d/m/Y') : '-', 'class' => 'td-center'],
+                                ['value' => $row->employee?->nip ?? '-', 'class' => 'td-nip'],
+                                ['value' => $row->employee?->full_name ?? '-', 'class' => 'td-bold'],
+                                ['value' => $row->employee?->branch?->name ?? 'Kantor Pusat'],
+                                ['value' => $row->employee?->department?->name ?? '-'],
+                                ['value' => $row->clock_in ? Carbon::parse($row->clock_in)->format('H:i') : '-', 'class' => 'td-center'],
+                                ['value' => $row->clock_out ? Carbon::parse($row->clock_out)->format('H:i') : '-', 'class' => 'td-center'],
+                                ['value' => $statusLabel, 'class' => $badgeClass],
+                                ['value' => $lateMins, 'class' => 'td-num'],
+                                ['value' => number_format($penalty, 0, '.', ''), 'class' => 'td-rp'],
+                                ['value' => $row->notes ? ($sumber . ' | ' . $row->notes) : $sumber],
                             ];
-                        })
-                        ->default(now()->year)
-                        ->required(),
-                    Select::make('branch_id')
-                        ->label('Filter Kantor Unit Kerja')
-                        ->options(fn () => Branch::orderBy('name')->pluck('name', 'id')->toArray())
-                        ->placeholder('Semua Unit Kerja BPR Banda Raya')
-                        ->visible(fn () => ! auth()->user()?->isBranchManager())
-                        ->nullable(),
-                    Select::make('action_type')
-                        ->label('Aksi Laporan')
-                        ->options([
-                            'preview' => 'Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
-                            'excel' => 'Langsung Unduh Berkas Excel Resmi (.xlsx)',
-                            'csv' => 'Langsung Unduh Berkas Teks (.csv)',
-                        ])
-                        ->default('preview')
-                        ->required(),
-                ])
-                ->modalSubmitActionLabel('Lanjutkan')
-                ->action(function (array $data) {
-                    $user = auth()->user();
-                    $year = (int) ($data['year'] ?? now()->year);
-                    $month = (int) ($data['month'] ?? now()->month);
-                    $branchId = $user?->isBranchManager()
-                        ? (($user->branch_id ?? $user->employee?->branch_id) ?: 0)
-                        : (! empty($data['branch_id']) ? (int) $data['branch_id'] : null);
-                    $actionType = $data['action_type'] ?? 'preview';
+                        }
 
-                    if ($actionType === 'excel') {
-                        return redirect()->route('admin.attendance.export-matrix', [
-                            'year' => $year,
-                            'month' => $month,
-                            'branch_id' => $branchId,
-                            'format' => 'excel',
-                        ]);
-                    }
+                        $summaryRow = [
+                            ['value' => '', 'class' => 'td-center'],
+                            ['value' => 'TOTAL', 'class' => 'td-center'],
+                            ['value' => count($rows) . ' Log', 'class' => 'td-center'],
+                            ['value' => ''],
+                            ['value' => ''],
+                            ['value' => ''],
+                            ['value' => ''],
+                            ['value' => ''],
+                            ['value' => ''],
+                            ['value' => $totalLateMinutes, 'class' => 'td-num'],
+                            ['value' => number_format($totalPenalty, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => ''],
+                        ];
 
-                    if ($actionType === 'csv') {
-                        return redirect()->route('admin.attendance.export-matrix', [
-                            'year' => $year,
-                            'month' => $month,
-                            'branch_id' => $branchId,
-                            'format' => 'csv',
-                        ]);
-                    }
+                        return BprExcelExport::stream(
+                            'Rekap_Log_Presensi_BPR_' . date('Ymd_His') . '.xlsx',
+                            'Log Presensi',
+                            'REKAPITULASI LOG PRESENSI & KEHADIRAN STAF',
+                            'Seluruh Data Log Harian',
+                            [
+                                ['label' => 'No'], ['label' => 'Tanggal'], ['label' => 'NIP Pegawai'], ['label' => 'Nama Pegawai'],
+                                ['label' => 'Unit Kantor'], ['label' => 'Departemen'], ['label' => 'Jam Masuk'], ['label' => 'Jam Pulang'],
+                                ['label' => 'Status Kehadiran'], ['label' => 'Terlambat (Mnt)'], ['label' => 'Denda (Rp)'],
+                                ['label' => 'Sumber Data & Rincian Logbook'],
+                            ],
+                            $rows,
+                            $summaryRow,
+                        );
+                    }),
+            ])
+                ->label('Laporan & Ekspor')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->button(),
 
-                    // Default: Buka Halaman Pratinjau & Cetak Resmi
-                    return redirect()->route('admin.attendance.matrix-preview', [
-                        'year' => $year,
-                        'month' => $month,
-                        'branch_id' => $branchId,
-                    ]);
-                }),
             CreateAction::make()
-                ->label('Input Presensi Manual')
+                ->label('Input Manual')
                 ->visible(fn () => in_array(auth()->user()?->role, ['super_admin', 'hr_admin'])),
         ];
     }

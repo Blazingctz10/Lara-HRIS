@@ -2209,4 +2209,326 @@ CSV;
 
         return $csv;
     }
+
+    /**
+     * Impor Logbook Dispensasi / Ketidakhadiran Lama (mendukung format Tabel Standar maupun Matriks Rekap Absen Excel).
+     * Otomatis menyelaraskan log kehadiran (attendances) dan melewati pegawai berstatus Resigned/Terminated.
+     */
+    public function importDispensationsFromFile(string $filePath, ?int $recordedBy = null): array
+    {
+        if (! file_exists($filePath) || ! is_readable($filePath)) {
+            return [
+                'success' => false,
+                'message' => 'Berkas logbook tidak ditemukan atau tidak dapat dibaca.',
+                'imported' => 0,
+                'errors' => [],
+            ];
+        }
+
+        $rows = $this->parseAnyFile($filePath);
+        if (count($rows) < 2) {
+            return [
+                'success' => false,
+                'message' => 'Berkas logbook tidak memiliki baris data.',
+                'imported' => 0,
+                'errors' => [],
+            ];
+        }
+
+        // Cek apakah format Matriks Rekap Lama (ada baris dengan >= 3 angka serial tanggal Excel 40000..55000)
+        $isMatrix = false;
+        foreach (array_slice($rows, 0, 15) as $r) {
+            $serialCount = 0;
+            foreach ((array) $r as $cell) {
+                $val = trim((string) $cell);
+                if (is_numeric($val) && (int) $val >= 40000 && (int) $val <= 55000) {
+                    $serialCount++;
+                }
+            }
+            if ($serialCount >= 3) {
+                $isMatrix = true;
+                break;
+            }
+        }
+
+        return $isMatrix
+            ? $this->importDispensationsFromMatrixRows($rows, $recordedBy)
+            : $this->importDispensationsFromTableRows($rows, $recordedBy);
+    }
+
+    protected function resolveActiveEmployeeByIdentifier(string $identifier, array &$cache): ?Employee
+    {
+        $clean = trim(preg_replace('/\s+/', ' ', $identifier));
+        if ($clean === '') {
+            return null;
+        }
+
+        $key = strtolower($clean);
+        if (array_key_exists($key, $cache)) {
+            return $cache[$key];
+        }
+
+        $emp = Employee::where('nip', $clean)->first()
+            ?? Employee::whereRaw('LOWER(full_name) = ?', [$key])->where('status', 'Active')->first()
+            ?? Employee::whereRaw('LOWER(full_name) = ?', [$key])->first();
+
+        if (! $emp) {
+            $noTitle = trim(preg_replace('/,.*$/', '', $clean));
+            $emp = Employee::where('status', 'Active')->whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($noTitle) . '%'])->first()
+                ?? Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($noTitle) . '%'])->first();
+
+            if (! $emp && preg_match('/\b(?:m|muh|moh)\.?\s+/i', $noTitle)) {
+                $expanded = trim(preg_replace('/\b(?:m|muh|moh)\.?\s+/i', 'muhammad ', $noTitle));
+                $emp = Employee::where('status', 'Active')->whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first()
+                    ?? Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first();
+            }
+        }
+
+        return $cache[$key] = $emp;
+    }
+
+    protected function mapLegacyLogbookCode(string $rawCode): ?array
+    {
+        $norm = strtolower(trim($rawCode));
+        if ($norm === '' || is_numeric($norm) || preg_match('/^\d{1,2}[:.]\d{2}/', $norm)) {
+            return null;
+        }
+
+        return match (true) {
+            str_contains($norm, 'mc') || str_contains($norm, 'sakit') => ['Sakit Mendadak', 'MC / Sakit (Logbook Lama)'],
+            $norm === 'ta' || str_contains($norm, 'tidak absen') => ['Lainnya / Isi Sendiri', 'TA / Tidak Absen (Logbook Lama)'],
+            str_contains($norm, 'izin pot cuti') => ['Izin via Chat/WhatsApp', 'Izin Potong Cuti (Logbook Lama)'],
+            str_contains($norm, 'telat') || str_contains($norm, 'terlambat') || str_contains($norm, 'disp') => ['Izin Telat Masuk', 'Dispensasi Telat (Logbook Lama)'],
+            str_contains($norm, 'dinas') || str_contains($norm, 'lapangan') => ['Tugas Dinas Luar', 'Tugas Dinas Luar (Logbook Lama)'],
+            str_contains($norm, 'izin') => ['Izin via Chat/WhatsApp', 'Izin (Logbook Lama)'],
+            str_contains($norm, 'cuti') => ['Lainnya / Isi Sendiri', 'Cuti (Logbook Lama)'],
+            default => null,
+        };
+    }
+
+    protected function importDispensationsFromMatrixRows(array $rows, ?int $recordedBy): array
+    {
+        $imported = 0;
+        $skippedResigned = 0;
+        $errors = [];
+        $cache = [];
+        $dateCols = [];
+        $nipCol = null;
+        $nameCol = null;
+
+        DB::beginTransaction();
+        try {
+            foreach ($rows as $rowIdx => $r) {
+                if (empty($r)) {
+                    continue;
+                }
+
+                // Deteksi baris header tanggal matriks (bisa berulang tiap sheet)
+                $foundDates = [];
+                $foundNip = null;
+                $foundName = null;
+                foreach ($r as $cIdx => $cell) {
+                    $val = trim((string) $cell);
+                    $low = strtolower($val);
+                    if (in_array($low, ['nik', 'nip'], true) && $foundNip === null) {
+                        $foundNip = $cIdx;
+                    } elseif ($low === 'nama' && $foundName === null) {
+                        $foundName = $cIdx;
+                    } elseif (is_numeric($val) && (int) $val >= 40000 && (int) $val <= 55000) {
+                        $dateStr = Carbon::create(1899, 12, 30)->addDays((int) $val)->toDateString();
+                        $foundDates[$cIdx] = $dateStr;
+                        // Kolom sebelahnya adalah pasangan 'out' untuk tanggal yang sama
+                        $foundDates[$cIdx + 1] = $dateStr;
+                    }
+                }
+
+                if (count($foundDates) >= 6) {
+                    $dateCols = $foundDates;
+                    $nipCol = $foundNip ?? 1;
+                    $nameCol = $foundName ?? 2;
+                    continue;
+                }
+
+                if (empty($dateCols)) {
+                    continue;
+                }
+
+                $nipVal = trim((string) ($r[$nipCol] ?? ''));
+                $nameVal = trim((string) ($r[$nameCol] ?? ''));
+                $identifier = $nipVal !== '' ? $nipVal : $nameVal;
+                if ($identifier === '' || in_array(strtolower($identifier), ['nik', 'nip', 'nama', 'in', 'out'], true)) {
+                    continue;
+                }
+
+                $employee = $this->resolveActiveEmployeeByIdentifier($identifier, $cache);
+                if (! $employee && $nameVal !== '' && $nameVal !== $identifier) {
+                    $employee = $this->resolveActiveEmployeeByIdentifier($nameVal, $cache);
+                }
+
+                if (! $employee) {
+                    continue;
+                }
+
+                if (in_array($employee->status, ['Resigned', 'Terminated'], true)) {
+                    $skippedResigned++;
+                    continue;
+                }
+
+                $processedDatesForEmp = [];
+                foreach ($dateCols as $cIdx => $dateStr) {
+                    $cellVal = trim((string) ($r[$cIdx] ?? ''));
+                    if ($cellVal === '' || isset($processedDatesForEmp[$dateStr])) {
+                        continue;
+                    }
+
+                    $mapped = $this->mapLegacyLogbookCode($cellVal);
+                    if (! $mapped) {
+                        continue;
+                    }
+
+                    $processedDatesForEmp[$dateStr] = true;
+                    [$dispType, $customReason] = $mapped;
+
+                    \App\Models\AttendanceDispensation::updateOrCreate(
+                        [
+                            'employee_id' => $employee->id,
+                            'date' => $dateStr,
+                        ],
+                        [
+                            'dispensation_type' => $dispType,
+                            'custom_reason' => $customReason,
+                            'description' => "Impor otomatis dari Matriks Logbook Lama ({$cellVal})",
+                            'recorded_by' => $recordedBy ?? auth()->id(),
+                        ]
+                    );
+
+                    $imported++;
+                }
+            }
+
+            DB::commit();
+            $skipMsg = $skippedResigned > 0 ? " ({$skippedResigned} baris pegawai resign dilewati)" : '';
+
+            return [
+                'success' => true,
+                'message' => "Impor logbook matriks sukses: {$imported} catatan izin/MC/TA/cuti diselaraskan{$skipMsg}.",
+                'imported' => $imported,
+                'errors' => $errors,
+            ];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => 'Gagal memproses logbook matriks: ' . $e->getMessage(),
+                'imported' => 0,
+                'errors' => [$e->getMessage()],
+            ];
+        }
+    }
+
+    protected function importDispensationsFromTableRows(array $rows, ?int $recordedBy): array
+    {
+        $headerIndex = -1;
+        foreach ($rows as $idx => $r) {
+            $joined = strtolower(implode(' ', (array) $r));
+            if (str_contains($joined, 'nip') || str_contains($joined, 'nama') || str_contains($joined, 'tanggal') || str_contains($joined, 'date')) {
+                $headerIndex = $idx;
+                break;
+            }
+        }
+        if ($headerIndex === -1) {
+            $headerIndex = 0;
+        }
+
+        $header = array_map(fn ($h) => trim(strtolower(str_replace([' ', '-'], '_', (string) $h))), $rows[$headerIndex]);
+        $dataRows = array_slice($rows, $headerIndex + 1);
+
+        $imported = 0;
+        $skippedResigned = 0;
+        $errors = [];
+        $cache = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($dataRows as $index => $rowValues) {
+                if (empty($rowValues)) {
+                    continue;
+                }
+
+                $data = [];
+                foreach ($header as $hIdx => $hKey) {
+                    $data[$hKey] = isset($rowValues[$hIdx]) ? trim((string) $rowValues[$hIdx]) : '';
+                }
+
+                $identifier = (string) ($data['nip'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? ($data['name'] ?? ''))));
+                if (trim($identifier) === '') {
+                    continue;
+                }
+
+                $employee = $this->resolveActiveEmployeeByIdentifier($identifier, $cache);
+                if (! $employee) {
+                    $errors[] = 'Baris ' . ($index + 2) . ": Pegawai '{$identifier}' tidak ditemukan.";
+                    continue;
+                }
+
+                if (in_array($employee->status, ['Resigned', 'Terminated'], true)) {
+                    $skippedResigned++;
+                    continue;
+                }
+
+                $rawDate = trim((string) ($data['tanggal'] ?? ($data['date'] ?? '')));
+                if ($rawDate === '') {
+                    $errors[] = 'Baris ' . ($index + 2) . ': Tanggal wajib diisi.';
+                    continue;
+                }
+
+                if (is_numeric($rawDate) && (int) $rawDate >= 30000) {
+                    $dateStr = Carbon::create(1899, 12, 30)->addDays((int) $rawDate)->toDateString();
+                } elseif (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $rawDate, $m)) {
+                    $dateStr = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                } else {
+                    $dateStr = Carbon::parse($rawDate)->toDateString();
+                }
+
+                $rawType = trim((string) ($data['jenis'] ?? ($data['kategori'] ?? ($data['dispensation_type'] ?? ($data['keterangan'] ?? 'Izin')))));
+                $mapped = $this->mapLegacyLogbookCode($rawType) ?? ['Lainnya / Isi Sendiri', $rawType];
+                $desc = trim((string) ($data['keterangan'] ?? ($data['catatan'] ?? ($data['description'] ?? ''))));
+
+                \App\Models\AttendanceDispensation::updateOrCreate(
+                    [
+                        'employee_id' => $employee->id,
+                        'date' => $dateStr,
+                    ],
+                    [
+                        'dispensation_type' => $mapped[0],
+                        'custom_reason' => $mapped[1],
+                        'description' => $desc !== '' ? $desc : "Impor Logbook Lama ({$rawType})",
+                        'recorded_by' => $recordedBy ?? auth()->id(),
+                    ]
+                );
+
+                $imported++;
+            }
+
+            DB::commit();
+            $skipMsg = $skippedResigned > 0 ? " ({$skippedResigned} baris pegawai resign dilewati)" : '';
+
+            return [
+                'success' => true,
+                'message' => "Impor logbook tabel sukses: {$imported} catatan dispensasi diselaraskan{$skipMsg}.",
+                'imported' => $imported,
+                'errors' => $errors,
+            ];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => 'Gagal memproses logbook: ' . $e->getMessage(),
+                'imported' => 0,
+                'errors' => [$e->getMessage()],
+            ];
+        }
+    }
 }
