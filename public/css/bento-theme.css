@@ -233,10 +233,20 @@ body.fi-body {
     background: var(--bento-chrome) !important;
     border-bottom: 1px solid var(--bento-border) !important;
     box-shadow: none !important;
+    position: relative !important;
+    z-index: 40 !important;
 }
 
 .fi-topbar-ctn {
     overflow-x: visible !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+}
+
+.fi-main {
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 .fi-topbar-end,
@@ -637,6 +647,11 @@ body.fi-body {
 /* =============================================================================
    8. STACKING, NOTIFICATIONS & HIGH CONTRAST
    ============================================================================= */
+.fi-ta-ctn {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
 .fi-elevated-active {
     position: relative !important;
     z-index: 60 !important;
