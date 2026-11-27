@@ -24,7 +24,9 @@ class EmployeesByBranchChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $branches = Branch::where('is_active', true)->withCount('employees')->get();
+        $branches = Branch::where('is_active', true)
+            ->withCount(['employees' => fn ($query) => $query->where('status', 'Active')])
+            ->get();
 
         $labels = [];
         $counts = [];

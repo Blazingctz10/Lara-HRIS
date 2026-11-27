@@ -37,8 +37,8 @@ class DepartmentsTable
                     ->color('info'),
 
                 TextColumn::make('employees_count')
-                    ->counts('employees')
-                    ->label('Jumlah Pegawai')
+                    ->counts(['employees' => fn ($query) => $query->where('status', 'Active')])
+                    ->label('Jumlah Pegawai Aktif')
                     ->alignCenter()
                     ->badge()
                     ->color('success'),

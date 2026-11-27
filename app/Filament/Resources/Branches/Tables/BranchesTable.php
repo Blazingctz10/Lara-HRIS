@@ -58,8 +58,8 @@ class BranchesTable
                     ->placeholder('-'),
 
                 TextColumn::make('employees_count')
-                    ->counts('employees')
-                    ->label('Jumlah Staf')
+                    ->counts(['employees' => fn ($query) => $query->where('status', 'Active')])
+                    ->label('Jumlah Staf Aktif')
                     ->alignCenter()
                     ->badge()
                     ->color('secondary'),
