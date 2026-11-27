@@ -40,11 +40,13 @@ class BankStatsOverview extends BaseWidget
 
         // 1. IT ADMIN / SUPER ADMIN
         if ($user && $user->role === 'super_admin') {
-            $totalUsers = User::count();
+            $activeUsers = User::where('is_active', true)
+                ->where(fn ($q) => $q->whereDoesntHave('employee')->orWhereHas('employee', fn ($eq) => $eq->whereNotIn('status', ['Resigned', 'Terminated'])))
+                ->count();
 
             return [
-                Stat::make('Total Akun Sistem', "{$totalUsers} Akun")
-                    ->description('Kredensial & hak akses terdaftar')
+                Stat::make('Akun Sistem Aktif', "{$activeUsers} Akun")
+                    ->description('Kredensial login aktif terdaftar')
                     ->descriptionIcon('heroicon-o-users')
                     ->color('primary'),
 
@@ -53,8 +55,8 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-o-building-office-2')
                     ->color('primary'),
 
-                Stat::make('Master Pegawai', "{$activeEmployees} / {$totalEmployees}")
-                    ->description('Data pegawai aktif di sistem')
+                Stat::make('Pegawai Aktif', "{$activeEmployees} Pegawai")
+                    ->description('Pegawai operasional aktif')
                     ->descriptionIcon('heroicon-o-user-group')
                     ->color('info'),
 
@@ -76,7 +78,7 @@ class BankStatsOverview extends BaseWidget
 
             return [
                 Stat::make('Total Pegawai BPR', "{$activeEmployees} Pegawai")
-                    ->description("Total master: {$totalEmployees} pegawai")
+                    ->description('Pegawai operasional aktif')
                     ->descriptionIcon('heroicon-o-user-group')
                     ->color('primary'),
 
@@ -108,7 +110,7 @@ class BankStatsOverview extends BaseWidget
             $newApplicants = JobApplicant::where('status', 'Applied')->count();
 
             return [
-                Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
+                Stat::make('Total Pegawai Aktif', "{$activeEmployees} Pegawai")
                     ->description('Status operasional aktif')
                     ->descriptionIcon('heroicon-o-user-group')
                     ->color('success'),
@@ -211,7 +213,7 @@ class BankStatsOverview extends BaseWidget
         $pendingLeaves = LeaveRequest::whereIn('status', ['Pending', 'Approved_HR'])->count();
 
         return [
-            Stat::make('Total Pegawai Aktif', "{$activeEmployees} / {$totalEmployees}")
+            Stat::make('Total Pegawai Aktif', "{$activeEmployees} Pegawai")
                 ->description('Status operasional bank')
                 ->descriptionIcon('heroicon-o-user-group')
                 ->color('success'),
