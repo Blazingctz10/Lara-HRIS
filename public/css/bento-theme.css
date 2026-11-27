@@ -143,11 +143,46 @@ html, body {
     }
 }
 
+html,
+body,
+body.fi-body,
+.fi-modal,
+.fi-ta-table,
+button,
+input,
+select,
+textarea {
+    font-family: var(--bento-font) !important;
+}
+
 body.fi-body {
     background: var(--bento-bg-mesh) !important;
     background-attachment: fixed !important;
     color: var(--bento-text) !important;
     min-height: 100vh;
+}
+
+/* Standardisasi ukuran & keterbacaan logo resmi PT BPR Banda Raya */
+.fi-logo img,
+.fi-topbar .fi-logo img,
+.fi-sidebar-header .fi-logo img {
+    height: 40px !important;
+    max-height: 40px !important;
+    width: auto !important;
+    object-fit: contain !important;
+}
+
+.fi-simple-header .fi-logo img {
+    height: 54px !important;
+    max-height: 54px !important;
+    width: auto !important;
+    object-fit: contain !important;
+}
+
+:is(.dark) .fi-logo img {
+    background: rgba(255, 255, 255, 0.94);
+    padding: 4px 10px;
+    border-radius: 10px;
 }
 
 .fi-header-heading {

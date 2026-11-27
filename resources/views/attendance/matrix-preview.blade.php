@@ -721,7 +721,7 @@
   <div class="top-toolbar no-print">
     <div class="toolbar-left">
       <div class="brand-badge">
-        <div class="brand-logo-icon">BPR</div>
+        <img src="{{ asset('images/logo-bpr-horizontal.png') }}" alt="PT BPR Banda Raya" style="height: 36px; width: auto; object-fit: contain;">
         <div>
           <div class="brand-title">PT BPR BANDA RAYA</div>
           <div class="brand-sub">Sistem Informasi Manajemen Presensi & HRIS Terpadu</div>

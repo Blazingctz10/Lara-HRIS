@@ -28,10 +28,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('BPR Banda Raya')
-            ->brandLogo(asset('images/logo-horizontal-clean.png'))
-            ->darkModeBrandLogo(asset('images/logo-horizontal-dark.png'))
-            ->brandLogoHeight('2.75rem')
-            ->favicon(asset('images/logo-tight.png'))
+            ->brandLogo(asset('images/logo-bpr-horizontal.png'))
+            ->darkModeBrandLogo(asset('images/logo-bpr-horizontal.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('images/logo-bpr-vertical.png'))
             ->colors([
                 'primary' => Color::hex('#0E6838'), // BPR Banda Raya Forest Green
                 'warning' => Color::hex('#F37A20'), // BPR Banda Raya Warm Orange
