@@ -73,14 +73,15 @@ class BprExcelExport
   .title-main { font-size: 15px; font-weight: bold; color: #0E6838; }
   .subtitle { font-size: 11px; font-weight: bold; color: #1F2937; }
   .meta { font-size: 10px; color: #64748B; }
-  .th-head { background-color: #0E6838; color: #FFFFFF; font-weight: bold; text-align: center; border: 1px solid #084022; padding: 6px 8px; font-size: 11px; }
-  .td-cell { border: 1px solid #CBD5E1; padding: 5px 7px; font-size: 10px; vertical-align: middle; }
+  .th-head { background-color: #0E6838; color: #FFFFFF; font-weight: bold; text-align: center; border: 1px solid #084022; padding: 7px 10px; font-size: 11px; white-space: nowrap; }
+  .td-cell { border: 1px solid #CBD5E1; padding: 6px 9px; font-size: 10px; vertical-align: middle; }
   .td-center { text-align: center; }
   .td-right { text-align: right; }
   .td-bold { font-weight: bold; }
-  .td-text { mso-number-format: "\@"; }
-  .td-nip { font-family: "Courier New", monospace; text-align: center; mso-number-format: "\@"; }
-  .td-num { text-align: right; mso-number-format: "#,##0"; }
+  .td-text { mso-number-format: "\@"; white-space: nowrap; }
+  .td-nip { font-family: "Courier New", monospace; text-align: center; mso-number-format: "\@"; white-space: nowrap; }
+  .td-num { text-align: right; mso-number-format: "\#\,\#\#0"; white-space: nowrap; }
+  .td-rp { text-align: right; mso-number-format: "\0022Rp \0022\#\,\#\#0;\0022-Rp \0022\#\,\#\#0;\0022-\0022"; white-space: nowrap; }
   .tr-odd { background-color: #F8FAFC; }
   .tr-even { background-color: #FFFFFF; }
   .tr-total td { background-color: #E8F3EC; font-weight: bold; color: #0E6838; border-top: 2px solid #0E6838; }
@@ -105,13 +106,28 @@ class BprExcelExport
             $headerHtml .= '</tr></thead><tbody>';
             fputs($handle, $headerHtml);
 
+            $renderCell = static function (array $cell): string {
+                $rawClass = $cell['class'] ?? '';
+                $cls = trim('td-cell ' . $rawClass);
+                $inlineStyle = '';
+
+                if (str_contains($rawClass, 'td-rp')) {
+                    $inlineStyle = ' style="mso-number-format:\'\0022Rp \0022#,##0;\0022-Rp \0022#,##0;\0022-\0022\'"';
+                } elseif (str_contains($rawClass, 'td-num')) {
+                    $inlineStyle = ' style="mso-number-format:\'#,##0\'"';
+                } elseif (str_contains($rawClass, 'td-nip') || str_contains($rawClass, 'td-text')) {
+                    $inlineStyle = ' style="mso-number-format:\'\@\'"';
+                }
+
+                return '<td class="' . htmlspecialchars($cls) . '"' . $inlineStyle . '>' . htmlspecialchars((string) $cell['value']) . '</td>';
+            };
+
             $rowIndex = 1;
             foreach ($rows as $row) {
                 $rowClass = ($rowIndex++ % 2 === 0) ? 'tr-even' : 'tr-odd';
                 $tr = '<tr class="' . $rowClass . '">';
                 foreach ($row as $cell) {
-                    $cls = trim('td-cell ' . ($cell['class'] ?? ''));
-                    $tr .= '<td class="' . htmlspecialchars($cls) . '">' . htmlspecialchars((string) $cell['value']) . '</td>';
+                    $tr .= $renderCell($cell);
                 }
                 $tr .= '</tr>';
                 fputs($handle, $tr);
@@ -120,8 +136,7 @@ class BprExcelExport
             if ($summaryRow !== null) {
                 $tr = '<tr class="tr-total">';
                 foreach ($summaryRow as $cell) {
-                    $cls = trim('td-cell ' . ($cell['class'] ?? ''));
-                    $tr .= '<td class="' . htmlspecialchars($cls) . '">' . htmlspecialchars((string) $cell['value']) . '</td>';
+                    $tr .= $renderCell($cell);
                 }
                 $tr .= '</tr>';
                 fputs($handle, $tr);

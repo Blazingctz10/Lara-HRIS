@@ -77,24 +77,21 @@ class ListPayrolls extends ListRecords
                     $filename = sprintf('Rekap_Payroll_BPR_%04d_%02d.xls', $year, $month);
 
                     $totals = [
-                        'basic' => 0.0, 'allowances' => 0.0, 'overtime' => 0.0, 'reimb' => 0.0,
-                        'bpjs_tk' => 0.0, 'bpjs_kes' => 0.0, 'pph21' => 0.0, 'penalty' => 0.0, 'net' => 0.0,
+                        'basic' => 0.0, 'allowances' => 0.0, 'extras' => 0.0, 'deductions' => 0.0, 'net' => 0.0,
                     ];
 
                     $rows = [];
                     foreach ($records as $idx => $p) {
                         $emp = $p->employee;
                         $fixedAllowance = (float) $p->position_allowance + (float) $p->transport_allowance + (float) $p->meal_allowance;
+                        $extras = (float) $p->overtime_pay + (float) $p->reimbursement_pay;
+                        $totalDeductions = (float) $p->bpjs_tk_deduction + (float) $p->bpjs_kes_deduction + (float) $p->pph21_deduction + (float) $p->late_penalty_deduction;
                         $rekening = $emp?->bank_bpr_account ?: ($emp?->bank_account_number ?: '-');
 
                         $totals['basic'] += (float) $p->basic_salary;
                         $totals['allowances'] += $fixedAllowance;
-                        $totals['overtime'] += (float) $p->overtime_pay;
-                        $totals['reimb'] += (float) $p->reimbursement_pay;
-                        $totals['bpjs_tk'] += (float) $p->bpjs_tk_deduction;
-                        $totals['bpjs_kes'] += (float) $p->bpjs_kes_deduction;
-                        $totals['pph21'] += (float) $p->pph21_deduction;
-                        $totals['penalty'] += (float) $p->late_penalty_deduction;
+                        $totals['extras'] += $extras;
+                        $totals['deductions'] += $totalDeductions;
                         $totals['net'] += (float) $p->net_salary;
 
                         $rows[] = [
@@ -102,15 +99,11 @@ class ListPayrolls extends ListRecords
                             ['value' => $emp?->nip ?? '-', 'class' => 'td-nip'],
                             ['value' => $emp?->full_name ?? '-', 'class' => 'td-bold'],
                             ['value' => $emp?->branch?->name ?? 'Kantor Pusat'],
-                            ['value' => number_format((float) $p->basic_salary, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format($fixedAllowance, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->overtime_pay, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->reimbursement_pay, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->bpjs_tk_deduction, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->bpjs_kes_deduction, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->pph21_deduction, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->late_penalty_deduction, 0, '.', ''), 'class' => 'td-num'],
-                            ['value' => number_format((float) $p->net_salary, 0, '.', ''), 'class' => 'td-num td-bold'],
+                            ['value' => number_format((float) $p->basic_salary, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => number_format($fixedAllowance, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => number_format($extras, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => number_format($totalDeductions, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => number_format((float) $p->net_salary, 0, '.', ''), 'class' => 'td-rp td-bold'],
                             ['value' => $rekening, 'class' => 'td-text td-center'],
                             ['value' => $p->status, 'class' => $p->status === 'Paid' ? 'badge-ok' : 'badge-warn'],
                         ];
@@ -121,15 +114,11 @@ class ListPayrolls extends ListRecords
                         ['value' => 'TOTAL', 'class' => 'td-center'],
                         ['value' => count($records) . ' Pegawai'],
                         ['value' => ''],
-                        ['value' => number_format($totals['basic'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['allowances'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['overtime'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['reimb'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['bpjs_tk'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['bpjs_kes'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['pph21'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['penalty'], 0, '.', ''), 'class' => 'td-num'],
-                        ['value' => number_format($totals['net'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['basic'], 0, '.', ''), 'class' => 'td-rp'],
+                        ['value' => number_format($totals['allowances'], 0, '.', ''), 'class' => 'td-rp'],
+                        ['value' => number_format($totals['extras'], 0, '.', ''), 'class' => 'td-rp'],
+                        ['value' => number_format($totals['deductions'], 0, '.', ''), 'class' => 'td-rp'],
+                        ['value' => number_format($totals['net'], 0, '.', ''), 'class' => 'td-rp'],
                         ['value' => ''],
                         ['value' => ''],
                     ];
@@ -140,11 +129,17 @@ class ListPayrolls extends ListRecords
                         'REKAPITULASI PENGGAJIAN (PAYROLL) KARYAWAN',
                         $periodLabel,
                         [
-                            ['label' => 'No'], ['label' => 'NIP'], ['label' => 'Nama Pegawai'], ['label' => 'Unit Kantor'],
-                            ['label' => 'Gaji Pokok (Rp)'], ['label' => 'Tunjangan (Rp)'], ['label' => 'Lembur (Rp)'],
-                            ['label' => 'Reimburse (Rp)'], ['label' => 'BPJS TK (Rp)'], ['label' => 'BPJS Kes (Rp)'],
-                            ['label' => 'PPh 21 (Rp)'], ['label' => 'Denda Telat (Rp)'], ['label' => 'Take-Home Pay (Rp)'],
-                            ['label' => 'No. Rekening'], ['label' => 'Status'],
+                            ['label' => 'No'],
+                            ['label' => 'NIP'],
+                            ['label' => 'Nama Pegawai'],
+                            ['label' => 'Unit Kantor'],
+                            ['label' => 'Gaji Pokok'],
+                            ['label' => 'Tunjangan'],
+                            ['label' => 'Lembur & Reimburse'],
+                            ['label' => 'Total Potongan (BPJS & PPh21)'],
+                            ['label' => 'Take-Home Pay (Netto)'],
+                            ['label' => 'No. Rekening BPR'],
+                            ['label' => 'Status'],
                         ],
                         $rows,
                         $summaryRow,

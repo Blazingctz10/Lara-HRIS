@@ -86,7 +86,7 @@ class ListOvertimes extends ListRecords
                             ['value' => $emp?->branch?->name ?? 'Kantor Pusat'],
                             ['value' => ($ot->start_time ?? '--:--') . ' - ' . ($ot->end_time ?? '--:--'), 'class' => 'td-center'],
                             ['value' => $hours, 'class' => 'td-num'],
-                            ['value' => number_format($pay, 0, '.', ''), 'class' => 'td-num td-bold'],
+                            ['value' => number_format($pay, 0, '.', ''), 'class' => 'td-rp td-bold'],
                             ['value' => $ot->status, 'class' => $statusClass],
                             ['value' => $ot->reason ?? '-'],
                         ];
@@ -100,7 +100,7 @@ class ListOvertimes extends ListRecords
                         ['value' => ''],
                         ['value' => ''],
                         ['value' => $totalHours, 'class' => 'td-num'],
-                        ['value' => number_format($totalPay, 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totalPay, 0, '.', ''), 'class' => 'td-rp'],
                         ['value' => ''],
                         ['value' => ''],
                     ];
