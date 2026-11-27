@@ -84,13 +84,30 @@ class ListAttendances extends ListRecords
                 ->modalDescription('Unggah berkas log presensi mesin cabang (.xls format Solution/ZK atau berkas .csv). Sistem akan secara otomatis MENGGABUNGKAN data jam masuk/keluar dengan data Cuti Resmi yang disetujui dan Logbook Dispensasi HRD & GA (termasuk membebaskan denda pegawai yang memiliki izin telat masuk sah).')
                 ->form([
                     FileUpload::make('csv_file')
-                        ->label('Pilih Berkas Mesin Presensi (.xls atau .csv)')
-                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel', 'application/x-msexcel'])
-                        ->maxSize(10240)
+                        ->label('Pilih Berkas Mesin Presensi (.xls, .xlsx, atau .csv)')
+                        ->acceptedFileTypes([
+                            'text/csv',
+                            'text/plain',
+                            'application/vnd.ms-excel',
+                            'application/x-msexcel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'application/octet-stream',
+                        ])
+                        ->rules([
+                            fn () => function (string $attribute, $value, \Closure $fail) {
+                                if ($value && method_exists($value, 'getClientOriginalExtension')) {
+                                    $ext = strtolower($value->getClientOriginalExtension());
+                                    if (! in_array($ext, ['xls', 'xlsx', 'csv', 'txt'], true)) {
+                                        $fail('Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), atau TXT.');
+                                    }
+                                }
+                            },
+                        ])
+                        ->maxSize(20480)
                         ->disk('local')
                         ->directory('temp_imports')
                         ->required()
-                        ->helperText('Mendukung berkas Excel ekspor mesin Solution/ZK (.xls template: Name, Date, Timetable, On duty, Off duty, Clock In, Clock Out, OT Time) maupun CSV HRIS baku.'),
+                        ->helperText('Mendukung berkas Excel ekspor mesin Solution/ZK (.xls biner maupun .xlsx/.csv template: Name, Date, Timetable, On duty, Off duty, Clock In, Clock Out, OT Time).'),
                 ])
                 ->modalSubmitActionLabel('Mulai Gabungkan Data')
                 ->action(function (array $data) {

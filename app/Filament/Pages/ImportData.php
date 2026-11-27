@@ -106,10 +106,10 @@ class ImportData extends Page
     public function importEmployees(): void
     {
         $this->validate([
-            'employeeFile' => 'required|file|mimes:csv,txt,xls,xlsx,pdf|max:20480',
+            'employeeFile' => 'required|file|extensions:csv,txt,xls,xlsx,pdf|max:20480',
         ], [
             'employeeFile.required' => 'Silakan pilih berkas Excel (.xlsx, .xls), CSV, atau PDF data pegawai terlebih dahulu.',
-            'employeeFile.mimes' => 'Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), TXT, atau PDF (.pdf).',
+            'employeeFile.extensions' => 'Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), TXT, atau PDF (.pdf).',
             'employeeFile.max' => 'Ukuran berkas maksimal 20 MB.',
         ]);
 
@@ -151,10 +151,10 @@ class ImportData extends Page
     public function importAttendances(): void
     {
         $this->validate([
-            'attendanceFile' => 'required|file|mimes:csv,txt,xls,xlsx|max:20480',
+            'attendanceFile' => 'required|file|extensions:csv,txt,xls,xlsx|max:20480',
         ], [
             'attendanceFile.required' => 'Silakan pilih berkas log absensi terlebih dahulu.',
-            'attendanceFile.mimes' => 'Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), atau TXT.',
+            'attendanceFile.extensions' => 'Format berkas harus berupa Excel (.xls, .xlsx), CSV (.csv), atau TXT.',
             'attendanceFile.max' => 'Ukuran berkas maksimal 20 MB.',
         ]);
 

@@ -1914,6 +1914,7 @@ CSV;
 
         $imported = 0;
         $errors = [];
+        $employeeCache = [];
 
         DB::beginTransaction();
         try {
@@ -1927,20 +1928,31 @@ CSV;
                     $data[$hKey] = isset($rowValues[$hIdx]) ? trim((string) $rowValues[$hIdx]) : '';
                 }
 
-                // Resolusi Identitas Pegawai (NIP atau Nama Lengkap)
+                // Resolusi Identitas Pegawai (NIP atau Nama Lengkap, termasuk singkatan mesin fingerprint seperti "M. Riva")
                 $identifier = trim(preg_replace('/\s+/', ' ', (string) ($data['nip'] ?? ($data['name'] ?? ($data['nama'] ?? ($data['nama_pegawai'] ?? ''))))));
                 if (empty($identifier)) {
                     continue;
                 }
 
-                $employee = Employee::where('nip', $identifier)->first();
-                if (! $employee) {
-                    $employee = Employee::whereRaw('LOWER(full_name) = ?', [strtolower($identifier)])->first();
+                $cacheKey = strtolower($identifier);
+                if (! array_key_exists($cacheKey, $employeeCache)) {
+                    $emp = Employee::where('nip', $identifier)->first()
+                        ?? Employee::whereRaw('LOWER(full_name) = ?', [$cacheKey])->first();
+
+                    if (! $emp) {
+                        $cleanName = trim(preg_replace('/,.*$/', '', $identifier));
+                        $emp = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first();
+
+                        if (! $emp && preg_match('/\b(?:m|muh|moh)\.?\s+/i', $cleanName)) {
+                            $expanded = trim(preg_replace('/\b(?:m|muh|moh)\.?\s+/i', 'muhammad ', $cleanName));
+                            $emp = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($expanded) . '%'])->first();
+                        }
+                    }
+
+                    $employeeCache[$cacheKey] = $emp;
                 }
-                if (! $employee) {
-                    $cleanName = trim(preg_replace('/,.*$/', '', $identifier));
-                    $employee = Employee::whereRaw('LOWER(full_name) LIKE ?', ['%' . strtolower($cleanName) . '%'])->first();
-                }
+
+                $employee = $employeeCache[$cacheKey];
                 if (! $employee) {
                     $errors[] = "Baris " . ($index + 2) . ": Pegawai '{$identifier}' tidak terdaftar di sistem HRIS.";
                     continue;
