@@ -24,9 +24,9 @@ class ListLeaveRequests extends ListRecords
                 ->label('Unduh Rekap Saldo Cuti (Excel)')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->modalHeading('Unduh Laporan Rekap Saldo & Kuota Cuti (.xls)')
+                ->modalHeading('Unduh Laporan Rekap Saldo & Kuota Cuti (.xlsx)')
                 ->modalDescription('Format matriks ringkas 1 baris per pegawai (Sisa / Kuota Awal) sesuai hak cuti dan jenis kelamin pegawai.')
-                ->modalSubmitActionLabel('Unduh Excel (.xls)')
+                ->modalSubmitActionLabel('Unduh Excel (.xlsx)')
                 ->form([
                     TextInput::make('year')
                         ->label('Tahun Kuota Cuti')

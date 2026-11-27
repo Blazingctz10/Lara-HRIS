@@ -7,6 +7,7 @@ use App\Models\AttendanceDispensation;
 use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
+use App\Support\BprExcelExport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -256,20 +257,98 @@ class AttendanceReportController extends Controller
     }
 
     /**
-     * Stream Unduhan Excel (.xls)
+     * Stream Unduhan Excel (.xlsx native OpenXML)
      */
     protected function streamExcelExport(array $data): StreamedResponse
     {
-        $filename = 'Matriks_Rekap_Presensi_BPR_' . sprintf('%04d_%02d', $data['year'], $data['month']) . '.xls';
+        $filename = 'Matriks_Rekap_Presensi_BPR_' . sprintf('%04d_%02d', $data['year'], $data['month']) . '.xlsx';
+        $branchLabel = $data['selectedBranch']?->name ?? 'Semua Unit Kerja';
 
-        return response()->streamDownload(function () use ($data) {
-            $streamHandle = fopen('php://output', 'w');
-            fputs($streamHandle, "\xEF\xBB\xBF");
-            fputs($streamHandle, view('attendance.matrix-excel-table', $data)->render());
-            fclose($streamHandle);
-        }, $filename, [
-            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-        ]);
+        $columns = [
+            ['label' => 'No'],
+            ['label' => 'NIP'],
+            ['label' => 'Nama Pegawai'],
+            ['label' => 'Unit Kantor'],
+        ];
+
+        for ($d = 1; $d <= $data['daysInMonth']; $d++) {
+            $pad = sprintf('%02d', $d);
+            $dayName = $data['daysMeta'][$d]['name'] ?? '';
+            $columns[] = ['label' => "{$pad} ({$dayName}) In"];
+            $columns[] = ['label' => "{$pad} ({$dayName}) Out"];
+        }
+
+        $columns[] = ['label' => 'Hadir'];
+        $columns[] = ['label' => 'Cuti'];
+        $columns[] = ['label' => 'Izin / Disp.'];
+        $columns[] = ['label' => 'Telat'];
+        $columns[] = ['label' => 'Denda (Rp)'];
+        $columns[] = ['label' => 'Alpa'];
+        $columns[] = ['label' => 'Keterangan / Rincian Logbook & Cuti'];
+
+        $rows = [];
+        foreach ($data['matrixRows'] as $row) {
+            $emp = $row['employee'];
+            $r = [
+                ['value' => $row['no'], 'class' => 'td-center'],
+                ['value' => $emp->nip ?? '-', 'class' => 'td-nip'],
+                ['value' => $emp->full_name ?? '-', 'class' => 'td-bold'],
+                ['value' => $emp->branch?->name ?? 'Kantor Pusat'],
+            ];
+
+            for ($d = 1; $d <= $data['daysInMonth']; $d++) {
+                $dayInfo = $row['days'][$d] ?? ['type' => 'future', 'in' => '-', 'out' => '-'];
+                $type = $dayInfo['type'] ?? 'future';
+                $cellClass = match ($type) {
+                    'late' => 'badge-warn',
+                    'alpa' => 'badge-danger',
+                    'cuti', 'izin' => 'badge-ok',
+                    default => 'td-center',
+                };
+                $r[] = ['value' => (string) ($dayInfo['in'] ?? '-'), 'class' => $cellClass];
+                $r[] = ['value' => (string) ($dayInfo['out'] ?? '-'), 'class' => $cellClass];
+            }
+
+            $r[] = ['value' => (int) $row['total_hadir'], 'class' => 'td-num td-bold'];
+            $r[] = ['value' => (int) $row['total_cuti'], 'class' => 'td-num'];
+            $r[] = ['value' => (int) $row['total_izin'], 'class' => 'td-num'];
+            $r[] = ['value' => (int) $row['total_telat'], 'class' => 'td-num'];
+            $r[] = ['value' => number_format((float) $row['total_denda'], 0, '.', ''), 'class' => 'td-rp'];
+            $r[] = ['value' => (int) $row['total_alpa'], 'class' => 'td-num'];
+            $r[] = ['value' => $row['notes'] ?: '-'];
+
+            $rows[] = $r;
+        }
+
+        $gt = $data['grandTotals'];
+        $summaryRow = [
+            ['value' => '', 'class' => 'td-center'],
+            ['value' => 'TOTAL', 'class' => 'td-center'],
+            ['value' => count($data['matrixRows']) . ' Pegawai'],
+            ['value' => $branchLabel],
+        ];
+        for ($d = 1; $d <= $data['daysInMonth']; $d++) {
+            $summaryRow[] = ['value' => '', 'class' => 'td-center'];
+            $summaryRow[] = ['value' => '', 'class' => 'td-center'];
+        }
+        $summaryRow[] = ['value' => (int) ($gt['hadir'] ?? 0), 'class' => 'td-num'];
+        $summaryRow[] = ['value' => (int) ($gt['cuti'] ?? 0), 'class' => 'td-num'];
+        $summaryRow[] = ['value' => (int) ($gt['izin'] ?? 0), 'class' => 'td-num'];
+        $summaryRow[] = ['value' => (int) ($gt['telat'] ?? 0), 'class' => 'td-num'];
+        $summaryRow[] = ['value' => number_format((float) ($gt['denda'] ?? 0), 0, '.', ''), 'class' => 'td-rp'];
+        $summaryRow[] = ['value' => (int) ($gt['alpa'] ?? 0), 'class' => 'td-num'];
+        $summaryRow[] = ['value' => ''];
+
+        return BprExcelExport::stream(
+            $filename,
+            'Matriks Presensi',
+            'MATRIKS REKAPITULASI PRESENSI BULANAN (MESIN, CUTI & LOGBOOK)',
+            "{$data['periodName']} | {$branchLabel}",
+            $columns,
+            $rows,
+            $summaryRow,
+            freezeCols: 4,
+        );
     }
 
     /**

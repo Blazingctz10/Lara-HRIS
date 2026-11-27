@@ -26,6 +26,7 @@ class BprExcelExport
         array $columns,
         iterable $rows,
         ?array $summaryRow = null,
+        int $freezeCols = 0,
     ): StreamedResponse {
         $xlsxFilename = preg_replace('/\.xls$/i', '.xlsx', $filename) ?: ($filename . '.xlsx');
         if (! str_ends_with(strtolower($xlsxFilename), '.xlsx')) {
@@ -44,6 +45,7 @@ class BprExcelExport
             $columns,
             $rowsArray,
             $summaryRow,
+            $freezeCols,
         ) {
             $tempFile = tempnam(sys_get_temp_dir(), 'bpr_xlsx_');
             $zip = new ZipArchive();
@@ -56,7 +58,7 @@ class BprExcelExport
             $zip->addFromString('xl/styles.xml', self::stylesXml());
             $zip->addFromString(
                 'xl/worksheets/sheet1.xml',
-                self::worksheetXml($reportTitle, $periodLabel, $columns, $rowsArray, $summaryRow)
+                self::worksheetXml($reportTitle, $periodLabel, $columns, $rowsArray, $summaryRow, $freezeCols)
             );
 
             $zip->close();
@@ -258,6 +260,7 @@ class BprExcelExport
         array $columns,
         array $rows,
         ?array $summaryRow,
+        int $freezeCols = 0,
     ): string {
         $colCount = max(1, count($columns));
         $lastCol = self::colLetter($colCount);
@@ -356,10 +359,16 @@ class BprExcelExport
             . '<mergeCell ref="A3:' . $lastCol . '3"/>'
             . '</mergeCells>';
 
+        $freezeCols = max(0, min($colCount - 1, $freezeCols));
+        $topLeftCell = self::colLetter($freezeCols + 1) . '6';
+        $paneAttr = $freezeCols > 0
+            ? 'xSplit="' . $freezeCols . '" ySplit="5" topLeftCell="' . $topLeftCell . '" activePane="bottomRight" state="frozen"'
+            : 'ySplit="5" topLeftCell="A6" activePane="bottomLeft" state="frozen"';
+
         return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             . '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             . '<sheetViews><sheetView tabSelected="1" workbookViewId="0">'
-            . '<pane ySplit="5" topLeftCell="A6" activePane="bottomLeft" state="frozen"/>'
+            . '<pane ' . $paneAttr . '/>'
             . '</sheetView></sheetViews>'
             . $colsXml
             . $sheetData

@@ -9,6 +9,7 @@ use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Services\DataMigrationService;
+use App\Support\BprExcelExport;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -117,161 +118,95 @@ class ListAttendances extends ListRecords
                 }),
 
             Action::make('export_csv')
-                ->label('Unduh Rekap Presensi (Excel / XLS)')
+                ->label('Unduh Log Harian (Excel .xlsx)')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->action(function (): StreamedResponse {
                     $baseQuery = Attendance::accessibleBy()
                         ->with(['employee.branch', 'employee.department'])
                         ->orderBy('date', 'desc');
-                    $totalCount = (clone $baseQuery)->count();
 
-                    $filename = 'Rekap_Log_Presensi_BPR_' . date('Ymd_His') . '.xls';
-                    $headers = [
-                        'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-                        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                        'Pragma' => 'no-cache',
-                        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                        'Expires' => '0',
-                    ];
+                    $rows = [];
+                    $totalLateMinutes = 0;
+                    $totalPenalty = 0.0;
+                    $no = 1;
 
-                    $callback = function () use ($baseQuery, $totalCount) {
-                        $streamHandle = fopen('php://output', 'w');
-                        fputs($streamHandle, "\xEF\xBB\xBF");
-
-                        $html = '<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:x="urn:schemas-microsoft-com:office:excel"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!--[if gte mso 9]>
-<xml>
- <x:ExcelWorkbook>
-  <x:ExcelWorksheets>
-   <x:ExcelWorksheet>
-    <x:Name>Log Presensi</x:Name>
-    <x:WorksheetOptions>
-     <x:DisplayGridlines/>
-     <x:FreezePanes/>
-     <x:FrozenNoSplit/>
-     <x:SplitHorizontal>5</x:SplitHorizontal>
-     <x:TopRowBottomPane>5</x:TopRowBottomPane>
-     <x:ActivePane>0</x:ActivePane>
-    </x:WorksheetOptions>
-   </x:ExcelWorksheet>
-  </x:ExcelWorksheets>
- </x:ExcelWorkbook>
-</xml>
-<![endif]-->
-<style>
-  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 11px; }
-  table { border-collapse: collapse; width: 100%; }
-  .title-main { font-size: 15px; font-weight: bold; color: #0E6838; }
-  .subtitle { font-size: 11px; font-weight: bold; color: #333333; }
-  .meta { font-size: 10px; color: #666666; }
-  .th-head { background-color: #0E6838; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #084022; padding: 6px 8px; font-size: 11px; }
-  .td-cell { border: 1px solid #cbd5e1; padding: 4px 6px; font-size: 10px; vertical-align: middle; }
-  .td-center { text-align: center; }
-  .td-right { text-align: right; }
-  .td-nip { font-family: "Courier New", monospace; text-align: center; mso-number-format: "\@"; }
-  .badge-present { color: #047857; font-weight: bold; background-color: #d1fae5; }
-  .badge-late { color: #dc2626; font-weight: bold; background-color: #fee2e2; }
-  .badge-cuti { color: #1e40af; font-weight: bold; background-color: #dbeafe; }
-  .badge-izin { color: #92400e; font-weight: bold; background-color: #fef3c7; }
-  .badge-alpa { color: #991b1b; font-weight: bold; background-color: #ffe4e6; }
-  .tr-odd { background-color: #f8fafc; }
-  .tr-even { background-color: #ffffff; }
-</style>
-</head>
-<body>
-<table>
-  <tr><td colspan="12" class="title-main">PT BPR BANDA RAYA</td></tr>
-  <tr><td colspan="12" class="subtitle">REKAPITULASI LOG PRESENSI & KEHADIRAN STAF</td></tr>
-  <tr><td colspan="12" class="meta">Waktu Cetak: ' . now()->format('d/m/Y H:i:s') . ' WIB | Total Transaksi: ' . $totalCount . ' Data</td></tr>
-  <tr><td colspan="12">&nbsp;</td></tr>
-  <thead>
-    <tr>
-      <th class="th-head">No</th>
-      <th class="th-head">Tanggal</th>
-      <th class="th-head">NIP Pegawai</th>
-      <th class="th-head">Nama Pegawai</th>
-      <th class="th-head">Unit Kantor</th>
-      <th class="th-head">Departemen</th>
-      <th class="th-head">Jam Masuk</th>
-      <th class="th-head">Jam Pulang</th>
-      <th class="th-head">Status Kehadiran</th>
-      <th class="th-head">Terlambat (Mnt)</th>
-      <th class="th-head">Denda (Rp)</th>
-      <th class="th-head">Sumber Data & Rincian Logbook</th>
-    </tr>
-  </thead>
-  <tbody>';
-
-                        fputs($streamHandle, $html);
-
-                        $no = 1;
-                        foreach ($baseQuery->cursor() as $row) {
-                            $isLateDisp = str_contains($row->notes ?? '', 'Dispensasi Telat');
-                            $sumber = 'Tarik Berkas Mesin';
-                            if (str_contains($row->notes ?? '', 'Cuti Resmi') || str_contains($row->notes ?? '', 'Cuti')) {
-                                $sumber = 'Permohonan Cuti (ESS)';
-                            } elseif ($isLateDisp) {
-                                $sumber = 'Mesin Presensi + Disp. Telat';
-                            } elseif (str_contains($row->notes ?? '', 'Dispensasi') || $row->status === 'Excused') {
-                                $sumber = 'Logbook HRD & GA';
-                            }
-
-                            $statusLabel = match ($row->status) {
-                                'Present' => $isLateDisp ? 'Hadir (Disp. Telat)' : 'Hadir Tepat Waktu',
-                                'Late' => 'Terlambat (' . ($row->late_minutes ?? 0) . ' m)',
-                                'Excused' => str_contains($row->notes ?? '', 'Cuti') ? 'Cuti Resmi' : 'Izin / Sakit',
-                                'Absent' => 'Alpa',
-                                default => $row->status ?? '-',
-                            };
-
-                            $badgeClass = match ($row->status) {
-                                'Present' => 'badge-present',
-                                'Late' => 'badge-late',
-                                'Excused' => str_contains($row->notes ?? '', 'Cuti') ? 'badge-cuti' : 'badge-izin',
-                                'Absent' => 'badge-alpa',
-                                default => '',
-                            };
-
-                            $rowCls = ($no % 2 === 0) ? 'tr-even' : 'tr-odd';
-                            $inTime = $row->clock_in ? Carbon::parse($row->clock_in)->format('H:i') : '-';
-                            $outTime = $row->clock_out ? Carbon::parse($row->clock_out)->format('H:i') : '-';
-                            $notes = $row->notes ? ($sumber . ' | ' . $row->notes) : $sumber;
-
-                            $tr = '<tr class="' . $rowCls . '">';
-                            $tr .= '<td class="td-cell td-center">' . $no++ . '</td>';
-                            $tr .= '<td class="td-cell td-center">' . ($row->date ? $row->date->format('d/m/Y') : '-') . '</td>';
-                            $tr .= '<td class="td-cell td-nip">' . htmlspecialchars($row->employee?->nip ?? '-') . '</td>';
-                            $tr .= '<td class="td-cell" style="font-weight: 600;">' . htmlspecialchars($row->employee?->full_name ?? '-') . '</td>';
-                            $tr .= '<td class="td-cell">' . htmlspecialchars($row->employee?->branch?->name ?? 'Kantor Pusat') . '</td>';
-                            $tr .= '<td class="td-cell">' . htmlspecialchars($row->employee?->department?->name ?? '-') . '</td>';
-                            $tr .= '<td class="td-cell td-center">' . $inTime . '</td>';
-                            $tr .= '<td class="td-cell td-center">' . $outTime . '</td>';
-                            $tr .= '<td class="td-cell td-center ' . $badgeClass . '">' . htmlspecialchars($statusLabel) . '</td>';
-                            $tr .= '<td class="td-cell td-center">' . ($row->late_minutes ?? 0) . '</td>';
-                            $tr .= '<td class="td-cell td-right">' . number_format($row->penalty_amount ?? 0, 0, ',', '.') . '</td>';
-                            $tr .= '<td class="td-cell" style="font-size: 9px; color: #475569;">' . htmlspecialchars($notes) . '</td>';
-                            $tr .= '</tr>';
-
-                            fputs($streamHandle, $tr);
+                    foreach ($baseQuery->cursor() as $row) {
+                        $isLateDisp = str_contains($row->notes ?? '', 'Dispensasi Telat');
+                        $sumber = 'Tarik Berkas Mesin';
+                        if (str_contains($row->notes ?? '', 'Cuti Resmi') || str_contains($row->notes ?? '', 'Cuti')) {
+                            $sumber = 'Permohonan Cuti (ESS)';
+                        } elseif ($isLateDisp) {
+                            $sumber = 'Mesin Presensi + Disp. Telat';
+                        } elseif (str_contains($row->notes ?? '', 'Dispensasi') || $row->status === 'Excused') {
+                            $sumber = 'Logbook HRD & GA';
                         }
 
-                        $footerHtml = '</tbody>
-</table>
-</body>
-</html>';
-                        fputs($streamHandle, $footerHtml);
-                        fclose($streamHandle);
-                    };
+                        $statusLabel = match ($row->status) {
+                            'Present' => $isLateDisp ? 'Hadir (Disp. Telat)' : 'Hadir Tepat Waktu',
+                            'Late' => 'Terlambat (' . ($row->late_minutes ?? 0) . ' m)',
+                            'Excused' => str_contains($row->notes ?? '', 'Cuti') ? 'Cuti Resmi' : 'Izin / Sakit',
+                            'Absent' => 'Alpa',
+                            default => $row->status ?? '-',
+                        };
 
-                    return response()->streamDownload($callback, $filename, [
-                        'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-                    ]);
+                        $badgeClass = match ($row->status) {
+                            'Present', 'Excused' => 'badge-ok',
+                            'Late' => 'badge-warn',
+                            'Absent' => 'badge-danger',
+                            default => 'td-center',
+                        };
+
+                        $lateMins = (int) ($row->late_minutes ?? 0);
+                        $penalty = (float) ($row->penalty_amount ?? 0);
+                        $totalLateMinutes += $lateMins;
+                        $totalPenalty += $penalty;
+
+                        $rows[] = [
+                            ['value' => $no++, 'class' => 'td-center'],
+                            ['value' => $row->date ? $row->date->format('d/m/Y') : '-', 'class' => 'td-center'],
+                            ['value' => $row->employee?->nip ?? '-', 'class' => 'td-nip'],
+                            ['value' => $row->employee?->full_name ?? '-', 'class' => 'td-bold'],
+                            ['value' => $row->employee?->branch?->name ?? 'Kantor Pusat'],
+                            ['value' => $row->employee?->department?->name ?? '-'],
+                            ['value' => $row->clock_in ? Carbon::parse($row->clock_in)->format('H:i') : '-', 'class' => 'td-center'],
+                            ['value' => $row->clock_out ? Carbon::parse($row->clock_out)->format('H:i') : '-', 'class' => 'td-center'],
+                            ['value' => $statusLabel, 'class' => $badgeClass],
+                            ['value' => $lateMins, 'class' => 'td-num'],
+                            ['value' => number_format($penalty, 0, '.', ''), 'class' => 'td-rp'],
+                            ['value' => $row->notes ? ($sumber . ' | ' . $row->notes) : $sumber],
+                        ];
+                    }
+
+                    $summaryRow = [
+                        ['value' => '', 'class' => 'td-center'],
+                        ['value' => 'TOTAL', 'class' => 'td-center'],
+                        ['value' => count($rows) . ' Log', 'class' => 'td-center'],
+                        ['value' => ''],
+                        ['value' => ''],
+                        ['value' => ''],
+                        ['value' => ''],
+                        ['value' => ''],
+                        ['value' => ''],
+                        ['value' => $totalLateMinutes, 'class' => 'td-num'],
+                        ['value' => number_format($totalPenalty, 0, '.', ''), 'class' => 'td-rp'],
+                        ['value' => ''],
+                    ];
+
+                    return BprExcelExport::stream(
+                        'Rekap_Log_Presensi_BPR_' . date('Ymd_His') . '.xlsx',
+                        'Log Presensi',
+                        'REKAPITULASI LOG PRESENSI & KEHADIRAN STAF',
+                        'Seluruh Data Log Harian',
+                        [
+                            ['label' => 'No'], ['label' => 'Tanggal'], ['label' => 'NIP Pegawai'], ['label' => 'Nama Pegawai'],
+                            ['label' => 'Unit Kantor'], ['label' => 'Departemen'], ['label' => 'Jam Masuk'], ['label' => 'Jam Pulang'],
+                            ['label' => 'Status Kehadiran'], ['label' => 'Terlambat (Mnt)'], ['label' => 'Denda (Rp)'],
+                            ['label' => 'Sumber Data & Rincian Logbook'],
+                        ],
+                        $rows,
+                        $summaryRow,
+                    );
                 }),
 
             Action::make('export_monthly_matrix')
@@ -322,7 +257,7 @@ class ListAttendances extends ListRecords
                         ->label('Aksi Laporan')
                         ->options([
                             'preview' => 'Buka Pratinjau & Siap Cetak (Print Preview / Simpan PDF)',
-                            'excel' => 'Langsung Unduh Berkas Excel Resmi (.xls)',
+                            'excel' => 'Langsung Unduh Berkas Excel Resmi (.xlsx)',
                             'csv' => 'Langsung Unduh Berkas Teks (.csv)',
                         ])
                         ->default('preview')

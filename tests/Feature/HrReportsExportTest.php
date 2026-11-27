@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\Attendances\Pages\ListAttendances;
 use App\Filament\Resources\LeaveRequests\Pages\ListLeaveRequests;
 use App\Filament\Resources\Overtimes\Pages\ListOvertimes;
 use App\Filament\Resources\Payrolls\Pages\ListPayrolls;
@@ -77,5 +78,16 @@ class HrReportsExportTest extends TestCase
                 'year' => (int) date('Y'),
             ])
             ->assertFileDownloaded(sprintf('Rekap_Lembur_BPR_%04d_%02d.xlsx', (int) date('Y'), (int) date('m')));
+
+        Livewire::test(ListAttendances::class)
+            ->callAction('export_csv')
+            ->assertFileDownloaded();
+
+        $this->get(route('admin.attendance.export-matrix', [
+            'year' => (int) date('Y'),
+            'month' => (int) date('m'),
+            'format' => 'excel',
+        ]))->assertOk()
+            ->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
 }
