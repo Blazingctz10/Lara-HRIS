@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\Payrolls\Pages;
 
 use App\Filament\Resources\Payrolls\PayrollResource;
+use App\Models\Payroll;
 use App\Services\PayrollCalculationService;
+use App\Support\BprExcelExport;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
@@ -11,6 +14,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Grid;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ListPayrolls extends ListRecords
 {
@@ -19,6 +23,134 @@ class ListPayrolls extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('export_payroll_excel')
+                ->label('Unduh Rekap Payroll (Excel)')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('info')
+                ->modalHeading('Unduh Laporan Rekapitulasi Payroll (.xls)')
+                ->modalDescription('Ekspor rekap slip gaji pegawai lengkap dengan tunjangan, lembur, reimbursement, potongan BPJS/PPh 21, denda keterlambatan, dan Take-Home Pay.')
+                ->modalSubmitActionLabel('Unduh Excel (.xls)')
+                ->form([
+                    Grid::make(3)->schema([
+                        Select::make('month')
+                            ->label('Bulan')
+                            ->options([
+                                1 => '01 - Januari', 2 => '02 - Februari', 3 => '03 - Maret',
+                                4 => '04 - April', 5 => '05 - Mei', 6 => '06 - Juni',
+                                7 => '07 - Juli', 8 => '08 - Agustus', 9 => '09 - September',
+                                10 => '10 - Oktober', 11 => '11 - November', 12 => '12 - Desember',
+                            ])
+                            ->default((int) date('m'))
+                            ->required(),
+                        TextInput::make('year')
+                            ->label('Tahun')
+                            ->numeric()
+                            ->default((int) date('Y'))
+                            ->required(),
+                        Select::make('status')
+                            ->label('Filter Status')
+                            ->options([
+                                'all' => 'Semua Status',
+                                'Paid' => 'Sudah Dibayar (Paid)',
+                                'Draft' => 'Draft',
+                            ])
+                            ->default('all')
+                            ->required(),
+                    ]),
+                ])
+                ->action(function (array $data): StreamedResponse {
+                    $month = (int) $data['month'];
+                    $year = (int) $data['year'];
+                    $status = $data['status'] ?? 'all';
+
+                    $query = Payroll::accessibleBy()
+                        ->with(['employee.branch', 'employee.position'])
+                        ->where('period_month', $month)
+                        ->where('period_year', $year);
+
+                    if ($status !== 'all') {
+                        $query->where('status', $status);
+                    }
+
+                    $records = $query->orderBy('id')->get();
+                    $periodLabel = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
+                    $filename = sprintf('Rekap_Payroll_BPR_%04d_%02d.xls', $year, $month);
+
+                    $totals = [
+                        'basic' => 0.0, 'allowances' => 0.0, 'overtime' => 0.0, 'reimb' => 0.0,
+                        'bpjs_tk' => 0.0, 'bpjs_kes' => 0.0, 'pph21' => 0.0, 'penalty' => 0.0, 'net' => 0.0,
+                    ];
+
+                    $rows = [];
+                    foreach ($records as $idx => $p) {
+                        $emp = $p->employee;
+                        $fixedAllowance = (float) $p->position_allowance + (float) $p->transport_allowance + (float) $p->meal_allowance;
+                        $rekening = $emp?->bank_bpr_account ?: ($emp?->bank_account_number ?: '-');
+
+                        $totals['basic'] += (float) $p->basic_salary;
+                        $totals['allowances'] += $fixedAllowance;
+                        $totals['overtime'] += (float) $p->overtime_pay;
+                        $totals['reimb'] += (float) $p->reimbursement_pay;
+                        $totals['bpjs_tk'] += (float) $p->bpjs_tk_deduction;
+                        $totals['bpjs_kes'] += (float) $p->bpjs_kes_deduction;
+                        $totals['pph21'] += (float) $p->pph21_deduction;
+                        $totals['penalty'] += (float) $p->late_penalty_deduction;
+                        $totals['net'] += (float) $p->net_salary;
+
+                        $rows[] = [
+                            ['value' => $idx + 1, 'class' => 'td-center'],
+                            ['value' => $emp?->nip ?? '-', 'class' => 'td-nip'],
+                            ['value' => $emp?->full_name ?? '-', 'class' => 'td-bold'],
+                            ['value' => $emp?->branch?->name ?? 'Kantor Pusat'],
+                            ['value' => number_format((float) $p->basic_salary, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format($fixedAllowance, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->overtime_pay, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->reimbursement_pay, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->bpjs_tk_deduction, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->bpjs_kes_deduction, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->pph21_deduction, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->late_penalty_deduction, 0, '.', ''), 'class' => 'td-num'],
+                            ['value' => number_format((float) $p->net_salary, 0, '.', ''), 'class' => 'td-num td-bold'],
+                            ['value' => $rekening, 'class' => 'td-text td-center'],
+                            ['value' => $p->status, 'class' => $p->status === 'Paid' ? 'badge-ok' : 'badge-warn'],
+                        ];
+                    }
+
+                    $summaryRow = [
+                        ['value' => '', 'class' => 'td-center'],
+                        ['value' => 'TOTAL', 'class' => 'td-center'],
+                        ['value' => count($records) . ' Pegawai'],
+                        ['value' => ''],
+                        ['value' => number_format($totals['basic'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['allowances'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['overtime'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['reimb'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['bpjs_tk'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['bpjs_kes'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['pph21'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['penalty'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => number_format($totals['net'], 0, '.', ''), 'class' => 'td-num'],
+                        ['value' => ''],
+                        ['value' => ''],
+                    ];
+
+                    return BprExcelExport::stream(
+                        $filename,
+                        'Rekap Payroll',
+                        'REKAPITULASI PENGGAJIAN (PAYROLL) KARYAWAN',
+                        $periodLabel,
+                        [
+                            ['label' => 'No'], ['label' => 'NIP'], ['label' => 'Nama Pegawai'], ['label' => 'Unit Kantor'],
+                            ['label' => 'Gaji Pokok (Rp)'], ['label' => 'Tunjangan (Rp)'], ['label' => 'Lembur (Rp)'],
+                            ['label' => 'Reimburse (Rp)'], ['label' => 'BPJS TK (Rp)'], ['label' => 'BPJS Kes (Rp)'],
+                            ['label' => 'PPh 21 (Rp)'], ['label' => 'Denda Telat (Rp)'], ['label' => 'Take-Home Pay (Rp)'],
+                            ['label' => 'No. Rekening'], ['label' => 'Status'],
+                        ],
+                        $rows,
+                        $summaryRow,
+                    );
+                }),
+
             Action::make('generate_batch')
                 ->label('Hitung Otomatis Seluruh Pegawai')
                 ->icon('heroicon-o-calculator')
