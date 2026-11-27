@@ -24,13 +24,13 @@ class ListCareerMovements extends ListRecords
     public function getTabs(): array
     {
         return [
-            'active' => Tab::make('Pegawai Aktif')
+            'active' => Tab::make('Riwayat Pegawai Aktif')
                 ->icon('heroicon-o-check-circle')
                 ->badge(CareerMovement::whereHas('employee', fn ($q) => $q->where('status', 'Active'))->count())
                 ->badgeColor('success')
                 ->modifyQueryUsing(fn ($query) => $query->whereHas('employee', fn ($q) => $q->where('status', 'Active'))),
 
-            'resigned' => Tab::make('Alumni / Resign')
+            'resigned' => Tab::make('Riwayat Alumni / Resign')
                 ->icon('heroicon-o-user-minus')
                 ->badge(CareerMovement::whereHas('employee', fn ($q) => $q->where('status', 'Resigned'))->count())
                 ->badgeColor('danger')
