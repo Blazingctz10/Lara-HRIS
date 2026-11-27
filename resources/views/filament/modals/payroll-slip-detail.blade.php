@@ -17,7 +17,10 @@
             justify-content: space-between;
             gap: 1rem;
             padding-bottom: 0.9rem;
-            border-bottom: 2px solid var(--bento-text, #0f172a);
+            border-bottom: 1.5px solid #cbd5e1;
+        }
+        :is(.dark) .bpr-slip-header {
+            border-bottom-color: rgba(255, 255, 255, 0.16);
         }
 
         .bpr-slip-brand {
@@ -27,9 +30,9 @@
         }
 
         .bpr-slip-logo-img {
-            height: 44px;
+            height: 40px;
             width: auto;
-            max-width: 190px;
+            max-width: 210px;
             object-fit: contain;
             flex-shrink: 0;
         }
@@ -107,9 +110,12 @@
             font-weight: 700;
             letter-spacing: 0.03em;
             text-transform: uppercase;
-            border: 1px solid var(--bento-text, #334155);
+            border: 1px solid #cbd5e1;
             color: var(--bento-text, #0f172a);
             background: transparent;
+        }
+        :is(.dark) .bpr-slip-badge {
+            border-color: rgba(255, 255, 255, 0.16);
         }
 
         .bpr-slip-meta {
@@ -124,8 +130,11 @@
             gap: 0.8rem 1rem;
             padding: 0.9rem 1rem;
             border-radius: 12px;
-            border: 1px solid var(--bento-border-strong, #cbd5e1);
+            border: 1px solid #cbd5e1;
             background: transparent;
+        }
+        :is(.dark) .bpr-slip-info-grid {
+            border-color: rgba(255, 255, 255, 0.14);
         }
         @media (max-width: 720px) {
             .bpr-slip-info-grid {
@@ -161,22 +170,28 @@
 
         .bpr-slip-card {
             border-radius: 12px;
-            border: 1px solid var(--bento-border-strong, #cbd5e1);
+            border: 1px solid #cbd5e1;
             background: transparent;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
+        :is(.dark) .bpr-slip-card {
+            border-color: rgba(255, 255, 255, 0.14);
+        }
 
         .bpr-slip-card-head {
             padding: 0.65rem 1rem;
-            border-bottom: 1.5px solid var(--bento-text, #334155);
+            border-bottom: 1px solid #cbd5e1;
             font-size: 0.72rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--bento-text, #0f172a);
+        }
+        :is(.dark) .bpr-slip-card-head {
+            border-bottom-color: rgba(255, 255, 255, 0.14);
         }
 
         .bpr-slip-rows {
@@ -208,10 +223,13 @@
             align-items: center;
             justify-content: space-between;
             padding: 0.7rem 1rem;
-            border-top: 1.5px solid var(--bento-text, #334155);
+            border-top: 1px solid #cbd5e1;
             font-size: 0.82rem;
             font-weight: 800;
             color: var(--bento-text, #0f172a);
+        }
+        :is(.dark) .bpr-slip-card-foot {
+            border-top-color: rgba(255, 255, 255, 0.14);
         }
 
         .bpr-slip-net-box {
@@ -222,8 +240,11 @@
             gap: 1rem;
             padding: 1rem 1.25rem;
             border-radius: 12px;
-            border: 2px solid var(--bento-text, #0f172a);
+            border: 1.5px solid #475569;
             background: transparent;
+        }
+        :is(.dark) .bpr-slip-net-box {
+            border-color: rgba(255, 255, 255, 0.25);
         }
         .bpr-slip-net-label {
             display: block;
