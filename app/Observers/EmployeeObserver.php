@@ -31,8 +31,10 @@ class EmployeeObserver
             $employee->updateQuietly(['user_id' => $user->id]);
         }
 
-        // 2. Auto-initialize Leave Balances for the current year
-        $activeLeaveTypes = LeaveType::where('is_active', true)->get();
+        // 2. Auto-initialize Leave Balances for the current year (sesuai gender pegawai)
+        $activeLeaveTypes = LeaveType::where('is_active', true)
+            ->forEmployeeGender($employee->gender)
+            ->get();
         $currentYear = now()->year;
 
         foreach ($activeLeaveTypes as $leaveType) {

@@ -112,6 +112,17 @@ class LeaveRequestsTable
                 SelectFilter::make('leave_type_id')
                     ->relationship('leaveType', 'name')
                     ->label('Jenis Cuti'),
+                SelectFilter::make('gender')
+                    ->label('Jenis Kelamin Pegawai')
+                    ->options([
+                        'Male' => 'Laki-laki',
+                        'Female' => 'Perempuan',
+                    ])
+                    ->query(function ($query, array $data) {
+                        if (! empty($data['value'])) {
+                            $query->whereHas('employee', fn ($q) => $q->where('gender', $data['value']));
+                        }
+                    }),
             ])
             ->recordAction('view_details')
             ->recordActions([

@@ -36,7 +36,14 @@ class LeaveRequestForm
                                 ->live(),
 
                             Select::make('leave_type_id')
-                                ->relationship('leaveType', 'name', fn ($query) => $query->where('is_active', true))
+                                ->relationship('leaveType', 'name', function ($query, Get $get) {
+                                    $query->where('is_active', true);
+                                    $empId = $get('employee_id');
+                                    if ($empId) {
+                                        $emp = Employee::find($empId);
+                                        $query->forEmployeeGender($emp?->gender);
+                                    }
+                                })
                                 ->label('Jenis Cuti')
                                 ->searchable()
                                 ->preload()

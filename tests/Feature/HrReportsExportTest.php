@@ -58,8 +58,18 @@ class HrReportsExportTest extends TestCase
         Livewire::test(ListLeaveRequests::class)
             ->callAction('export_leave_balances', [
                 'year' => (int) date('Y'),
+                'gender' => 'all',
+                'status' => 'Active',
             ])
-            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '.xls');
+            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Semua.xls');
+
+        Livewire::test(ListLeaveRequests::class)
+            ->callAction('export_leave_balances', [
+                'year' => (int) date('Y'),
+                'gender' => 'Female',
+                'status' => 'Active',
+            ])
+            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Perempuan.xls');
 
         Livewire::test(ListOvertimes::class)
             ->callAction('export_overtime_excel', [

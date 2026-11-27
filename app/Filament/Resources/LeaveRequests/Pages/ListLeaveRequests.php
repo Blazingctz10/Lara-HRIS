@@ -4,10 +4,11 @@ namespace App\Filament\Resources\LeaveRequests\Pages;
 
 use App\Filament\Resources\LeaveRequests\LeaveRequestResource;
 use App\Models\Employee;
-use App\Models\EmployeeLeaveBalance;
+use App\Models\LeaveType;
 use App\Support\BprExcelExport;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ListRecords;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -24,7 +25,7 @@ class ListLeaveRequests extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->modalHeading('Unduh Laporan Rekap Saldo & Kuota Cuti (.xls)')
-                ->modalDescription('Menghasilkan rekap kuota awal, cuti terpakai, dan sisa kuota cuti seluruh pegawai sesuai hak akses Anda.')
+                ->modalDescription('Format matriks ringkas 1 baris per pegawai (Sisa / Kuota Awal) sesuai hak cuti dan jenis kelamin pegawai.')
                 ->modalSubmitActionLabel('Unduh Excel (.xls)')
                 ->form([
                     TextInput::make('year')
@@ -32,66 +33,151 @@ class ListLeaveRequests extends ListRecords
                         ->numeric()
                         ->default((int) date('Y'))
                         ->required(),
+                    Select::make('gender')
+                        ->label('Filter Jenis Kelamin')
+                        ->options([
+                            'all' => 'Semua Pegawai (Laki-laki & Perempuan)',
+                            'Male' => 'Hanya Laki-laki (L)',
+                            'Female' => 'Hanya Perempuan (P)',
+                        ])
+                        ->default('all')
+                        ->required(),
+                    Select::make('status')
+                        ->label('Status Kepegawaian')
+                        ->options([
+                            'Active' => 'Pegawai Aktif Saja',
+                            'all' => 'Semua Status Pegawai',
+                        ])
+                        ->default('Active')
+                        ->required(),
                 ])
                 ->action(function (array $data): StreamedResponse {
                     $year = (int) ($data['year'] ?? date('Y'));
-                    $accessibleEmployeeIds = Employee::accessibleBy()->pluck('id');
+                    $genderFilter = $data['gender'] ?? 'all';
+                    $statusFilter = $data['status'] ?? 'Active';
 
-                    $balances = EmployeeLeaveBalance::with(['employee.branch', 'employee.position', 'leaveType'])
-                        ->whereIn('employee_id', $accessibleEmployeeIds)
-                        ->where('year', $year)
-                        ->orderBy('employee_id')
-                        ->orderBy('leave_type_id')
-                        ->get();
+                    $employeesQuery = Employee::accessibleBy()
+                        ->with([
+                            'branch',
+                            'position',
+                            'leaveBalances' => fn ($q) => $q->where('year', $year)->with('leaveType'),
+                        ])
+                        ->orderBy('nip');
+
+                    if ($genderFilter !== 'all') {
+                        $employeesQuery->where('gender', $genderFilter);
+                    }
+
+                    if ($statusFilter !== 'all') {
+                        $employeesQuery->where('status', $statusFilter);
+                    }
+
+                    $employees = $employeesQuery->get();
+                    $leaveTypes = LeaveType::where('is_active', true)->orderBy('id')->get();
+
+                    $headers = [
+                        ['label' => 'No'],
+                        ['label' => 'NIP'],
+                        ['label' => 'Nama Pegawai'],
+                        ['label' => 'L/P'],
+                        ['label' => 'Unit Kantor'],
+                        ['label' => 'Jabatan'],
+                    ];
+
+                    foreach ($leaveTypes as $lt) {
+                        $shortLabel = match ($lt->code) {
+                            'MATERNITY' => 'Melahirkan (Khusus P)',
+                            'PATERNITY' => 'Dampingi Istri (Khusus L)',
+                            'BLOCK_LEAVE' => 'Block Leave OJK',
+                            default => $lt->name,
+                        };
+                        $headers[] = ['label' => "{$shortLabel} (Sisa/Kuota)"];
+                    }
+
+                    $headers[] = ['label' => 'Total Terpakai (Hari)'];
+                    $headers[] = ['label' => 'Sisa Cuti Tahunan (Hari)'];
 
                     $rows = [];
-                    $totalInitial = 0;
-                    $totalUsed = 0;
-                    $totalRemaining = 0;
+                    $totalUsedAll = 0;
+                    $totalAnnualRemaining = 0;
+                    $maleCount = 0;
+                    $femaleCount = 0;
 
-                    foreach ($balances as $idx => $bal) {
-                        $emp = $bal->employee;
-                        $totalInitial += (int) $bal->initial_quota;
-                        $totalUsed += (int) $bal->used_quota;
-                        $totalRemaining += (int) $bal->remaining_quota;
+                    foreach ($employees as $idx => $emp) {
+                        $isMale = LeaveType::normalizeGender($emp->gender) === 'male';
+                        $isFemale = LeaveType::normalizeGender($emp->gender) === 'female';
+                        if ($isMale) {
+                            $maleCount++;
+                        } elseif ($isFemale) {
+                            $femaleCount++;
+                        }
 
-                        $rows[] = [
+                        $balancesByType = $emp->leaveBalances->keyBy('leave_type_id');
+                        $empUsedTotal = 0;
+                        $empAnnualRemaining = 0;
+
+                        $row = [
                             ['value' => $idx + 1, 'class' => 'td-center'],
-                            ['value' => $emp?->nip ?? '-', 'class' => 'td-nip'],
-                            ['value' => $emp?->full_name ?? '-', 'class' => 'td-bold'],
-                            ['value' => $emp?->branch?->name ?? 'Kantor Pusat'],
-                            ['value' => $emp?->position?->name ?? '-'],
-                            ['value' => $bal->leaveType?->name ?? 'Cuti'],
-                            ['value' => $bal->year, 'class' => 'td-center'],
-                            ['value' => (int) $bal->initial_quota, 'class' => 'td-num'],
-                            ['value' => (int) $bal->used_quota, 'class' => 'td-num'],
-                            ['value' => (int) $bal->remaining_quota, 'class' => 'td-num td-bold'],
+                            ['value' => $emp->nip ?? '-', 'class' => 'td-nip'],
+                            ['value' => $emp->full_name ?? '-', 'class' => 'td-bold'],
+                            ['value' => $isFemale ? 'P' : 'L', 'class' => 'td-center td-bold'],
+                            ['value' => $emp->branch?->name ?? 'Kantor Pusat'],
+                            ['value' => $emp->position?->name ?? '-'],
                         ];
+
+                        foreach ($leaveTypes as $lt) {
+                            if (! $lt->isAllowedForGender($emp->gender)) {
+                                $row[] = ['value' => '-', 'class' => 'td-center'];
+                                continue;
+                            }
+
+                            $bal = $balancesByType->get($lt->id);
+                            $initial = $bal ? (int) $bal->initial_quota : (int) $lt->default_days;
+                            $used = $bal ? (int) $bal->used_quota : 0;
+                            $remaining = $bal ? (int) $bal->remaining_quota : $initial;
+
+                            $empUsedTotal += $used;
+                            if ($lt->code === 'ANNUAL') {
+                                $empAnnualRemaining = $remaining;
+                            }
+
+                            $cellClass = $used > 0 ? 'td-center td-bold' : 'td-center';
+                            $row[] = ['value' => "{$remaining} / {$initial}", 'class' => $cellClass];
+                        }
+
+                        $totalUsedAll += $empUsedTotal;
+                        $totalAnnualRemaining += $empAnnualRemaining;
+
+                        $row[] = ['value' => $empUsedTotal, 'class' => 'td-num'];
+                        $row[] = ['value' => $empAnnualRemaining, 'class' => 'td-num td-bold'];
+
+                        $rows[] = $row;
                     }
 
                     $summaryRow = [
                         ['value' => '', 'class' => 'td-center'],
                         ['value' => 'TOTAL', 'class' => 'td-center'],
-                        ['value' => count($balances) . ' Baris Saldo'],
+                        ['value' => "{$employees->count()} Pegawai ({$maleCount} L / {$femaleCount} P)"],
+                        ['value' => '', 'class' => 'td-center'],
                         ['value' => ''],
                         ['value' => ''],
-                        ['value' => ''],
-                        ['value' => (string) $year, 'class' => 'td-center'],
-                        ['value' => $totalInitial, 'class' => 'td-num'],
-                        ['value' => $totalUsed, 'class' => 'td-num'],
-                        ['value' => $totalRemaining, 'class' => 'td-num'],
                     ];
 
+                    foreach ($leaveTypes as $lt) {
+                        $summaryRow[] = ['value' => '', 'class' => 'td-center'];
+                    }
+
+                    $summaryRow[] = ['value' => $totalUsedAll, 'class' => 'td-num'];
+                    $summaryRow[] = ['value' => $totalAnnualRemaining, 'class' => 'td-num'];
+
+                    $genderSuffix = $genderFilter === 'all' ? 'Semua' : ($genderFilter === 'Male' ? 'Laki' : 'Perempuan');
+
                     return BprExcelExport::stream(
-                        "Rekap_Saldo_Cuti_BPR_{$year}.xls",
+                        "Rekap_Saldo_Cuti_BPR_{$year}_{$genderSuffix}.xls",
                         'Rekap Saldo Cuti',
                         'REKAPITULASI HAK & SISA SALDO CUTI PEGAWAI',
-                        "Tahun {$year}",
-                        [
-                            ['label' => 'No'], ['label' => 'NIP'], ['label' => 'Nama Pegawai'], ['label' => 'Unit Kantor'],
-                            ['label' => 'Jabatan'], ['label' => 'Jenis Cuti'], ['label' => 'Tahun'],
-                            ['label' => 'Kuota Awal (Hari)'], ['label' => 'Terpakai (Hari)'], ['label' => 'Sisa Kuota (Hari)'],
-                        ],
+                        "Tahun {$year} | Gender: {$genderSuffix} | Format: Sisa / Kuota Awal",
+                        $headers,
                         $rows,
                         $summaryRow,
                     );

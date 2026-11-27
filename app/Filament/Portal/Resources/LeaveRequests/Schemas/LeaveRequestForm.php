@@ -42,15 +42,8 @@ class LeaveRequestForm
                                     'leaveType',
                                     'name',
                                     function ($query) use ($employee) {
-                                        $query->where('is_active', true);
-                                        // Filter jenis kelamin jika ada restriksi
-                                        if ($employee && $employee->gender) {
-                                            if ($employee->gender === 'Laki-laki') {
-                                                $query->where(fn ($q) => $q->whereNull('gender_restriction')->orWhere('gender_restriction', '!=', 'female'));
-                                            } elseif ($employee->gender === 'Perempuan') {
-                                                $query->where(fn ($q) => $q->whereNull('gender_restriction')->orWhere('gender_restriction', '!=', 'male'));
-                                            }
-                                        }
+                                        $query->where('is_active', true)
+                                            ->forEmployeeGender($employee?->gender);
                                     }
                                 )
                                 ->label('Pilih Jenis Cuti')
