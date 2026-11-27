@@ -74,7 +74,7 @@ class ListPayrolls extends ListRecords
 
                     $records = $query->orderBy('id')->get();
                     $periodLabel = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
-                    $filename = sprintf('Rekap_Payroll_BPR_%04d_%02d.xls', $year, $month);
+                    $filename = sprintf('Rekap_Payroll_BPR_%04d_%02d.xlsx', $year, $month);
 
                     $totals = [
                         'basic' => 0.0, 'allowances' => 0.0, 'extras' => 0.0, 'deductions' => 0.0, 'net' => 0.0,

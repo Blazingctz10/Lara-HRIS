@@ -59,7 +59,7 @@ class ListOvertimes extends ListRecords
                         ->get();
 
                     $periodLabel = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
-                    $filename = sprintf('Rekap_Lembur_BPR_%04d_%02d.xls', $year, $month);
+                    $filename = sprintf('Rekap_Lembur_BPR_%04d_%02d.xlsx', $year, $month);
 
                     $rows = [];
                     $totalHours = 0;

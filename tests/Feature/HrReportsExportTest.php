@@ -53,7 +53,7 @@ class HrReportsExportTest extends TestCase
                 'year' => (int) date('Y'),
                 'status' => 'all',
             ])
-            ->assertFileDownloaded(sprintf('Rekap_Payroll_BPR_%04d_%02d.xls', (int) date('Y'), (int) date('m')));
+            ->assertFileDownloaded(sprintf('Rekap_Payroll_BPR_%04d_%02d.xlsx', (int) date('Y'), (int) date('m')));
 
         Livewire::test(ListLeaveRequests::class)
             ->callAction('export_leave_balances', [
@@ -61,7 +61,7 @@ class HrReportsExportTest extends TestCase
                 'gender' => 'all',
                 'status' => 'Active',
             ])
-            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Semua.xls');
+            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Semua.xlsx');
 
         Livewire::test(ListLeaveRequests::class)
             ->callAction('export_leave_balances', [
@@ -69,13 +69,13 @@ class HrReportsExportTest extends TestCase
                 'gender' => 'Female',
                 'status' => 'Active',
             ])
-            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Perempuan.xls');
+            ->assertFileDownloaded('Rekap_Saldo_Cuti_BPR_' . date('Y') . '_Perempuan.xlsx');
 
         Livewire::test(ListOvertimes::class)
             ->callAction('export_overtime_excel', [
                 'month' => (int) date('m'),
                 'year' => (int) date('Y'),
             ])
-            ->assertFileDownloaded(sprintf('Rekap_Lembur_BPR_%04d_%02d.xls', (int) date('Y'), (int) date('m')));
+            ->assertFileDownloaded(sprintf('Rekap_Lembur_BPR_%04d_%02d.xlsx', (int) date('Y'), (int) date('m')));
     }
 }

@@ -173,7 +173,7 @@ class ListLeaveRequests extends ListRecords
                     $genderSuffix = $genderFilter === 'all' ? 'Semua' : ($genderFilter === 'Male' ? 'Laki' : 'Perempuan');
 
                     return BprExcelExport::stream(
-                        "Rekap_Saldo_Cuti_BPR_{$year}_{$genderSuffix}.xls",
+                        "Rekap_Saldo_Cuti_BPR_{$year}_{$genderSuffix}.xlsx",
                         'Rekap Saldo Cuti',
                         'REKAPITULASI HAK & SISA SALDO CUTI PEGAWAI',
                         "Tahun {$year} | Gender: {$genderSuffix} | Format: Sisa / Kuota Awal",
