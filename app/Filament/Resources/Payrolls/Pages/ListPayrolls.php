@@ -72,7 +72,11 @@ class ListPayrolls extends ListRecords
                         $query->where('status', $status);
                     }
 
-                    $records = $query->orderBy('id')->get();
+                    $records = $query->join('employees', 'employees.id', '=', 'payrolls.employee_id')
+                        ->select('payrolls.*')
+                        ->orderBy('employees.branch_id')
+                        ->orderBy('employees.nip')
+                        ->get();
                     $periodLabel = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
                     $filename = sprintf('Rekap_Payroll_BPR_%04d_%02d.xlsx', $year, $month);
 
@@ -102,8 +106,8 @@ class ListPayrolls extends ListRecords
                             ['value' => number_format((float) $p->basic_salary, 0, '.', ''), 'class' => 'td-rp'],
                             ['value' => number_format($fixedAllowance, 0, '.', ''), 'class' => 'td-rp'],
                             ['value' => number_format($extras, 0, '.', ''), 'class' => 'td-rp'],
-                            ['value' => number_format($totalDeductions, 0, '.', ''), 'class' => 'td-rp'],
-                            ['value' => number_format((float) $p->net_salary, 0, '.', ''), 'class' => 'td-rp td-bold'],
+                            ['value' => number_format($totalDeductions, 0, '.', ''), 'class' => 'td-rp-deduct'],
+                            ['value' => number_format((float) $p->net_salary, 0, '.', ''), 'class' => 'td-rp-highlight td-bold'],
                             ['value' => $rekening, 'class' => 'td-text td-center'],
                             ['value' => $p->status, 'class' => $p->status === 'Paid' ? 'badge-ok' : 'badge-warn'],
                         ];
@@ -143,6 +147,7 @@ class ListPayrolls extends ListRecords
                         ],
                         $rows,
                         $summaryRow,
+                        freezeCols: 3,
                     );
                 }),
 

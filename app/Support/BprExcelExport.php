@@ -137,20 +137,22 @@ class BprExcelExport
             . '<numFmt numFmtId="164" formatCode="&quot;Rp &quot;#,##0;-&quot;Rp &quot;#,##0;&quot;-&quot;"/>'
             . '<numFmt numFmtId="165" formatCode="#,##0"/>'
             . '</numFmts>'
-            . '<fonts count="11">'
-            . '<font><sz val="10"/><color rgb="FF1E293B"/><name val="Calibri"/></font>' // 0: body
-            . '<font><b/><sz val="15"/><color rgb="FF0E6838"/><name val="Calibri"/></font>' // 1: title
-            . '<font><b/><sz val="11"/><color rgb="FF1F2937"/><name val="Calibri"/></font>' // 2: subtitle
-            . '<font><sz val="9"/><color rgb="FF64748B"/><name val="Calibri"/></font>' // 3: meta
-            . '<font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>' // 4: table head
-            . '<font><b/><sz val="10"/><color rgb="FF0F172A"/><name val="Calibri"/></font>' // 5: bold body
-            . '<font><sz val="10"/><color rgb="FF0F172A"/><name val="Courier New"/></font>' // 6: nip
-            . '<font><b/><sz val="10"/><color rgb="FF0E6838"/><name val="Calibri"/></font>' // 7: total green
-            . '<font><b/><sz val="10"/><color rgb="FF047857"/><name val="Calibri"/></font>' // 8: badge ok
-            . '<font><b/><sz val="10"/><color rgb="FFB45309"/><name val="Calibri"/></font>' // 9: badge warn
-            . '<font><b/><sz val="10"/><color rgb="FFB91C1C"/><name val="Calibri"/></font>' // 10: badge danger
+            . '<fonts count="13">'
+            . '<font><sz val="10"/><color rgb="FF1E293B"/><name val="Segoe UI"/></font>' // 0: body
+            . '<font><b/><sz val="15"/><color rgb="FF0E6838"/><name val="Segoe UI"/></font>' // 1: title
+            . '<font><b/><sz val="11"/><color rgb="FF1E293B"/><name val="Segoe UI"/></font>' // 2: subtitle
+            . '<font><sz val="9"/><color rgb="FF475569"/><name val="Segoe UI"/></font>' // 3: meta
+            . '<font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Segoe UI"/></font>' // 4: table head
+            . '<font><b/><sz val="10"/><color rgb="FF0F172A"/><name val="Segoe UI"/></font>' // 5: bold body
+            . '<font><sz val="10"/><color rgb="FF334155"/><name val="Consolas"/></font>' // 6: nip
+            . '<font><b/><sz val="10"/><color rgb="FF0E6838"/><name val="Segoe UI"/></font>' // 7: total green
+            . '<font><b/><sz val="10"/><color rgb="FF047857"/><name val="Segoe UI"/></font>' // 8: badge ok
+            . '<font><b/><sz val="10"/><color rgb="FFB45309"/><name val="Segoe UI"/></font>' // 9: badge warn
+            . '<font><b/><sz val="10"/><color rgb="FFB91C1C"/><name val="Segoe UI"/></font>' // 10: badge danger
+            . '<font><b/><sz val="10"/><color rgb="FF065F46"/><name val="Segoe UI"/></font>' // 11: rp highlight
+            . '<font><sz val="10"/><color rgb="FFB91C1C"/><name val="Segoe UI"/></font>' // 12: rp deduct
             . '</fonts>'
-            . '<fills count="8">'
+            . '<fills count="10">'
             . '<fill><patternFill patternType="none"/></fill>' // 0
             . '<fill><patternFill patternType="gray125"/></fill>' // 1
             . '<fill><patternFill patternType="solid"><fgColor rgb="FF0E6838"/></patternFill></fill>' // 2: header green
@@ -159,19 +161,22 @@ class BprExcelExport
             . '<fill><patternFill patternType="solid"><fgColor rgb="FFD1FAE5"/></patternFill></fill>' // 5: badge ok
             . '<fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/></patternFill></fill>' // 6: badge warn
             . '<fill><patternFill patternType="solid"><fgColor rgb="FFFEE2E2"/></patternFill></fill>' // 7: badge danger
+            . '<fill><patternFill patternType="solid"><fgColor rgb="FFF0FDF4"/></patternFill></fill>' // 8: banner & highlight
+            . '<fill><patternFill patternType="solid"><fgColor rgb="FFECFDF5"/></patternFill></fill>' // 9: net pay highlight
             . '</fills>'
-            . '<borders count="4">'
+            . '<borders count="5">'
             . '<border><left/><right/><top/><bottom/><diagonal/></border>' // 0: none
-            . '<border><left style="thin"><color rgb="FF084022"/></left><right style="thin"><color rgb="FF084022"/></right><top style="thin"><color rgb="FF084022"/></top><bottom style="thin"><color rgb="FF084022"/></bottom><diagonal/></border>' // 1: head
-            . '<border><left style="thin"><color rgb="FFCBD5E1"/></left><right style="thin"><color rgb="FFCBD5E1"/></right><top style="thin"><color rgb="FFCBD5E1"/></top><bottom style="thin"><color rgb="FFCBD5E1"/></bottom><diagonal/></border>' // 2: cell
-            . '<border><left style="thin"><color rgb="FFCBD5E1"/></left><right style="thin"><color rgb="FFCBD5E1"/></right><top style="medium"><color rgb="FF0E6838"/></top><bottom style="thin"><color rgb="FF0E6838"/></bottom><diagonal/></border>' // 3: total
+            . '<border><left style="thin"><color rgb="FF084022"/></left><right style="thin"><color rgb="FF084022"/></right><top style="thin"><color rgb="FF084022"/></top><bottom style="medium"><color rgb="FF084022"/></bottom><diagonal/></border>' // 1: head
+            . '<border><left style="thin"><color rgb="FFE2E8F0"/></left><right style="thin"><color rgb="FFE2E8F0"/></right><top style="thin"><color rgb="FFE2E8F0"/></top><bottom style="thin"><color rgb="FFE2E8F0"/></bottom><diagonal/></border>' // 2: cell
+            . '<border><left style="thin"><color rgb="FFCBD5E1"/></left><right style="thin"><color rgb="FFCBD5E1"/></right><top style="medium"><color rgb="FF0E6838"/></top><bottom style="medium"><color rgb="FF0E6838"/></bottom><diagonal/></border>' // 3: total
+            . '<border><left/><right/><top/><bottom style="medium"><color rgb="FF0E6838"/></bottom><diagonal/></border>' // 4: banner bottom
             . '</borders>'
             . '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            . '<cellXfs count="30">'
+            . '<cellXfs count="33">'
             . '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' // 0: default
-            . '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' // 1: title
-            . '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' // 2: subtitle
-            . '<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>' // 3: meta
+            . '<xf numFmtId="0" fontId="1" fillId="8" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' // 1: title
+            . '<xf numFmtId="0" fontId="2" fillId="8" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' // 2: subtitle
+            . '<xf numFmtId="0" fontId="3" fillId="8" borderId="4" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' // 3: meta
             . '<xf numFmtId="0" fontId="4" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>' // 4: head
             // Even rows (fillId=0, borderId=2)
             . '<xf numFmtId="49" fontId="0" fillId="0" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>' // 5: text left
@@ -202,6 +207,10 @@ class BprExcelExport
             . '<xf numFmtId="49" fontId="7" fillId="4" borderId="3" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' // 27: total center
             . '<xf numFmtId="165" fontId="7" fillId="4" borderId="3" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>' // 28: total num
             . '<xf numFmtId="164" fontId="7" fillId="4" borderId="3" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>' // 29: total rp
+            // Special Rupiah styles (30..32)
+            . '<xf numFmtId="164" fontId="11" fillId="9" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>' // 30: rp highlight (net pay)
+            . '<xf numFmtId="164" fontId="12" fillId="0" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>' // 31: rp deduct even
+            . '<xf numFmtId="164" fontId="12" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>' // 32: rp deduct odd
             . '</cellXfs>'
             . '</styleSheet>';
     }
@@ -235,6 +244,12 @@ class BprExcelExport
         $offset = $isOdd ? 9 : 0;
         $isBold = str_contains($rawClass, 'td-bold');
 
+        if (str_contains($rawClass, 'td-rp-highlight')) {
+            return [30, true];
+        }
+        if (str_contains($rawClass, 'td-rp-deduct')) {
+            return [$isOdd ? 32 : 31, true];
+        }
         if (str_contains($rawClass, 'td-rp')) {
             return [($isBold ? 13 : 12) + $offset, true];
         }
@@ -276,11 +291,11 @@ class BprExcelExport
                 $len = mb_strlen((string) $cell['value']);
                 $cls = $cell['class'] ?? '';
                 if (str_contains($cls, 'td-rp')) {
-                    $len += 6; // "Rp " + thousands separators
+                    $len = max($len + 10, 17); // "Rp 12.345.678" + breathing room
                 } elseif (str_contains($cls, 'td-num')) {
-                    $len += 3;
+                    $len += 4;
                 }
-                $colWidths[$cIdx] = min(42, max($colWidths[$cIdx] ?? 10, $len + 3));
+                $colWidths[$cIdx] = min(45, max($colWidths[$cIdx] ?? 10, $len + 4));
             }
         }
 
@@ -301,17 +316,17 @@ class BprExcelExport
         $sheetData = '<sheetData>';
 
         // Row 1: Company Name
-        $sheetData .= '<row r="1" ht="24" customHeight="1"><c r="A1" t="inlineStr" s="1"><is><t>PT BPR BANDA RAYA</t></is></c></row>';
+        $sheetData .= '<row r="1" ht="28" customHeight="1"><c r="A1" t="inlineStr" s="1"><is><t>PT BPR BANDA RAYA</t></is></c></row>';
         // Row 2: Report Title
-        $sheetData .= '<row r="2" ht="18" customHeight="1"><c r="A2" t="inlineStr" s="2"><is><t>' . self::xmlEscape($reportTitle) . '</t></is></c></row>';
+        $sheetData .= '<row r="2" ht="20" customHeight="1"><c r="A2" t="inlineStr" s="2"><is><t>' . self::xmlEscape($reportTitle) . '</t></is></c></row>';
         // Row 3: Meta
         $meta = "Periode: {$periodLabel} | Dicetak: " . now()->format('d/m/Y H:i') . ' WIB';
-        $sheetData .= '<row r="3" ht="16" customHeight="1"><c r="A3" t="inlineStr" s="3"><is><t>' . self::xmlEscape($meta) . '</t></is></c></row>';
+        $sheetData .= '<row r="3" ht="18" customHeight="1"><c r="A3" t="inlineStr" s="3"><is><t>' . self::xmlEscape($meta) . '</t></is></c></row>';
         // Row 4: Blank spacer
-        $sheetData .= '<row r="4" ht="8" customHeight="1"/>';
+        $sheetData .= '<row r="4" ht="10" customHeight="1"/>';
 
         // Row 5: Header
-        $sheetData .= '<row r="5" ht="26" customHeight="1">';
+        $sheetData .= '<row r="5" ht="30" customHeight="1">';
         foreach ($columns as $cIdx => $col) {
             $ref = self::colLetter($cIdx + 1) . '5';
             $sheetData .= '<c r="' . $ref . '" t="inlineStr" s="4"><is><t>' . self::xmlEscape($col['label']) . '</t></is></c>';
@@ -321,7 +336,7 @@ class BprExcelExport
         $rowNum = 6;
         foreach ($rows as $idx => $row) {
             $isOdd = ($idx % 2 === 0);
-            $sheetData .= '<row r="' . $rowNum . '" ht="20" customHeight="1">';
+            $sheetData .= '<row r="' . $rowNum . '" ht="22" customHeight="1">';
             foreach ($row as $cIdx => $cell) {
                 $ref = self::colLetter($cIdx + 1) . $rowNum;
                 [$styleId, $isNumeric] = self::resolveStyleAndType($cell['class'] ?? '', $isOdd, false);
@@ -353,6 +368,13 @@ class BprExcelExport
 
         $sheetData .= '</sheetData>';
 
+        $lastDataRow = max(5, $rowNum - ($summaryRow !== null ? 0 : 1));
+        if ($summaryRow !== null) {
+            $lastDataRow = max(5, $rowNum - 1);
+        }
+
+        $autoFilterXml = '<autoFilter ref="A5:' . $lastCol . $lastDataRow . '"/>';
+
         $mergeXml = '<mergeCells count="3">'
             . '<mergeCell ref="A1:' . $lastCol . '1"/>'
             . '<mergeCell ref="A2:' . $lastCol . '2"/>'
@@ -372,6 +394,7 @@ class BprExcelExport
             . '</sheetView></sheetViews>'
             . $colsXml
             . $sheetData
+            . $autoFilterXml
             . $mergeXml
             . '</worksheet>';
     }
