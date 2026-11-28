@@ -289,6 +289,7 @@
             <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
                 {{ $this->createDatabaseBackupAction }}
                 {{ $this->createFullBackupAction }}
+                {{ $this->importBackupAction }}
             </div>
         </div>
 

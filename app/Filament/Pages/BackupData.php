@@ -4,8 +4,11 @@ namespace App\Filament\Pages;
 
 use App\Services\BackupService;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use UnitEnum;
 
@@ -181,6 +184,69 @@ class BackupData extends Page
             ->modalCancelActionLabel('Batal')
             ->action(function (array $arguments) {
                 $this->deleteBackup($arguments['filename']);
+            });
+    }
+
+    public function importBackupAction(): Action
+    {
+        return Action::make('importBackup')
+            ->label('Impor / Restore Backup')
+            ->icon('heroicon-o-arrow-up-tray')
+            ->color('warning')
+            ->size('lg')
+            ->requiresConfirmation()
+            ->modalHeading('Impor & Pulihkan Data dari Berkas Cadangan')
+            ->modalDescription('Unggah berkas cadangan (.sqlite, .zip, atau .json) dari sistem HRIS ini. Sistem akan otomatis membuat cadangan pengaman terlebih dahulu sebelum memulihkan data.')
+            ->form([
+                FileUpload::make('backup_file')
+                    ->label('Pilih Berkas Cadangan (.sqlite, .zip, atau .json)')
+                    ->acceptedFileTypes([
+                        'application/x-sqlite3',
+                        'application/vnd.sqlite3',
+                        'application/zip',
+                        'application/x-zip-compressed',
+                        'application/json',
+                        'application/octet-stream',
+                    ])
+                    ->rules([
+                        fn () => function (string $attribute, $value, \Closure $fail) {
+                            if ($value && method_exists($value, 'getClientOriginalExtension')) {
+                                $ext = strtolower($value->getClientOriginalExtension());
+                                if (! in_array($ext, ['sqlite', 'zip', 'json'], true)) {
+                                    $fail('Format berkas harus berupa .sqlite, .zip, atau .json.');
+                                }
+                            }
+                        },
+                    ])
+                    ->maxSize(102400)
+                    ->disk('local')
+                    ->directory('temp_restore')
+                    ->required(),
+            ])
+            ->modalSubmitActionLabel('Ya, Pulihkan Sekarang')
+            ->modalCancelActionLabel('Batal')
+            ->action(function (array $data) {
+                $relPath = $data['backup_file'];
+                $fullPath = Storage::disk('local')->path($relPath);
+                $result = app(BackupService::class)->restoreFromBackupFile($fullPath, basename($relPath));
+
+                if (File::exists($fullPath)) {
+                    File::delete($fullPath);
+                }
+
+                if ($result['success']) {
+                    Notification::make()
+                        ->title('Pemulihan Data Berhasil')
+                        ->body($result['message'])
+                        ->success()
+                        ->send();
+                } else {
+                    Notification::make()
+                        ->title('Gagal Memulihkan Backup')
+                        ->body($result['message'])
+                        ->danger()
+                        ->send();
+                }
             });
     }
 

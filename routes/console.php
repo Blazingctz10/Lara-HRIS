@@ -174,3 +174,12 @@ Artisan::command('hris:backup {--type=full : Tipe arsip cadangan (full|db)}', fu
   ->name('hris:log-failsafe-prune')
   ->withoutOverlapping();
 
+Artisan::command('hris:warm-cache', function (\App\Services\HrisDashboardCacheService $cacheService) {
+    $metrics = $cacheService->warmAll();
+    $this->info("Cache HRIS diperbarui dalam {$metrics['duration_ms']} ms -> storage/app/hris-cache/dashboard_metrics.json");
+})->purpose('Hitung metrik dashboard HRIS di belakang layar dan simpan ke folder cache hris-cache');
+
+\Illuminate\Support\Facades\Schedule::command('hris:warm-cache')
+    ->everyTenMinutes()
+    ->withoutOverlapping();
+

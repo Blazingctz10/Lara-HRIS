@@ -24,7 +24,27 @@ class AdminShortcutWidget extends Widget
 
     public function getData(): array
     {
-        $role = auth()->user()?->role ?? 'employee';
+        $user = auth()->user();
+        $role = $user?->role ?? 'employee';
+
+        if (! $user?->isBranchManager()) {
+            $metrics = app(\App\Services\HrisDashboardCacheService::class)->getMetrics();
+
+            return [
+                'role' => $role,
+                'unpaidClaimsCount' => (int) ($metrics['unpaid_claims_count'] ?? 0),
+                'pendingLeaveCount' => match ($role) {
+                    'direksi' => (int) ($metrics['pending_direksi_leaves'] ?? 0),
+                    'hr_admin' => (int) ($metrics['pending_hr_leaves'] ?? 0),
+                    default => (int) ($metrics['pending_hr_leaves'] ?? 0) + (int) ($metrics['pending_direksi_leaves'] ?? 0),
+                },
+                'newApplicantsCount' => (int) ($metrics['new_applicants'] ?? 0),
+                'totalUsersCount' => (int) ($metrics['active_users'] ?? 0),
+                'dispensationCount' => (int) ($metrics['dispensation_count'] ?? 0),
+                'overtimePendingCount' => (int) ($metrics['pending_overtime'] ?? 0),
+                'draftPayrollCount' => (int) ($metrics['draft_payroll'] ?? 0),
+            ];
+        }
 
         $unpaidClaimsCount = Reimbursement::accessibleBy()
             ->whereIn('status', ['Pending', 'Approved_Pincab'])

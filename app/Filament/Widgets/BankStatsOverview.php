@@ -9,6 +9,7 @@ use App\Models\JobApplicant;
 use App\Models\LeaveRequest;
 use App\Models\Reimbursement;
 use App\Models\User;
+use App\Services\HrisDashboardCacheService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -26,23 +27,33 @@ class BankStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $user = auth()->user();
+        $isBranchManager = $user?->isBranchManager() ?? false;
 
-        $employeeQuery = Employee::accessibleBy();
-        $totalEmployees = $employeeQuery->count();
-        $activeEmployees = (clone $employeeQuery)->where('status', 'Active')->count();
+        if (! $isBranchManager) {
+            $metrics = app(HrisDashboardCacheService::class)->getMetrics();
+            $totalEmployees = (int) ($metrics['total_employees'] ?? 0);
+            $activeEmployees = (int) ($metrics['active_employees'] ?? 0);
+            $attendanceToday = (int) ($metrics['attendance_today'] ?? 0);
+            $totalBranches = (int) ($metrics['active_branches'] ?? 0);
+            $unpaidClaimsCount = (int) ($metrics['unpaid_claims_count'] ?? 0);
+            $unpaidClaimsSum = (float) ($metrics['unpaid_claims_sum'] ?? 0);
+            $activeUsers = (int) ($metrics['active_users'] ?? 0);
+        } else {
+            $employeeQuery = Employee::accessibleBy();
+            $totalEmployees = $employeeQuery->count();
+            $activeEmployees = (clone $employeeQuery)->where('status', 'Active')->count();
 
-        $attendanceToday = Attendance::accessibleBy()->whereDate('date', now())->count();
-        $totalBranches = Branch::where('is_active', true)->count();
+            $attendanceToday = Attendance::accessibleBy()->whereDate('date', now())->count();
+            $totalBranches = Branch::where('is_active', true)->count();
 
-        $unpaidClaimsQuery = Reimbursement::accessibleBy()->whereIn('status', ['Pending', 'Approved_Pincab']);
-        $unpaidClaimsCount = $unpaidClaimsQuery->count();
-        $unpaidClaimsSum = (float) $unpaidClaimsQuery->sum('amount');
+            $unpaidClaimsQuery = Reimbursement::accessibleBy()->whereIn('status', ['Pending', 'Approved_Pincab']);
+            $unpaidClaimsCount = $unpaidClaimsQuery->count();
+            $unpaidClaimsSum = (float) $unpaidClaimsQuery->sum('amount');
+            $activeUsers = 0;
+        }
 
         // 1. IT ADMIN / SUPER ADMIN
         if ($user && $user->role === 'super_admin') {
-            $activeUsers = User::where('is_active', true)
-                ->where(fn ($q) => $q->whereDoesntHave('employee')->orWhereHas('employee', fn ($eq) => $eq->whereNotIn('status', ['Resigned', 'Terminated'])))
-                ->count();
 
             return [
                 Stat::make('Akun Sistem Aktif', "{$activeUsers} Akun")

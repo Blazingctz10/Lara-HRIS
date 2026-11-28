@@ -402,5 +402,153 @@ class BackupService
 
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
+
+    /**
+     * Impor & Pulihkan (Restore) database atau arsip lengkap dari berkas .sqlite, .zip, atau .json.
+     * Otomatis membuat cadangan darurat sebelum menimpa database aktif.
+     */
+    public function restoreFromBackupFile(string $uploadedPath, string $originalName): array
+    {
+        if (! File::exists($uploadedPath) || ! is_readable($uploadedPath)) {
+            return ['success' => false, 'message' => 'Berkas cadangan tidak ditemukan atau tidak terbaca.'];
+        }
+
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        if (! in_array($ext, ['sqlite', 'zip', 'json'], true)) {
+            return ['success' => false, 'message' => 'Format berkas tidak didukung. Gunakan .sqlite, .zip, atau .json.'];
+        }
+
+        // Buat cadangan darurat terlebih dahulu sebelum restore
+        $safetyBackup = null;
+        try {
+            $safetyBackup = $this->createDatabaseBackup();
+        } catch (\Throwable $e) {
+            // Lanjutkan jika belum ada database
+        }
+
+        try {
+            if ($ext === 'sqlite') {
+                $this->restoreSqliteBinary($uploadedPath);
+                app(HrisDashboardCacheService::class)->warmAll();
+
+                return [
+                    'success' => true,
+                    'message' => "Database SQLite berhasil dipulihkan dari {$originalName}." . ($safetyBackup ? " Cadangan pengaman sebelum restore: {$safetyBackup}." : ''),
+                ];
+            }
+
+            if ($ext === 'zip') {
+                $zip = new ZipArchive();
+                if ($zip->open($uploadedPath) !== true) {
+                    return ['success' => false, 'message' => 'Berkas ZIP cadangan rusak atau tidak dapat dibuka.'];
+                }
+
+                $restoredDb = false;
+                $tempDir = storage_path('app/temp_restore_' . uniqid());
+                File::makeDirectory($tempDir, 0755, true);
+
+                try {
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $entryName = $zip->getNameIndex($i);
+                        if (str_ends_with(strtolower($entryName), '.sqlite') && ! str_contains($entryName, '..')) {
+                            $tmpSqlite = $tempDir . DIRECTORY_SEPARATOR . 'restore.sqlite';
+                            copy("zip://{$uploadedPath}#{$entryName}", $tmpSqlite);
+                            $this->restoreSqliteBinary($tmpSqlite);
+                            $restoredDb = true;
+                            break;
+                        }
+                    }
+
+                    // Pulihkan file lampiran di storage_public/ jika ada
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $entryName = $zip->getNameIndex($i);
+                        if (str_starts_with($entryName, 'storage_public/') && ! str_ends_with($entryName, '/') && ! str_contains($entryName, '..')) {
+                            $rel = substr($entryName, strlen('storage_public/'));
+                            $target = storage_path('app/public/' . $rel);
+                            File::ensureDirectoryExists(dirname($target));
+                            copy("zip://{$uploadedPath}#{$entryName}", $target);
+                        }
+                    }
+                } finally {
+                    $zip->close();
+                    File::deleteDirectory($tempDir);
+                }
+
+                if (! $restoredDb) {
+                    return ['success' => false, 'message' => 'Arsip ZIP tidak berisi file database (.sqlite) yang valid.'];
+                }
+
+                app(HrisDashboardCacheService::class)->warmAll();
+
+                return [
+                    'success' => true,
+                    'message' => "Arsip lengkap ZIP berhasil dipulihkan dari {$originalName}." . ($safetyBackup ? " Cadangan pengaman sebelum restore: {$safetyBackup}." : ''),
+                ];
+            }
+
+            // Format JSON Snapshot
+            $decoded = json_decode((string) File::get($uploadedPath), true);
+            if (! is_array($decoded) || empty($decoded['tables']) || ! is_array($decoded['tables'])) {
+                return ['success' => false, 'message' => 'Format JSON cadangan tidak valid (tidak ditemukan key "tables").'];
+            }
+
+            DB::statement('PRAGMA foreign_keys = OFF');
+            DB::beginTransaction();
+            try {
+                foreach ($decoded['tables'] as $table => $rows) {
+                    if (! is_array($rows) || ! \Illuminate\Support\Facades\Schema::hasTable($table)) {
+                        continue;
+                    }
+                    DB::table($table)->delete();
+                    foreach (array_chunk($rows, 200) as $chunk) {
+                        DB::table($table)->insert($chunk);
+                    }
+                }
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                throw $e;
+            } finally {
+                DB::statement('PRAGMA foreign_keys = ON');
+            }
+
+            app(HrisDashboardCacheService::class)->warmAll();
+
+            return [
+                'success' => true,
+                'message' => "Snapshot JSON berhasil dipulihkan dari {$originalName}." . ($safetyBackup ? " Cadangan pengaman sebelum restore: {$safetyBackup}." : ''),
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Gagal memulihkan cadangan: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    protected function restoreSqliteBinary(string $sourcePath): void
+    {
+        $fp = @fopen($sourcePath, 'rb');
+        $magic = $fp ? fread($fp, 16) : '';
+        if ($fp) {
+            fclose($fp);
+        }
+
+        if (! str_starts_with($magic, "SQLite format 3\0")) {
+            throw new \RuntimeException('Berkas bukan database SQLite 3 yang valid.');
+        }
+
+        $targetDb = database_path('database.sqlite');
+        DB::disconnect('sqlite');
+
+        foreach (['-wal', '-shm'] as $suffix) {
+            if (File::exists($targetDb . $suffix)) {
+                @File::delete($targetDb . $suffix);
+            }
+        }
+
+        File::copy($sourcePath, $targetDb);
+        DB::reconnect('sqlite');
+    }
 }
 
