@@ -21,7 +21,6 @@ use App\Models\LoginLog;
 use App\Models\Overtime;
 use App\Models\Payroll;
 use App\Models\Position;
-use App\Models\Reimbursement;
 use App\Models\User;
 use App\Models\WarningLetter;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +62,6 @@ class BackupService
                 'attendances' => Attendance::count(),
                 'leave_requests' => LeaveRequest::count(),
                 'payrolls' => Payroll::count(),
-                'reimbursements' => Reimbursement::count(),
                 'warning_letters' => WarningLetter::count(),
                 'career_movements' => CareerMovement::count(),
                 'attendance_dispensations' => AttendanceDispensation::count(),
@@ -347,7 +345,6 @@ class BackupService
             ],
             'payroll_and_finance' => [
                 'payrolls' => Payroll::all(),
-                'reimbursements' => Reimbursement::all(),
             ],
             'employment_lifecycle' => [
                 'warning_letters' => WarningLetter::all(),

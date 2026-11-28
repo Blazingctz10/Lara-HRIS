@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
@@ -70,14 +71,28 @@ class UserForm
                                 ->label('Role & Tingkat Otoritas Sistem')
                                 ->options([
                                     'super_admin' => 'IT Administrator (Akses Penuh Seluruh Sistem & Backup)',
-                                    'direksi' => 'Direksi (Persetujuan Final Cuti & Pengawasan Eksekutif)',
-                                    'hr_admin' => 'Human Capital / HR Officer (SDM, Rekrutmen & Verifikasi Cuti)',
+                                    'direksi' => 'Direksi (TTD Persetujuan Final Cuti & Pengawasan Eksekutif)',
+                                    'hr_admin' => 'Human Capital / HR Officer (SDM, Payroll & Pengawasan Cuti)',
+                                    'division_leader' => 'Leader Divisi (TTD Cuti Div. Operasional / Kredit Support / Manager Bisnis)',
+                                    'branch_manager' => 'Pemimpin Cabang (Pincab - TTD Cuti & Operasional Cabang)',
                                     'compliance' => 'Petugas Kepatuhan / Compliance (Pengelolaan Kebijakan & Regulasi Bank)',
-                                    'branch_manager' => 'Pemimpin Cabang (Pincab - Operasional Cabang & Reimbursement)',
-                                    'employee' => 'Karyawan / Staf (ESS Portal Presensi, Cuti & Klaim)',
+                                    'employee' => 'Karyawan / Staf (ESS Portal Presensi, Cuti & Slip Gaji)',
                                 ])
                                 ->default('employee')
+                                ->live()
                                 ->required(),
+
+                            Select::make('division_scope')
+                                ->label('Lingkup Bagian / Divisi (Untuk Leader Cuti)')
+                                ->options([
+                                    'operasional' => 'Div. Operasional',
+                                    'kredit_support' => 'Div. Kredit Support',
+                                    'bisnis' => 'Manager Bisnis',
+                                    'cabang' => 'Bagian Cabang',
+                                ])
+                                ->visible(fn (Get $get): bool => in_array($get('role'), ['division_leader', 'branch_manager'], true))
+                                ->placeholder('Pilih bagian yang dipimpin')
+                                ->helperText('Menentukan antrean pengajuan cuti divisi mana yang ditandatangani oleh Leader ini.'),
 
                             Select::make('branch_id')
                                 ->label('Kantor Penempatan')

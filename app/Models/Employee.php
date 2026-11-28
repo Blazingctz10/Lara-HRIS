@@ -158,11 +158,6 @@ class Employee extends Model
         return $this->hasMany(Overtime::class);
     }
 
-    public function reimbursements(): HasMany
-    {
-        return $this->hasMany(Reimbursement::class);
-    }
-
     public function careerMovements(): HasMany
     {
         return $this->hasMany(CareerMovement::class);

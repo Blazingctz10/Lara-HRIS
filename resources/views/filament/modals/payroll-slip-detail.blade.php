@@ -390,10 +390,6 @@
                         <span class="bpr-slip-row-label">Uang Lembur (Overtime)</span>
                         <span class="bpr-slip-row-val">+ Rp {{ number_format($record->overtime_pay, 0, ',', '.') }}</span>
                     </div>
-                    <div class="bpr-slip-row">
-                        <span class="bpr-slip-row-label">Pencairan Reimbursement</span>
-                        <span class="bpr-slip-row-val">+ Rp {{ number_format($record->reimbursement_pay, 0, ',', '.') }}</span>
-                    </div>
                 </div>
             </div>
             <div class="bpr-slip-card-foot">

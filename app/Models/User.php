@@ -21,6 +21,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'email',
         'password',
         'role',
+        'division_scope',
         'avatar_url',
         'branch_id',
     ];
@@ -60,7 +61,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         }
 
         if ($panel->getId() === 'admin') {
-            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'direksi', 'compliance']);
+            return in_array($this->role, ['super_admin', 'hr_admin', 'branch_manager', 'division_leader', 'direksi', 'compliance']);
         }
 
         if ($panel->getId() === 'portal') {
@@ -88,6 +89,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function isBranchManager(): bool
     {
         return $this->role === 'branch_manager';
+    }
+
+    public function isDivisionLeader(): bool
+    {
+        return $this->role === 'division_leader';
     }
 
     public function isCompliance(): bool

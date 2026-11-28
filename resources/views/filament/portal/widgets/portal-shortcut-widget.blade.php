@@ -166,18 +166,6 @@
                 <span>Ajukan Cuti</span>
             </a>
 
-            {{-- Klaim Reimbursement --}}
-            <a
-                href="{{ url('/portal/reimbursements/create') }}"
-                title="Ajukan Klaim Reimbursement Operasional"
-                class="m3-portal-action-pill m3-pill-amber"
-            >
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 14.25l6-6m4.5-3.75H4.5a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V5.25A2.25 2.25 0 0019.5 3z" />
-                </svg>
-                <span>Klaim Reimbursement</span>
-            </a>
-
             {{-- Kebijakan & SOP --}}
             <a
                 href="{{ url('/portal/compliance-policies') }}"

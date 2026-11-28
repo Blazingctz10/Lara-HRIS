@@ -7,8 +7,8 @@ use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\JobApplicant;
 use App\Models\LeaveRequest;
-use App\Models\Reimbursement;
-use App\Models\User;
+use App\Models\Overtime;
+use App\Models\Payroll;
 use App\Services\HrisDashboardCacheService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -35,8 +35,8 @@ class BankStatsOverview extends BaseWidget
             $activeEmployees = (int) ($metrics['active_employees'] ?? 0);
             $attendanceToday = (int) ($metrics['attendance_today'] ?? 0);
             $totalBranches = (int) ($metrics['active_branches'] ?? 0);
-            $unpaidClaimsCount = (int) ($metrics['unpaid_claims_count'] ?? 0);
-            $unpaidClaimsSum = (float) ($metrics['unpaid_claims_sum'] ?? 0);
+            $pendingOvertime = (int) ($metrics['pending_overtime'] ?? 0);
+            $draftPayroll = (int) ($metrics['draft_payroll'] ?? 0);
             $activeUsers = (int) ($metrics['active_users'] ?? 0);
         } else {
             $employeeQuery = Employee::accessibleBy();
@@ -46,9 +46,8 @@ class BankStatsOverview extends BaseWidget
             $attendanceToday = Attendance::accessibleBy()->whereDate('date', now())->count();
             $totalBranches = Branch::where('is_active', true)->count();
 
-            $unpaidClaimsQuery = Reimbursement::accessibleBy()->whereIn('status', ['Pending', 'Approved_Pincab']);
-            $unpaidClaimsCount = $unpaidClaimsQuery->count();
-            $unpaidClaimsSum = (float) $unpaidClaimsQuery->sum('amount');
+            $pendingOvertime = Overtime::accessibleBy()->where('status', 'Pending')->count();
+            $draftPayroll = Payroll::accessibleBy()->where('status', 'Draft')->count();
             $activeUsers = 0;
         }
 
@@ -76,10 +75,10 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-o-clock')
                     ->color('success'),
 
-                Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
-                    ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : 'Tidak ada antrean klaim')
-                    ->descriptionIcon('heroicon-o-receipt-percent')
-                    ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
+                Stat::make('Slip Gaji Draft', "{$draftPayroll} Slip")
+                    ->description($draftPayroll > 0 ? 'Menunggu rilis ke pegawai' : 'Semua slip telah dirilis')
+                    ->descriptionIcon('heroicon-o-banknotes')
+                    ->color($draftPayroll > 0 ? 'warning' : 'gray'),
             ];
         }
 
@@ -103,10 +102,10 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-o-pencil-square')
                     ->color($pendingDireksi > 0 ? 'danger' : 'gray'),
 
-                Stat::make('Beban Klaim Operasional', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
-                    ->description("{$unpaidClaimsCount} klaim aktif dalam proses")
-                    ->descriptionIcon('heroicon-o-banknotes')
-                    ->color('warning'),
+                Stat::make('Pengajuan Lembur', "{$pendingOvertime} Berkas")
+                    ->description($pendingOvertime > 0 ? 'Menunggu persetujuan lembur' : 'Tidak ada lembur pending')
+                    ->descriptionIcon('heroicon-o-fire')
+                    ->color($pendingOvertime > 0 ? 'warning' : 'gray'),
 
                 Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                     ->description('Kantor Pusat & Kantor Cabang')
@@ -141,10 +140,10 @@ class BankStatsOverview extends BaseWidget
                     ->descriptionIcon('heroicon-o-briefcase')
                     ->color($newApplicants > 0 ? 'primary' : 'gray'),
 
-                Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
-                    ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim pending / siap cair" : 'Tidak ada antrean klaim')
-                    ->descriptionIcon('heroicon-o-receipt-percent')
-                    ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
+                Stat::make('Slip Gaji Draft', "{$draftPayroll} Slip")
+                    ->description($draftPayroll > 0 ? 'Menunggu rilis ke pegawai' : 'Semua slip telah dirilis')
+                    ->descriptionIcon('heroicon-o-banknotes')
+                    ->color($draftPayroll > 0 ? 'warning' : 'gray'),
             ];
         }
 
@@ -193,7 +192,7 @@ class BankStatsOverview extends BaseWidget
             $branchEmployeesCount = Employee::where('branch_id', $userBranchId)->where('status', 'Active')->count();
             $branchAttendanceToday = Attendance::where('branch_id', $userBranchId)->whereDate('date', now())->count();
             $branchPendingLeaves = LeaveRequest::accessibleBy()->where('status', 'Pending')->count();
-            $branchPendingClaims = Reimbursement::accessibleBy()->where('status', 'Pending')->count();
+            $branchPendingOvertimes = Overtime::accessibleBy()->where('status', 'Pending')->count();
 
             return [
                 Stat::make('Pegawai Cabang Aktif', "{$branchEmployeesCount} Pegawai")
@@ -212,11 +211,11 @@ class BankStatsOverview extends BaseWidget
                     ->color($branchPendingLeaves > 0 ? 'warning' : 'gray')
                     ->url('/admin/leave-requests'),
 
-                Stat::make('Klaim Reimbursement Cabang', "{$branchPendingClaims} Berkas")
-                    ->description($branchPendingClaims > 0 ? 'Menunggu persetujuan Pincab' : 'Semua klaim diproses')
-                    ->descriptionIcon('heroicon-o-receipt-percent')
-                    ->color($branchPendingClaims > 0 ? 'warning' : 'gray')
-                    ->url('/admin/reimbursements'),
+                Stat::make('Pengajuan Lembur Cabang', "{$branchPendingOvertimes} Berkas")
+                    ->description($branchPendingOvertimes > 0 ? 'Menunggu persetujuan' : 'Semua lembur diproses')
+                    ->descriptionIcon('heroicon-o-fire')
+                    ->color($branchPendingOvertimes > 0 ? 'warning' : 'gray')
+                    ->url('/admin/overtimes'),
             ];
         }
 
@@ -239,10 +238,10 @@ class BankStatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-o-document-text')
                 ->color($pendingLeaves > 0 ? 'warning' : 'gray'),
 
-            Stat::make('Klaim Reimbursement Aktif', 'Rp ' . number_format($unpaidClaimsSum, 0, ',', '.'))
-                ->description($unpaidClaimsCount > 0 ? "{$unpaidClaimsCount} klaim diajukan" : 'Tidak ada klaim pending')
-                ->descriptionIcon('heroicon-o-receipt-percent')
-                ->color($unpaidClaimsCount > 0 ? 'warning' : 'gray'),
+            Stat::make('Slip Gaji Draft', "{$draftPayroll} Slip")
+                ->description($draftPayroll > 0 ? 'Menunggu rilis ke pegawai' : 'Semua slip telah dirilis')
+                ->descriptionIcon('heroicon-o-banknotes')
+                ->color($draftPayroll > 0 ? 'warning' : 'gray'),
 
             Stat::make('Jaringan Kantor BPR', "{$totalBranches} Kantor")
                 ->description('Kantor Pusat, Cabang & Kas')

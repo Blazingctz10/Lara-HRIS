@@ -17,15 +17,27 @@ class LeaveRequestObserver
     {
         try {
             $employeeName = $leaveRequest->employee?->full_name ?? $leaveRequest->employee?->user?->name ?? 'Pegawai';
-            $leaveTypeName = $leaveRequest->leaveType?->name ?? 'Cuti';
-            
-            // Penerima notifikasi: seluruh HR Admin & Super Admin
-            $recipients = \App\Models\User::whereIn('role', ['hr_admin', 'super_admin'])->get();
+            $leaveTypeName = $leaveRequest->leave_type_display;
+            $divisionLabel = $leaveRequest->division_category_label;
+
+            // Penerima notifikasi: Leader Divisi terkait + HR Admin & Super Admin
+            $recipients = \App\Models\User::where(function ($q) use ($leaveRequest) {
+                $q->whereIn('role', ['hr_admin', 'super_admin'])
+                    ->orWhere(function ($lq) use ($leaveRequest) {
+                        $lq->where('role', 'division_leader')
+                            ->where(function ($sq) use ($leaveRequest) {
+                                $sq->whereNull('division_scope')->orWhere('division_scope', $leaveRequest->division_category);
+                            });
+                    });
+                if ($leaveRequest->division_category === 'cabang') {
+                    $q->orWhere('role', 'branch_manager');
+                }
+            })->get();
 
             if ($recipients->isNotEmpty()) {
                 \Filament\Notifications\Notification::make()
                     ->title('Pengajuan Cuti Baru')
-                    ->body("{$employeeName} mengajukan {$leaveTypeName} ({$leaveRequest->total_days} hari kerja). Menunggu verifikasi berkas.")
+                    ->body("{$employeeName} ({$divisionLabel}) mengajukan {$leaveTypeName} ({$leaveRequest->total_days} hari kerja). Menunggu TTD Leader Divisi.")
                     ->icon('heroicon-o-document-text')
                     ->iconColor('warning')
                     ->actions([
@@ -61,15 +73,15 @@ class LeaveRequestObserver
             $isFinalApproved = in_array($newStatus, $finalStatuses);
             $wasFinalApproved = in_array($originalStatus, $finalStatuses);
 
-            // Notifikasi ke Direksi ketika status berubah menjadi Approved_HR (siap otorisasi final)
-            if ($newStatus === 'Approved_HR') {
+            // Notifikasi ke Direksi ketika status berubah menjadi Approved_Leader / Approved_HR (siap TTD Direksi & ACC)
+            if (in_array($newStatus, ['Approved_Leader', 'Approved_HR'], true)) {
                 try {
                     $direksiUsers = \App\Models\User::where('role', 'direksi')->get();
                     if ($direksiUsers->isNotEmpty()) {
                         $empName = $leaveRequest->employee?->full_name ?? $leaveRequest->employee?->user?->name ?? 'Pegawai';
                         \Filament\Notifications\Notification::make()
-                            ->title('Otorisasi Final Cuti Direksi')
-                            ->body("Pengajuan cuti {$empName} telah diverifikasi HRD dan menunggu persetujuan akhir Direksi.")
+                            ->title('Menunggu TTD Direksi (ACC Cuti)')
+                            ->body("Pengajuan cuti {$empName} ({$leaveRequest->division_category_label}) telah ditandatangani Leader Divisi dan menunggu TTD Direksi.")
                             ->icon('heroicon-o-check-badge')
                             ->iconColor('primary')
                             ->actions([

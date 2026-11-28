@@ -10,7 +10,6 @@ use App\Models\JobApplicant;
 use App\Models\LeaveRequest;
 use App\Models\Overtime;
 use App\Models\Payroll;
-use App\Models\Reimbursement;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
@@ -53,12 +52,8 @@ class HrisDashboardCacheService
         $activeBranches = Branch::where('is_active', true)->count();
         $attendanceToday = Attendance::whereDate('date', today())->count();
 
-        $unpaidClaimsQuery = Reimbursement::whereIn('status', ['Pending', 'Approved_Pincab']);
-        $unpaidClaimsCount = (clone $unpaidClaimsQuery)->count();
-        $unpaidClaimsSum = (float) (clone $unpaidClaimsQuery)->sum('amount');
-
         $pendingHrLeaves = LeaveRequest::where('status', 'Pending')->count();
-        $pendingDireksiLeaves = LeaveRequest::where('status', 'Approved_HR')->count();
+        $pendingDireksiLeaves = LeaveRequest::whereIn('status', ['Approved_Leader', 'Approved_HR'])->count();
         $pendingOvertime = Overtime::where('status', 'Pending')->count();
         $draftPayroll = Payroll::where('status', 'Draft')->count();
         $newApplicants = JobApplicant::whereIn('status', ['Applied', 'Baru'])->count();
@@ -70,8 +65,6 @@ class HrisDashboardCacheService
             'active_users' => $activeUsers,
             'active_branches' => $activeBranches,
             'attendance_today' => $attendanceToday,
-            'unpaid_claims_count' => $unpaidClaimsCount,
-            'unpaid_claims_sum' => $unpaidClaimsSum,
             'pending_hr_leaves' => $pendingHrLeaves,
             'pending_direksi_leaves' => $pendingDireksiLeaves,
             'pending_overtime' => $pendingOvertime,

@@ -203,16 +203,6 @@
                     @endif
                 </a>
 
-                <a href="{{ url('/admin/reimbursements') }}" title="Klaim Reimbursement Pending" class="m3-shortcut-chip {{ $unpaidClaimsCount > 0 ? 'm3-chip-amber' : 'm3-chip-neutral' }}">
-                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
-                    </svg>
-                    <span>Klaim Belum Dicairkan</span>
-                    @if($unpaidClaimsCount > 0)
-                        <span class="m3-chip-count" style="background: #F37A20; color: #ffffff;">{{ $unpaidClaimsCount }}</span>
-                    @endif
-                </a>
-
             @elseif($role === 'compliance')
                 {{-- Petugas Kepatuhan / Compliance Shortcuts --}}
                 <a href="{{ url('/admin/compliance-policies') }}" title="Kelola Kebijakan Kepatuhan & SOP Bank" class="m3-shortcut-chip m3-chip-emerald">
@@ -262,16 +252,6 @@
                     <span>Mutasi & SK Karir</span>
                 </a>
 
-                <a href="{{ url('/admin/reimbursements') }}" title="Monitoring Pengajuan Reimbursement Bank" class="m3-shortcut-chip {{ $unpaidClaimsCount > 0 ? 'm3-chip-amber' : 'm3-chip-neutral' }}">
-                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
-                    </svg>
-                    <span>Monitoring Klaim</span>
-                    @if($unpaidClaimsCount > 0)
-                        <span class="m3-chip-count" style="background: #F37A20; color: #ffffff;">{{ $unpaidClaimsCount }}</span>
-                    @endif
-                </a>
-
                 <a href="{{ url('/admin/announcements/create') }}" title="Terbitkan Surat Edaran / Memo Direksi" class="m3-shortcut-chip m3-chip-neutral">
                     <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.75 3c-1.47 0-2.882.265-4.185.75M19.175 4.125l.417.834a3.75 3.75 0 0 1 0 3.352l-.417.834" />
@@ -300,16 +280,6 @@
                     <span>{{ $role === 'direksi' ? 'Otorisasi Cuti' : 'Verifikasi Cuti' }}</span>
                     @if($pendingLeaveCount > 0)
                         <span class="m3-chip-count" style="background: #0E6838; color: #ffffff;">{{ $pendingLeaveCount }}</span>
-                    @endif
-                </a>
-
-                <a href="{{ url('/admin/reimbursements') }}" title="Klaim Reimbursement yang Belum Dicairkan / Pending" class="m3-shortcut-chip {{ $unpaidClaimsCount > 0 ? 'm3-chip-amber' : 'm3-chip-neutral' }}">
-                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 14px; height: 14px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v8.25m0 0h.75A.75.75 0 0 1 3 15v.75m0 0v.75m0-1.5h16.5m0-9H3.75m16.5 0v.75A.75.75 0 0 1 21 6h.75m0 0v8.25m0 0h-.75a.75.75 0 0 1-.75-.75V15m0 0v.75m0-1.5a45.083 45.083 0 0 1-16.5 0m16.5 0a45.083 45.083 0 0 0-16.5 0" />
-                    </svg>
-                    <span>Klaim Belum Dicairkan</span>
-                    @if($unpaidClaimsCount > 0)
-                        <span class="m3-chip-count" style="background: #F37A20; color: #ffffff;">{{ $unpaidClaimsCount }}</span>
                     @endif
                 </a>
 

@@ -95,7 +95,7 @@ class BackupData extends Page
             ->size('lg')
             ->requiresConfirmation()
             ->modalHeading('Konfirmasi Cadangan Lengkap Sistem')
-            ->modalDescription('Sistem akan mengarsipkan database SQLite, seluruh berkas lampiran resmi (foto profil, kuitansi reimbursement, surat sakit, formulir cuti, dokumen SK), serta snapshot data JSON terpadu ke dalam satu file ZIP.')
+            ->modalDescription('Sistem akan mengarsipkan database SQLite, seluruh berkas lampiran resmi (foto profil, surat sakit, formulir cuti, dokumen SK), serta snapshot data JSON terpadu ke dalam satu file ZIP.')
             ->modalSubmitActionLabel('Ya, Mulai Cadangkan Lengkap')
             ->modalCancelActionLabel('Batal')
             ->action(function () {

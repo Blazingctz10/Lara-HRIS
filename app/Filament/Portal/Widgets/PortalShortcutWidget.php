@@ -2,7 +2,6 @@
 
 namespace App\Filament\Portal\Widgets;
 
-use App\Models\Reimbursement;
 use Filament\Widgets\Widget;
 
 class PortalShortcutWidget extends Widget
@@ -17,17 +16,6 @@ class PortalShortcutWidget extends Widget
 
     public function getData(): array
     {
-        $employee = auth()->user()?->employee;
-        $unpaidReimbursements = $employee
-            ? Reimbursement::where('employee_id', $employee->id)->where('status', 'Approved_Pincab')->get()
-            : collect();
-
-        $unpaidCount = $unpaidReimbursements->count();
-        $unpaidSum = (float) $unpaidReimbursements->sum('amount');
-
-        return [
-            'unpaidCount' => $unpaidCount,
-            'unpaidSum' => $unpaidSum,
-        ];
+        return [];
     }
 }

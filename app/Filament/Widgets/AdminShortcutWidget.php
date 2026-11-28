@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\JobApplicant;
 use App\Models\LeaveRequest;
-use App\Models\Reimbursement;
 use Filament\Widgets\Widget;
 
 class AdminShortcutWidget extends Widget
@@ -32,7 +31,6 @@ class AdminShortcutWidget extends Widget
 
             return [
                 'role' => $role,
-                'unpaidClaimsCount' => (int) ($metrics['unpaid_claims_count'] ?? 0),
                 'pendingLeaveCount' => match ($role) {
                     'direksi' => (int) ($metrics['pending_direksi_leaves'] ?? 0),
                     'hr_admin' => (int) ($metrics['pending_hr_leaves'] ?? 0),
@@ -45,10 +43,6 @@ class AdminShortcutWidget extends Widget
                 'draftPayrollCount' => (int) ($metrics['draft_payroll'] ?? 0),
             ];
         }
-
-        $unpaidClaimsCount = Reimbursement::accessibleBy()
-            ->whereIn('status', ['Pending', 'Approved_Pincab'])
-            ->count();
 
         $pendingLeaveCount = match ($role) {
             'direksi' => LeaveRequest::accessibleBy()->where('status', 'Approved_HR')->count(),
@@ -68,7 +62,6 @@ class AdminShortcutWidget extends Widget
 
         return [
             'role' => $role,
-            'unpaidClaimsCount' => $unpaidClaimsCount,
             'pendingLeaveCount' => $pendingLeaveCount,
             'newApplicantsCount' => $newApplicantsCount,
             'totalUsersCount' => $totalUsersCount,

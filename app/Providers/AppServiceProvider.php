@@ -79,7 +79,6 @@ class AppServiceProvider extends ServiceProvider
         foreach ([
             \App\Models\Overtime::class,
             \App\Models\LeaveRequest::class,
-            \App\Models\Reimbursement::class,
             \App\Models\Payroll::class,
             \App\Models\JobApplicant::class,
             \App\Models\Employee::class,

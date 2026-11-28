@@ -48,7 +48,7 @@ class PayrollForm
                     ]),
 
                 Section::make('Rincian Pendapatan (Earnings)')
-                    ->description('Gaji pokok, tunjangan resmi perbankan, lembur dan reimbursement')
+                    ->description('Gaji pokok, tunjangan resmi perbankan, dan lembur (sesuai data Excel HR)')
                     ->schema([
                         Grid::make(3)->schema([
                             TextInput::make('basic_salary')
@@ -89,15 +89,6 @@ class PayrollForm
 
                             TextInput::make('overtime_pay')
                                 ->label('Uang Lembur (Rp)')
-                                ->prefix('Rp')
-                                ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
-                                ->stripCharacters('.')
-                                ->formatStateUsing(fn ($state) => $state !== null ? number_format((float) $state, 0, ',', '.') : '0')
-                                ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) str_replace('.', '', (string) $state) : 0)
-                                ->default(0),
-
-                            TextInput::make('reimbursement_pay')
-                                ->label('Pencairan Reimburse (Rp)')
                                 ->prefix('Rp')
                                 ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
                                 ->stripCharacters('.')

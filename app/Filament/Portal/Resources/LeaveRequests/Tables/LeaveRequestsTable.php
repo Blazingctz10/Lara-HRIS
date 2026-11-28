@@ -20,10 +20,15 @@ class LeaveRequestsTable
                     ->date('d M Y')
                     ->sortable(),
 
-                TextColumn::make('leaveType.name')
-                    ->label('Jenis Cuti')
+                TextColumn::make('division_category_label')
+                    ->label('Bagian / Divisi')
                     ->badge()
-                    ->color('primary'),
+                    ->color('gray'),
+
+                TextColumn::make('leave_type_display')
+                    ->label('Jenis / Keterangan Cuti')
+                    ->wrap()
+                    ->weight('semibold'),
 
                 TextColumn::make('start_date')
                     ->label('Mulai')
@@ -35,9 +40,9 @@ class LeaveRequestsTable
                     ->date('d M Y'),
 
                 TextColumn::make('total_days')
-                    ->label('Hari Dipotong')
-                    ->formatStateUsing(fn ($state) => "-{$state} Hari")
-                    ->color('danger')
+                    ->label('Durasi')
+                    ->formatStateUsing(fn ($state) => "{$state} Hari")
+                    ->color('primary')
                     ->alignCenter()
                     ->weight('bold'),
 
@@ -53,18 +58,19 @@ class LeaveRequestsTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris' => 'success',
-                        'Approved_HR' => 'primary',
+                        'Approved_Leader', 'Approved_HR' => 'primary',
                         'Pending', 'Pending_Komisaris' => 'warning',
                         'Rejected' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
-                        'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
+                        'Approved_Direksi' => 'ACC Direksi (Disetujui)',
+                        'Approved_Leader' => 'TTD Leader -> Menunggu TTD Direksi',
+                        'Approved_HRD' => 'Disetujui SDM',
+                        'Approved_Komisaris' => 'Disetujui Dewan Komisaris',
                         'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
-                        'Approved_HR' => 'Diverifikasi SDM (Menunggu Otorisasi Direksi)',
-                        'Pending' => 'Menunggu Verifikasi SDM',
+                        'Approved_HR' => 'Menunggu TTD Direksi',
+                        'Pending' => 'Menunggu TTD Leader Divisi',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),

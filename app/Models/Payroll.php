@@ -20,7 +20,6 @@ class Payroll extends Model
         'transport_allowance',
         'meal_allowance',
         'overtime_pay',
-        'reimbursement_pay',
         'allowances',
         'deductions',
         'bpjs_tk_deduction',
@@ -45,7 +44,6 @@ class Payroll extends Model
         'transport_allowance' => 'decimal:2',
         'meal_allowance' => 'decimal:2',
         'overtime_pay' => 'decimal:2',
-        'reimbursement_pay' => 'decimal:2',
         'allowances' => 'decimal:2',
         'deductions' => 'decimal:2',
         'bpjs_tk_deduction' => 'decimal:2',
@@ -94,7 +92,7 @@ class Payroll extends Model
      */
     public function getTotalEarningsAttribute(): float
     {
-        return (float) ($this->basic_salary + $this->position_allowance + $this->transport_allowance + $this->meal_allowance + $this->overtime_pay + $this->reimbursement_pay);
+        return (float) ($this->basic_salary + $this->position_allowance + $this->transport_allowance + $this->meal_allowance + $this->overtime_pay);
     }
 
     /**

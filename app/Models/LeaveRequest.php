@@ -14,6 +14,8 @@ class LeaveRequest extends Model
     protected $fillable = [
         'employee_id',
         'leave_type_id',
+        'leave_type_custom',
+        'division_category',
         'start_date',
         'end_date',
         'total_days',
@@ -23,6 +25,12 @@ class LeaveRequest extends Model
         'attachment_url',
         'status',
         'approved_by',
+        'approved_leader_by',
+        'leader_signed_at',
+        'leader_signature_name',
+        'direksi_signed_at',
+        'direksi_signature_name',
+        'acc_at',
         'approved_hrd_by',
         'approved_komisaris_by',
         'rejection_reason',
@@ -35,6 +43,9 @@ class LeaveRequest extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'total_days' => 'integer',
+            'leader_signed_at' => 'datetime',
+            'direksi_signed_at' => 'datetime',
+            'acc_at' => 'datetime',
         ];
     }
 
@@ -61,6 +72,59 @@ class LeaveRequest extends Model
     public function approverKomisaris(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_komisaris_by');
+    }
+
+    public function approverLeader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_leader_by');
+    }
+
+    public static function divisionCategoryOptions(): array
+    {
+        return [
+            'operasional' => 'Div. Operasional',
+            'kredit_support' => 'Div. Kredit Support',
+            'bisnis' => 'Manager Bisnis',
+            'cabang' => 'Bagian Cabang',
+        ];
+    }
+
+    public static function resolveDivisionCategory(?Employee $employee): string
+    {
+        if (! $employee) {
+            return 'operasional';
+        }
+
+        $branchName = mb_strtolower((string) ($employee->branch?->name ?? ''));
+        if ($branchName !== '' && ! str_contains($branchName, 'pusat')) {
+            return 'cabang';
+        }
+
+        $deptCode = mb_strtoupper((string) ($employee->department?->code ?? ''));
+        $deptName = mb_strtolower((string) ($employee->department?->name ?? ''));
+        $posName = mb_strtolower((string) ($employee->position?->name ?? ''));
+
+        if ($deptCode === 'LEG01' || str_contains($posName, 'support') || str_contains($posName, 'admin kredit') || str_contains($deptName, 'legal')) {
+            return 'kredit_support';
+        }
+
+        if ($deptCode === 'BKP01' || str_contains($deptName, 'bisnis') || str_contains($posName, 'bisnis') || str_contains($posName, 'marketing') || str_contains($posName, 'ao')) {
+            return 'bisnis';
+        }
+
+        return 'operasional';
+    }
+
+    public function getDivisionCategoryLabelAttribute(): string
+    {
+        return self::divisionCategoryOptions()[$this->division_category] ?? 'Div. Operasional';
+    }
+
+    public function getLeaveTypeDisplayAttribute(): string
+    {
+        return filled($this->leave_type_custom)
+            ? (string) $this->leave_type_custom
+            : ($this->leaveType?->name ?? 'Pengajuan Cuti');
     }
 
     /**
@@ -93,6 +157,14 @@ class LeaveRequest extends Model
         }
 
         if ($user->isHrAdmin()) {
+            return $query;
+        }
+
+        if ($user->isDivisionLeader()) {
+            if ($user->division_scope) {
+                return $query->where('division_category', $user->division_scope);
+            }
+
             return $query;
         }
 

@@ -43,11 +43,15 @@ class LeaveRequestsTable
                     ->color('info')
                     ->searchable(),
 
-                TextColumn::make('leaveType.name')
-                    ->label('Jenis Cuti')
+                TextColumn::make('division_category_label')
+                    ->label('Bagian / Divisi')
                     ->badge()
-                    ->color('primary')
-                    ->searchable(),
+                    ->color('gray'),
+
+                TextColumn::make('leave_type_display')
+                    ->label('Jenis / Keterangan Cuti')
+                    ->wrap()
+                    ->weight('semibold'),
 
                 TextColumn::make('start_date')
                     ->label('Mulai')
@@ -69,18 +73,19 @@ class LeaveRequestsTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Approved_Direksi', 'Approved_HRD', 'Approved_Komisaris' => 'success',
-                        'Approved_HR' => 'primary',
+                        'Approved_Leader', 'Approved_HR' => 'primary',
                         'Pending', 'Pending_Komisaris' => 'warning',
                         'Rejected' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
-                        'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
+                        'Approved_Direksi' => 'ACC Direksi (Disetujui)',
+                        'Approved_Leader' => 'TTD Leader -> Menunggu TTD Direksi',
+                        'Approved_HRD' => 'Disetujui SDM',
+                        'Approved_Komisaris' => 'Disetujui Dewan Komisaris',
                         'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
-                        'Approved_HR' => 'Menunggu Otorisasi Direksi',
-                        'Pending' => 'Menunggu Verifikasi SDM',
+                        'Approved_HR' => 'Menunggu TTD Direksi',
+                        'Pending' => 'Menunggu TTD Leader Divisi',
                         'Rejected' => 'Ditolak',
                         default => $state,
                     }),
@@ -101,17 +106,14 @@ class LeaveRequestsTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'Pending' => 'Menunggu Verifikasi SDM',
-                        'Approved_HR' => 'Menunggu Otorisasi Direksi',
-                        'Approved_Direksi' => 'Disetujui Direksi (Final)',
-                        'Approved_HRD' => 'Disetujui SDM (Final Cuti Direksi ≤ 2 Hari)',
-                        'Pending_Komisaris' => 'Menunggu Dewan Komisaris',
-                        'Approved_Komisaris' => 'Disetujui Dewan Komisaris (Final)',
+                        'Pending' => 'Menunggu TTD Leader Divisi',
+                        'Approved_Leader' => 'TTD Leader -> Menunggu TTD Direksi',
+                        'Approved_Direksi' => 'ACC Direksi (Disetujui)',
                         'Rejected' => 'Ditolak',
                     ]),
-                SelectFilter::make('leave_type_id')
-                    ->relationship('leaveType', 'name')
-                    ->label('Jenis Cuti'),
+                SelectFilter::make('division_category')
+                    ->label('Bagian / Divisi')
+                    ->options(LeaveRequest::divisionCategoryOptions()),
                 SelectFilter::make('gender')
                     ->label('Jenis Kelamin Pegawai')
                     ->options([
@@ -138,55 +140,78 @@ class LeaveRequestsTable
                     ->modalCancelActionLabel('Tutup')
                     ->modalContent(fn (LeaveRequest $record) => view('filament.modals.leave-request-detail', ['record' => $record])),
 
-                // 1. Verifikasi HR untuk Karyawan Regular
-                Action::make('approve_hr')
-                    ->label('Verifikasi HR')
-                    ->icon('heroicon-o-document-check')
+                // 1. TTD Leader Divisi Masing-Masing (Operasional, Kredit Support, Manager Bisnis, Cabang)
+                Action::make('approve_leader')
+                    ->label('TTD Leader Divisi')
+                    ->icon('heroicon-o-pencil-square')
                     ->color('primary')
                     ->button()
-                    ->visible(fn (LeaveRequest $record) => ! $record->isDireksiRequest() && $record->status === 'Pending' && (auth()->user()->isHrAdmin() && !auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
+                    ->visible(function (LeaveRequest $record): bool {
+                        if ($record->status !== 'Pending') {
+                            return false;
+                        }
+                        $user = auth()->user();
+                        if (! $user) {
+                            return false;
+                        }
+                        if ($user->isSuperAdmin() || $user->role === 'hr_admin') {
+                            return true;
+                        }
+                        if ($user->isDivisionLeader()) {
+                            return ! $user->division_scope || $user->division_scope === $record->division_category;
+                        }
+                        if ($user->isBranchManager()) {
+                            return $record->division_category === 'cabang';
+                        }
+
+                        return false;
+                    })
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Verifikasi Berkas Cuti (HR)')
-                    ->modalDescription(fn (LeaveRequest $record) => "Verifikasi kelayakan berkas cuti untuk pegawai {$record->employee->user->name} sebelum diteruskan ke Direksi untuk persetujuan akhir.")
-                    ->modalSubmitActionLabel('Ya, Verifikasi Berkas')
+                    ->modalHeading('Konfirmasi TTD Leader Divisi')
+                    ->modalDescription(fn (LeaveRequest $record) => "Tandatangani pengajuan cuti {$record->employee->full_name} ({$record->division_category_label}) sebelum diteruskan ke Direksi untuk ACC.")
+                    ->modalSubmitActionLabel('Ya, TTD & Teruskan ke Direksi')
                     ->modalCancelActionLabel('Batal')
-                    ->modalIcon('heroicon-o-document-check')
+                    ->modalIcon('heroicon-o-pencil-square')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
-                            'status' => 'Approved_HR',
-                            'approved_by' => auth()->id(),
-                            'approved_hrd_by' => auth()->id(),
+                            'status' => 'Approved_Leader',
+                            'approved_leader_by' => auth()->id(),
+                            'leader_signed_at' => now(),
+                            'leader_signature_name' => auth()->user()?->name,
                         ]);
 
                         Notification::make()
-                            ->title('Pengajuan cuti berhasil diverifikasi HR')
-                            ->body('Status diteruskan ke Direksi untuk otorisasi final.')
+                            ->title('TTD Leader Divisi Tercatat')
+                            ->body('Pengajuan cuti diteruskan ke Direksi untuk TTD & ACC final.')
                             ->success()
                             ->send();
                     }),
 
-                // 2. Approval Direksi untuk Karyawan Regular
+                // 2. TTD Direksi & ACC Final
                 Action::make('approve_direksi')
-                    ->label('Approval Direksi (Final)')
+                    ->label('TTD Direksi (ACC)')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->button()
-                    ->visible(fn (LeaveRequest $record) => ! $record->isDireksiRequest() && $record->status === 'Approved_HR' && (auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Approved_Leader', 'Approved_HR'], true) && (auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Persetujuan Final Cuti oleh Direksi')
-                    ->modalDescription(fn (LeaveRequest $record) => "Persetujuan Direksi adalah otorisasi final yang secara resmi mengesahkan permohonan cuti {$record->employee->user->name} selama {$record->total_days} hari kerja dan memotong saldo cuti secara otomatis. Lanjutkan?")
-                    ->modalSubmitActionLabel('Ya, Setujui Direksi (Final)')
+                    ->modalHeading('Konfirmasi TTD Direksi & ACC Cuti')
+                    ->modalDescription(fn (LeaveRequest $record) => "Tandatangani & ACC pengajuan cuti {$record->employee->full_name} ({$record->total_days} hari kerja)? Status akan langsung dikirim ke pegawai.")
+                    ->modalSubmitActionLabel('Ya, TTD Direksi & ACC')
                     ->modalCancelActionLabel('Batal')
                     ->modalIcon('heroicon-o-check-badge')
                     ->action(function (LeaveRequest $record) {
                         $record->update([
                             'status' => 'Approved_Direksi',
                             'approved_by' => auth()->id(),
+                            'direksi_signed_at' => now(),
+                            'direksi_signature_name' => auth()->user()?->name,
+                            'acc_at' => now(),
                         ]);
 
                         Notification::make()
-                            ->title('Pengajuan cuti disetujui Final oleh Direksi')
-                            ->body('Saldo cuti pegawai telah dipotong dan log presensi disinkronkan.')
+                            ->title('Cuti Telah di-ACC Direksi')
+                            ->body('Notifikasi persetujuan telah dikirim ke pegawai dan presensi disinkronkan.')
                             ->success()
                             ->send();
                     }),
@@ -275,7 +300,7 @@ class LeaveRequestsTable
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->button()
-                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_HR', 'Pending_Komisaris']) && (auth()->user()->isHrAdmin() || auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
+                    ->visible(fn (LeaveRequest $record) => in_array($record->status, ['Pending', 'Approved_Leader', 'Approved_HR', 'Pending_Komisaris']) && (auth()->user()->isDivisionLeader() || auth()->user()->isBranchManager() || auth()->user()->isHrAdmin() || auth()->user()->isDireksi() || auth()->user()->isSuperAdmin()))
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Penolakan Pengajuan Cuti')
                     ->modalDescription('Mohon isi alasan penolakan sebelum memproses pembatalan pengajuan cuti ini.')

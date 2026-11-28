@@ -6,7 +6,6 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Overtime;
 use App\Models\Payroll;
-use App\Models\Reimbursement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -50,13 +49,7 @@ class PayrollCalculationService
         $hourlyRate = round($basicSalary / 173, 2);
         $overtimePay = round($totalOvertimeHours * $hourlyRate * 1.5, 2);
 
-        // 3. Hitung Reimbursement yang sudah disetujui dan belum dicairkan untuk dibayarkan bersama payroll
-        $reimbursements = Reimbursement::where('employee_id', $employee->id)
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
-            ->where('status', 'Approved_Pincab')
-            ->get();
-        $reimbursementPay = (float) $reimbursements->sum('amount');
+        $reimbursementPay = 0.0;
 
         // 4. Hitung Denda Keterlambatan Presensi (Late Penalty)
         // Standar BPR: gunakan kolom penalty_amount aktual (fallback Rp 50.000 per keterlambatan tanpa dispensasi)

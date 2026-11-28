@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\LeaveRequests\Schemas;
 
 use App\Models\Employee;
-use App\Models\EmployeeLeaveBalance;
+use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -24,7 +24,7 @@ class LeaveRequestForm
         return $schema
             ->components([
                 Section::make('Formulir Permohonan Cuti Resmi - PT BPR Banda Raya')
-                    ->description('Pencatatan permohonan cuti, verifikasi kuota personalia (HRD & GA), dan otorisasi bertingkat.')
+                    ->description('Pencatatan cuti bebas teks tanpa pelimitan kuota. Alur: Karyawan -> Bagian/Divisi -> TTD Leader Divisi -> TTD Direksi -> ACC.')
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('employee_id')
@@ -33,53 +33,30 @@ class LeaveRequestForm
                                 ->searchable()
                                 ->preload()
                                 ->required()
-                                ->live(),
+                                ->live()
+                                ->afterStateUpdated(function ($state, Set $set): void {
+                                    $emp = $state ? Employee::with(['branch', 'department', 'position'])->find($state) : null;
+                                    $set('division_category', LeaveRequest::resolveDivisionCategory($emp));
+                                }),
+
+                            Select::make('division_category')
+                                ->label('Bagian / Divisi')
+                                ->options(LeaveRequest::divisionCategoryOptions())
+                                ->default('operasional')
+                                ->required(),
+
+                            TextInput::make('leave_type_custom')
+                                ->label('Jenis / Keterangan Cuti (Teks Bebas)')
+                                ->placeholder('Contoh: Cuti Tahunan / Izin Keluarga / Sakit')
+                                ->required()
+                                ->maxLength(150),
 
                             Select::make('leave_type_id')
-                                ->relationship('leaveType', 'name', function ($query, Get $get) {
-                                    $query->where('is_active', true);
-                                    $empId = $get('employee_id');
-                                    if ($empId) {
-                                        $emp = Employee::find($empId);
-                                        $query->forEmployeeGender($emp?->gender);
-                                    }
-                                })
-                                ->label('Jenis Cuti')
+                                ->relationship('leaveType', 'name')
+                                ->label('Kategori Referensi (Opsional)')
+                                ->default(fn () => LeaveType::query()->value('id'))
                                 ->searchable()
-                                ->preload()
-                                ->required()
-                                ->live()
-                                ->helperText(function (Get $get) {
-                                    $leaveTypeId = $get('leave_type_id');
-                                    $empId = $get('employee_id');
-                                    if ($leaveTypeId && $empId) {
-                                        $type = LeaveType::find($leaveTypeId);
-                                        $emp = Employee::find($empId);
-                                        $balance = EmployeeLeaveBalance::where('employee_id', $empId)
-                                            ->where('leave_type_id', $leaveTypeId)
-                                            ->where('year', now()->year)
-                                            ->first();
-
-                                        $info = 'Sisa Kuota: ' . ($balance ? $balance->remaining_quota : ($type->default_days ?? 0)) . ' Hari Kerja.';
-                                        if ($type && $type->max_consecutive_days) {
-                                            $info .= " (Maks. {$type->max_consecutive_days} hari berturut-turut)";
-                                        }
-                                        if ($type && $type->code === 'LONG_LEAVE') {
-                                            $joinDate = $emp?->join_date ? \Carbon\Carbon::parse($emp->join_date) : null;
-                                            $years = $joinDate ? (int) $joinDate->diffInYears(now()) : 0;
-                                            if ($years < 5) {
-                                                $info .= " ⚠️ Cuti Besar hanya berhak untuk masa kerja min. 5 tahun (Masa kerja saat ini: {$years} tahun).";
-                                            } else {
-                                                $info .= " ✅ Memenuhi syarat Cuti Besar (Masa kerja: {$years} tahun, durasi: 6 HK).";
-                                            }
-                                        }
-                                        if ($emp && $emp->user?->role === 'direksi') {
-                                            $info .= " [Status Pemohon: Direksi - Cuti <= 2 hari di-ACC HRD, > 2 hari ke Dewan Komisaris]";
-                                        }
-                                        return $info;
-                                    }
-                                    return null;
-                                }),
+                                ->preload(),
 
                             DatePicker::make('start_date')
                                 ->label('Dari Tanggal')
@@ -100,43 +77,15 @@ class LeaveRequestForm
                                 ->numeric()
                                 ->required()
                                 ->minValue(1)
-                                ->helperText('Dihitung otomatis: Senin s/d Sabtu hari kerja (hanya Minggu yang tidak dihitung)')
-                                ->rules([
-                                    fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                        $leaveTypeId = $get('leave_type_id');
-                                        if ($leaveTypeId) {
-                                            $type = LeaveType::find($leaveTypeId);
-                                            if ($type && $type->min_consecutive_days && $value < $type->min_consecutive_days) {
-                                                $fail("Jenis cuti {$type->name} mewajibkan minimal {$type->min_consecutive_days} hari kerja berturut-turut sesuai regulasi OJK.");
-                                            }
-                                            if ($type && $type->max_consecutive_days && $value > $type->max_consecutive_days) {
-                                                $fail("Jenis cuti {$type->name} maksimal {$type->max_consecutive_days} hari kerja berturut-turut per pengajuan untuk menjamin kelancaran operasional bank.");
-                                            }
-                                            if ($type && $type->code === 'LONG_LEAVE') {
-                                                $empId = $get('employee_id');
-                                                $emp = Employee::find($empId);
-                                                $joinDate = $emp?->join_date ? \Carbon\Carbon::parse($emp->join_date) : null;
-                                                $years = $joinDate ? (int) $joinDate->diffInYears(now()) : 0;
-                                                if ($years < 5) {
-                                                    $fail("Cuti Besar hanya dapat diajukan oleh pegawai dengan masa kerja minimal 5 tahun di PT BPR Banda Raya. Masa kerja saat ini: {$years} tahun.");
-                                                }
-                                                if ($value > 6) {
-                                                    $fail("Durasi Cuti Besar maksimal adalah 6 hari kerja.");
-                                                }
-                                            }
-                                        }
-                                    },
-                                ]),
+                                ->helperText('Dihitung otomatis: Senin s/d Sabtu hari kerja (tanpa batas maksimal).'),
 
                             Select::make('status')
                                 ->label('Status Persetujuan / Otorisasi')
                                 ->options([
-                                    'Pending' => 'Pending (Menunggu Verifikasi HR)',
-                                    'Approved_HR' => 'Approved HR (Menunggu Otorisasi Direksi)',
-                                    'Approved_Direksi' => 'Approved Direksi (Disetujui Final)',
-                                    'Approved_HRD' => 'Approved HRD (Disetujui Final - Khusus Cuti Direksi <= 2 Hari)',
-                                    'Approved_Komisaris' => 'Approved Komisaris (Disetujui Final - Cuti Direksi > 2 Hari)',
-                                    'Rejected' => 'Rejected (Ditolak)',
+                                    'Pending' => 'Menunggu TTD Leader Divisi',
+                                    'Approved_Leader' => 'TTD Leader Divisi -> Menunggu TTD Direksi',
+                                    'Approved_Direksi' => 'TTD Direksi (ACC Final)',
+                                    'Rejected' => 'Ditolak',
                                 ])
                                 ->default('Pending')
                                 ->required(),

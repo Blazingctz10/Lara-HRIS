@@ -4,16 +4,19 @@ namespace App\Filament\Resources\Payrolls\Pages;
 
 use App\Filament\Resources\Payrolls\PayrollResource;
 use App\Models\Payroll;
-use App\Services\PayrollCalculationService;
+use App\Services\PayrollExcelService;
 use App\Support\BprExcelExport;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Grid;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ListPayrolls extends ListRecords
@@ -27,9 +30,9 @@ class ListPayrolls extends ListRecords
                 ->label('Unduh Rekap Payroll (Excel)')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('info')
-                ->modalHeading('Unduh Laporan Rekapitulasi Payroll (.xls)')
-                ->modalDescription('Ekspor rekap slip gaji pegawai lengkap dengan tunjangan, lembur, reimbursement, potongan BPJS/PPh 21, denda keterlambatan, dan Take-Home Pay.')
-                ->modalSubmitActionLabel('Unduh Excel (.xls)')
+                ->modalHeading('Unduh Laporan Rekapitulasi Payroll (.xlsx)')
+                ->modalDescription('Ekspor rekap slip gaji pegawai lengkap dengan tunjangan, lembur, potongan BPJS/PPh 21, denda keterlambatan, dan Take-Home Pay.')
+                ->modalSubmitActionLabel('Unduh Excel (.xlsx)')
                 ->form([
                     Grid::make(3)->schema([
                         Select::make('month')
@@ -88,7 +91,7 @@ class ListPayrolls extends ListRecords
                     foreach ($records as $idx => $p) {
                         $emp = $p->employee;
                         $fixedAllowance = (float) $p->position_allowance + (float) $p->transport_allowance + (float) $p->meal_allowance;
-                        $extras = (float) $p->overtime_pay + (float) $p->reimbursement_pay;
+                        $extras = (float) $p->overtime_pay;
                         $totalDeductions = (float) $p->bpjs_tk_deduction + (float) $p->bpjs_kes_deduction + (float) $p->pph21_deduction + (float) $p->late_penalty_deduction;
                         $rekening = $emp?->bank_bpr_account ?: ($emp?->bank_account_number ?: '-');
 
@@ -139,7 +142,7 @@ class ListPayrolls extends ListRecords
                             ['label' => 'Unit Kantor'],
                             ['label' => 'Gaji Pokok'],
                             ['label' => 'Tunjangan'],
-                            ['label' => 'Lembur & Reimburse'],
+                            ['label' => 'Uang Lembur'],
                             ['label' => 'Total Potongan (BPJS & PPh21)'],
                             ['label' => 'Take-Home Pay (Netto)'],
                             ['label' => 'No. Rekening BPR'],
@@ -151,14 +154,11 @@ class ListPayrolls extends ListRecords
                     );
                 }),
 
-            Action::make('generate_batch')
-                ->label('Hitung Otomatis Seluruh Pegawai')
-                ->icon('heroicon-o-calculator')
-                ->color('success')
+            Action::make('download_payroll_template')
+                ->label('Template Excel Payroll')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
                 ->visible(fn (): bool => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
-                ->modalHeading('Kalkulasi Otomatis Gaji Seluruh Pegawai')
-                ->modalDescription('Sistem Payroll Engine akan menghitung otomatis Gaji Pokok, Tunjangan Jabatan, Lembur (Approved), Pencairan Reimburse, Denda Telat Presensi, BPJS TK/Kes, dan PPh 21 TER untuk periode yang dipilih.')
-                ->modalSubmitActionLabel('Mulai Hitung Otomatis')
                 ->form([
                     Grid::make(2)->schema([
                         Select::make('month')
@@ -179,23 +179,106 @@ class ListPayrolls extends ListRecords
                             ->required(),
                     ]),
                 ])
-                ->action(function (array $data) {
-                    $service = app(PayrollCalculationService::class);
-                    $result = $service->generateBatchPayroll((int) $data['month'], (int) $data['year']);
+                ->action(fn (array $data): StreamedResponse => app(PayrollExcelService::class)->downloadTemplate((int) $data['month'], (int) $data['year'])),
 
-                    if ($result['success']) {
-                        Notification::make()
-                            ->title('Kalkulasi Gaji Selesai')
-                            ->body($result['message'])
-                            ->success()
-                            ->send();
-                    } else {
-                        Notification::make()
-                            ->title('Kalkulasi Gaji Gagal')
-                            ->body($result['message'])
-                            ->danger()
-                            ->send();
-                    }
+            Action::make('import_payroll_excel')
+                ->label('Import Payroll (Excel)')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('success')
+                ->visible(fn (): bool => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
+                ->modalHeading('Import Hasil Hitungan Payroll dari Excel HR')
+                ->modalDescription('Unggah file Excel (.xlsx / .xls / .csv) hasil perhitungan HR. Sistem akan langsung menyimpan rincian slip gaji tanpa menghitung ulang, lalu mendistribusikannya ke Portal Pegawai.')
+                ->modalSubmitActionLabel('Proses & Simpan Slip Gaji')
+                ->form([
+                    Grid::make(2)->schema([
+                        Select::make('month')
+                            ->label('Bulan Periode')
+                            ->options([
+                                1 => '01 - Januari', 2 => '02 - Februari', 3 => '03 - Maret',
+                                4 => '04 - April', 5 => '05 - Mei', 6 => '06 - Juni',
+                                7 => '07 - Juli', 8 => '08 - Agustus', 9 => '09 - September',
+                                10 => '10 - Oktober', 11 => '11 - November', 12 => '12 - Desember',
+                            ])
+                            ->default((int) date('m'))
+                            ->required(),
+
+                        TextInput::make('year')
+                            ->label('Tahun Periode')
+                            ->numeric()
+                            ->default((int) date('Y'))
+                            ->required(),
+                    ]),
+
+                    FileUpload::make('excel_file')
+                        ->label('File Excel Payroll (.xlsx / .xls / .csv)')
+                        ->disk('local')
+                        ->directory('payroll-imports')
+                        ->acceptedFileTypes([
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'application/vnd.ms-excel',
+                            'text/csv',
+                            'text/plain',
+                        ])
+                        ->required(),
+
+                    Toggle::make('publish_immediately')
+                        ->label('Langsung Rilis ke Portal Pegawai (Status Paid)')
+                        ->helperText('Jika aktif, slip gaji langsung dapat dilihat dan dicetak oleh masing-masing pegawai di Portal.')
+                        ->default(false),
+                ])
+                ->action(function (array $data): void {
+                    $path = Storage::disk('local')->path($data['excel_file']);
+                    $result = app(PayrollExcelService::class)->importFromExcel(
+                        $path,
+                        (int) $data['month'],
+                        (int) $data['year'],
+                        (bool) ($data['publish_immediately'] ?? false)
+                    );
+
+                    Storage::disk('local')->delete($data['excel_file']);
+
+                    Notification::make()
+                        ->title($result['success'] ? 'Import Payroll Berhasil' : 'Import Payroll Gagal')
+                        ->body($result['message'])
+                        ->{$result['success'] ? 'success' : 'danger'}()
+                        ->send();
+                }),
+
+            Action::make('release_all_drafts')
+                ->label('Rilis Semua Slip Draft')
+                ->icon('heroicon-o-paper-airplane')
+                ->color('warning')
+                ->visible(fn (): bool => in_array(auth()->user()?->role, ['super_admin', 'hr_admin']))
+                ->requiresConfirmation()
+                ->modalHeading('Rilis & Distribusikan Semua Slip Gaji Draft')
+                ->modalDescription('Seluruh slip gaji berstatus Draft pada periode yang dipilih akan diubah menjadi Paid sehingga langsung muncul di Portal masing-masing pegawai.')
+                ->form([
+                    Grid::make(2)->schema([
+                        Select::make('month')
+                            ->label('Bulan Periode')
+                            ->options([
+                                1 => '01 - Januari', 2 => '02 - Februari', 3 => '03 - Maret',
+                                4 => '04 - April', 5 => '05 - Mei', 6 => '06 - Juni',
+                                7 => '07 - Juli', 8 => '08 - Agustus', 9 => '09 - September',
+                                10 => '10 - Oktober', 11 => '11 - November', 12 => '12 - Desember',
+                            ])
+                            ->default((int) date('m'))
+                            ->required(),
+
+                        TextInput::make('year')
+                            ->label('Tahun Periode')
+                            ->numeric()
+                            ->default((int) date('Y'))
+                            ->required(),
+                    ]),
+                ])
+                ->action(function (array $data): void {
+                    $released = app(PayrollExcelService::class)->releasePeriod((int) $data['month'], (int) $data['year']);
+                    Notification::make()
+                        ->title('Distribusi Slip Gaji Selesai')
+                        ->body("{$released} slip gaji berhasil dirilis ke Portal Pegawai.")
+                        ->success()
+                        ->send();
                 }),
 
             CreateAction::make()
