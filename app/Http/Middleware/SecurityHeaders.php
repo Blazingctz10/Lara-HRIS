@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
@@ -13,6 +14,10 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->getHost()) {
+            URL::forceRootUrl($request->getSchemeAndHttpHost());
+        }
+
         // Remove X-Powered-By if set by PHP runtime
         if (function_exists('header_remove') && ! headers_sent()) {
             header_remove('X-Powered-By');

@@ -62,6 +62,13 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
+        if (! $this->app->runningInConsole()) {
+            $request = request();
+            if ($request && $request->getHost()) {
+                \Illuminate\Support\Facades\URL::forceRootUrl($request->getSchemeAndHttpHost());
+            }
+        }
+
         Employee::observe(EmployeeObserver::class);
         LeaveRequest::observe(LeaveRequestObserver::class);
 
