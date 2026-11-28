@@ -60,8 +60,7 @@ class AdminShortcutWidget extends Widget
         $newApplicantsCount = JobApplicant::where('status', 'Baru')
             ->count();
 
-        $totalUsersCount = \App\Models\User::where('is_active', true)
-            ->where(fn ($q) => $q->whereDoesntHave('employee')->orWhereHas('employee', fn ($eq) => $eq->whereNotIn('status', ['Resigned', 'Terminated'])))
+        $totalUsersCount = \App\Models\User::whereDoesntHave('employee', fn ($eq) => $eq->whereIn('status', ['Resigned', 'Terminated']))
             ->count();
         $dispensationCount = \App\Models\AttendanceDispensation::count();
         $overtimePendingCount = \App\Models\Overtime::accessibleBy()->where('status', 'Pending')->count();

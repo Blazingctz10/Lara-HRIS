@@ -72,6 +72,26 @@ class AppServiceProvider extends ServiceProvider
         Employee::observe(EmployeeObserver::class);
         LeaveRequest::observe(LeaveRequestObserver::class);
 
+        $invalidateDashboardCache = static function (): void {
+            app(\App\Services\HrisDashboardCacheService::class)->invalidate();
+        };
+
+        foreach ([
+            \App\Models\Overtime::class,
+            \App\Models\LeaveRequest::class,
+            \App\Models\Reimbursement::class,
+            \App\Models\Payroll::class,
+            \App\Models\JobApplicant::class,
+            \App\Models\Employee::class,
+            \App\Models\Attendance::class,
+            \App\Models\AttendanceDispensation::class,
+            \App\Models\Branch::class,
+            \App\Models\User::class,
+        ] as $trackedModel) {
+            $trackedModel::saved($invalidateDashboardCache);
+            $trackedModel::deleted($invalidateDashboardCache);
+        }
+
         // Enterprise Password Security Policy: Minimum 8 characters with letters & numbers
         Password::defaults(function () {
             return Password::min(8)

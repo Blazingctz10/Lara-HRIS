@@ -116,4 +116,16 @@ class HrisDashboardCacheService
 
         return $this->warmAll();
     }
+
+    /**
+     * Hapus cache & snapshot agar metrik dihitung ulang saat ada perubahan data.
+     */
+    public function invalidate(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+        $path = $this->getSnapshotPath();
+        if (File::exists($path)) {
+            File::delete($path);
+        }
+    }
 }
