@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') &bull; Core HRIS PT BPR Banda Raya</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-bpr-vertical.png') }}">
 
     <script>
         (function () {
@@ -346,8 +346,7 @@
     <div class="m3-error-card" data-variant="@yield('variant', 'danger')">
         <div class="m3-topbar">
             <div>
-                <img src="{{ asset('images/logo-horizontal-dark.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img m3-logo-dark">
-                <img src="{{ asset('images/logo-horizontal-light.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img m3-logo-light">
+                <img src="{{ asset('images/logo-bpr-horizontal.png') }}" alt="PT BPR Banda Raya" class="m3-logo-img" style="background: rgba(255,255,255,0.92); padding: 4px 10px; border-radius: 8px;">
             </div>
             <div>
                 <span class="m3-code-pill">

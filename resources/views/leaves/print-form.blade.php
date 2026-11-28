@@ -192,7 +192,7 @@
         <table class="header-table">
             <tr>
                 <td class="header-logo-cell">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo BPR Banda Raya" class="header-logo">
+                    <img src="{{ asset('images/logo-bpr-horizontal.png') }}" alt="Logo BPR Banda Raya" class="header-logo">
                 </td>
                 <td class="header-title-cell">
                     <div class="header-company">BANK PEREKONOMIAN RAKYAT BANDA RAYA</div>

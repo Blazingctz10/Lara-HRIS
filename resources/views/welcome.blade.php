@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Masuk — Core HRIS PT BPR Banda Raya</title>
-<link rel="icon" type="image/png" href="{{ asset('images/logo-tight.png') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/logo-bpr-vertical.png') }}">
 <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
 <meta name="theme-color" content="#0E6838" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="HRIS BPR">
-<link rel="apple-touch-icon" href="{{ asset('images/logo-tight.png') }}">
+<link rel="apple-touch-icon" href="{{ asset('images/logo-bpr-vertical.png') }}">
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
@@ -805,7 +805,7 @@
       <div class="form-center-box">
         <!-- Official Logo -->
         <div class="brand-logo-wrap">
-          <img id="brand-logo" src="{{ asset('images/logo-horizontal-clean.png') }}" alt="PT Bank Perekonomian Rakyat Banda Raya" class="brand-logo-img">
+          <img id="brand-logo" src="{{ asset('images/logo-bpr-horizontal.png') }}" alt="PT Bank Perekonomian Rakyat Banda Raya" class="brand-logo-img" style="background: rgba(255,255,255,0.92); padding: 4px 10px; border-radius: 10px;">
         </div>
 
         <div class="form-header">
@@ -909,8 +909,8 @@
   </div>
 
   <script>
-    const darkLogo = "{{ asset('images/logo-horizontal-dark.png') }}";
-    const lightLogo = "{{ asset('images/logo-horizontal-clean.png') }}";
+    const darkLogo = "{{ asset('images/logo-bpr-horizontal.png') }}";
+    const lightLogo = "{{ asset('images/logo-bpr-horizontal.png') }}";
 
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);

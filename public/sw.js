@@ -4,13 +4,12 @@
    NEVER caches authenticated HR/payroll/admin HTML or Livewire payloads.
    ============================================================================= */
 
-const CACHE_NAME = 'bpr-hris-static-v1';
+const CACHE_NAME = 'bpr-hris-static-v2';
 const STATIC_ASSETS = [
     '/offline.html',
     '/css/bento-theme.css',
-    '/images/logo-tight.png',
-    '/images/logo-horizontal-clean.png',
-    '/images/logo-horizontal-dark.png',
+    '/images/logo-bpr-vertical.png',
+    '/images/logo-bpr-horizontal.png',
 ];
 
 self.addEventListener('install', (event) => {
