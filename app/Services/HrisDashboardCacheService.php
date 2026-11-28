@@ -31,7 +31,11 @@ class HrisDashboardCacheService
 
     public function getSnapshotPath(): string
     {
-        return $this->getCacheDir() . DIRECTORY_SEPARATOR . 'dashboard_metrics.json';
+        $filename = app()->runningUnitTests()
+            ? 'dashboard_metrics_testing.json'
+            : 'dashboard_metrics.json';
+
+        return $this->getCacheDir() . DIRECTORY_SEPARATOR . $filename;
     }
 
     /**
@@ -43,8 +47,7 @@ class HrisDashboardCacheService
 
         $activeEmployees = Employee::where('status', 'Active')->count();
         $totalEmployees = Employee::count();
-        $activeUsers = User::where('is_active', true)
-            ->where(fn ($q) => $q->whereDoesntHave('employee')->orWhereHas('employee', fn ($eq) => $eq->whereNotIn('status', ['Resigned', 'Terminated'])))
+        $activeUsers = User::whereDoesntHave('employee', fn ($eq) => $eq->whereIn('status', ['Resigned', 'Terminated']))
             ->count();
 
         $activeBranches = Branch::where('is_active', true)->count();
